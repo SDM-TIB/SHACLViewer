@@ -1130,7 +1130,8 @@
                     updateGraph();
                 }
 
-                openRightNav('info', node)
+                {#openRightNav('info', node)#}
+                viewNodeInfo(node)
 
                 highlightNode(node)
             }
@@ -1759,7 +1760,7 @@
 
             let isRightNavOpen = false;
 
-            function openRightNav(selectedTab, node) {
+            function openRightNav(selectedTab) {
                 isRightNavOpen = true;
                 document.getElementById("myRightSidenav").classList.remove("closeRightNav");
                 document.getElementById("rightTabs").classList.add("tabs-openRightNav");
@@ -1772,7 +1773,7 @@
                         document.getElementById('infoMenu').classList.remove('disable')
                         document.getElementById('nodeChecklist').classList.add('disable')
 
-                        if (node) viewNodeInfo(node)
+                        {#if (node) viewNodeInfo(node)#}
                         break;
 
                     case 'shape':
