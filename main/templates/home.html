@@ -25,6 +25,10 @@
             margin: 1% 1% 1% 0%;
         }
 
+        .card.folder {
+            width: 23%;
+        }
+
         .card a {
             text-decoration: none;
         }
@@ -43,6 +47,14 @@
             text-decoration: none;
             display: block;
         }
+
+        .container > p {
+            padding-left: 35px;
+        }
+
+        .icon {
+            padding: 10px;
+        }
     </style>
 {% endblock %}
 
@@ -54,14 +66,25 @@
     <div class="main">
         <h2>SHACL Network List</h2>
         {% for item in data %}
-            <div class="card">
-                <a href="{{ request.url }}/graph3d?path={{ item.name }}">
-                    <div class="container">
-                        <h4><b>{{ item.name }}</b></h4>
-                        <p>Number of shapes: {{ item.filecount }}</p>
-                    </div>
-                </a>
-            </div>
+            {% if item.isNetwork %}
+                <div class="card">
+                    <a href="/graph3d?path={{ item.dir }}">
+                        <div class="container">
+                            <h4><i class="fas fa-project-diagram icon"></i><b>{{ item.name }}</b></h4>
+                            <p>Number of shapes: {{ item.filecount }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% else %}
+                <div class="card folder">
+                    <a href="/?path={{ item.dir }}">
+                        <div class="container">
+                            <h4><i class="fa fa-solid fa-folder icon"></i><b>{{ item.name }}</b></h4>
+                            <p>Folders inside: {{ item.filecount }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}
