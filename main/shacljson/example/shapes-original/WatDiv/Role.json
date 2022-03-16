@@ -1,0 +1,45 @@
+{
+  "name": "Role",
+  "targetDef": {
+    "query": "SELECT ?x WHERE { ?x a <http://db.uwaterloo.ca/~galuc/wsdbm/Role> }",
+    "class": "<http://db.uwaterloo.ca/~galuc/wsdbm/Role>"
+  },
+  "constraintDef": {
+    "conjunctions": [
+      [
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/follows>", "min": "2", "shape": "Role" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/follows>", "max": "100" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/friendOf>", "min": "3", "shape": "Role" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/friendOf>", "max": "164" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/gender>", "min": "1" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/gender>", "max": "1" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/likes>", "min": "3", "shape": "ProductCategory" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/likes>", "max": "18" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/makesPurchase>", "min": "3" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/makesPurchase>", "max": "15" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/subscribes>", "min": "2" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/subscribes>", "max": "12" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/userId>", "min": "1" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/userId>", "max": "1" },
+        { "path": "<http://purl.org/dc/terms/Location>", "min": "1" },
+        { "path": "<http://purl.org/dc/terms/Location>", "max": "1" },
+        { "path": "<http://schema.org/birthDate>", "min": "1" },
+        { "path": "<http://schema.org/birthDate>", "max": "1" },
+        { "path": "<http://schema.org/email>", "min": "1" },
+        { "path": "<http://schema.org/jobTitle>", "min": "1" },
+        { "path": "<http://schema.org/jobTitle>", "max": "1" },
+        { "path": "<http://schema.org/nationality>", "min": "1" },
+        { "path": "<http://schema.org/nationality>", "max": "1" },
+        { "path": "<http://schema.org/telephone>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/age>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/age>", "max": "1" },
+        { "path": "<http://xmlns.com/foaf/familyName>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/familyName>", "max": "1" },
+        { "path": "<http://xmlns.com/foaf/givenName>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/givenName>", "max": "1" },
+        { "path": "<http://xmlns.com/foaf/homepage>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/homepage>", "max": "1" }
+      ]
+    ]
+  }
+}

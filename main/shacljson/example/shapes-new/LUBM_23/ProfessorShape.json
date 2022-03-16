@@ -1,0 +1,57 @@
+{
+    "name": "ProfessorShape",
+    "targetDef": {
+        "class": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#Professor",
+        "query": "SELECT ?x WHERE { ?x a <http://swat.cse.lehigh.edu/onto/univ-bench.owl#Professor> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#degreeFrom>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#doctoralDegreeFrom>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#mastersDegreeFrom>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#name>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#researchInterest>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#teacherOf>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#undergraduateDegreeFrom>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#worksFor>",
+                    "min": 1
+                }
+            ]
+        ]
+    }
+}

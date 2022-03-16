@@ -1,0 +1,17 @@
+{
+    "name": "OntologyShape",
+    "targetDef": {
+        "class": "http://www.w3.org/2002/07/owl#Ontology",
+        "query": "SELECT ?x WHERE { ?x a <http://www.w3.org/2002/07/owl#Ontology> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://www.w3.org/2002/07/owl#imports>",
+                    "min": 1
+                }
+            ]
+        ]
+    }
+}

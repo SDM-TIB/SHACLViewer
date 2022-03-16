@@ -1,0 +1,67 @@
+{% extends 'basemain.html' %}
+
+{% block headbase %}
+    <style>
+        .main {
+            padding: 10px;
+        }
+    </style>
+    <style>
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            width: 48%;
+            background: var(--sidenav-background-inactive);
+            display: inline-flex;
+            margin: 1% 1% 1% 0%;
+        }
+
+        .card [data-theme="light"] {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            width: 48%;
+            background: var(--accordion-btn);
+            display: inline-flex;
+            margin: 1% 1% 1% 0%;
+        }
+
+        .card a {
+            text-decoration: none;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover [data-theme="light"] {
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            padding: 20px 16px 2px 16px;
+            color: var(--sidenav-text);
+            text-decoration: none;
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    <title>Home Page</title>
+{% endblock %}
+
+{% block body %}
+    <div class="main">
+        <h2>SHACL Network List</h2>
+        {% for item in data %}
+            <div class="card">
+                <a href="{{ request.url }}/graph3d?path={{ item.name }}">
+                    <div class="container">
+                        <h4><b>{{ item.name }}</b></h4>
+                        <p>Number of shapes: {{ item.filecount }}</p>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,1856 @@
+{% include 'basemain.html' %}
+{% block headbase %}
+    {# alert #}
+    <style>
+        #flash {
+            position: absolute;
+        }
+
+        .alert {
+            z-index: 1;
+            margin-left: 50vw;
+            transform: translateX(-50%);
+        }
+
+        .alert > button > span {
+            padding-left: 1rem;
+        }
+    </style>
+    {# navigation panels #}
+    <style>
+        .icon.bi::before, .icon.fa::before {
+            padding: 4px;
+        }
+
+        .navbar {
+            z-index: 3;
+        }
+
+        .option-btn {
+            cursor: pointer;
+            position: absolute;
+            z-index: 2;
+            padding: 1em;
+        }
+
+        #rightTabs {
+            position: absolute;
+            z-index: 2;
+            right: 0;
+            transition: 0.5s;
+            display: flex;
+            writing-mode: vertical-lr;
+        }
+
+        .right-tab-btn {
+            margin-bottom: 20px;
+            cursor: pointer;
+            background-color: var(--sidenav-background-inactive);
+            padding: 10px;
+            flex: 1;
+            transition: 0.5s;
+            transform: rotate(180deg);
+        }
+
+        .selected {
+            background-color: var(--sidenav-background);
+            box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.16);
+        }
+
+        .closeLeftNav {
+            transform: translateX(-285px);
+        }
+
+        .closeRightNav {
+            transform: translateX(400px);
+        }
+
+        .tabs-openRightNav {
+            transform: translateX(-400px);
+        }
+
+        /* The side navigation menu */
+        .sidenav {
+            height: calc(100vh - 50px); /* 100% Full-height - 50px navigation bar*/
+            width: 0; /* 0 width - change this with JavaScript */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Stay on top */
+            top: 0; /* Stay at the top */
+            background-color: var(--sidenav-background);; /* Black*/
+            overflow-x: hidden; /* Disable horizontal scroll */
+            margin-top: 56px; /* Place content 60px from the top */
+            transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+            box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
+        }
+
+        .leftnav {
+            padding-top: 50px;
+            left: 0;
+            width: 285px;
+        }
+
+        .rightnav {
+            right: 0;
+            width: 400px;
+            padding: 10px 10px 0px 10px;
+        }
+
+        .option-icon {
+            padding-right: 5px;
+            width: 20px;
+        }
+
+        /* The navigation menu links */
+        .sidenav a, .sidenav p {
+            padding: 8px 8px 8px 16px;
+            text-decoration: none;
+        {#color: #818181;#} color: var(--sidenav-text);
+            display: block;
+            transition: 0.3s;
+            margin-bottom: 0px;
+        }
+
+        /* When you mouse over the navigation links, change their color */
+        .sidenav a:hover {
+            color: var(--sidenav-text-hover);
+        }
+
+        /* Position and style the close button (top right corner) */
+        .sidenav .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+        #main {
+            transition: margin-left .5s;
+        {#padding: 20 px;#}
+        }
+
+        /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+        @media screen and (max-height: 450px) {
+            .sidenav {
+                padding-top: 15px;
+            }
+
+            .sidenav a {
+                font-size: 18px;
+            }
+        }
+    </style>
+    {#treeview#}
+    <style>
+
+        .list-group-item {
+            color: var(--sidenav-text);
+            background: transparent;
+            border: 0;
+        }
+
+        .list-group-item-action:focus, .list-group-item-action:hover {
+            z-index: 1;
+            color: var(--search-input);
+            text-decoration: none;
+            background-color: var(--accordion-btn);
+        }
+
+    </style>
+    {# search bar #}
+    <style>
+
+        .wrapper {
+            /* max-width: 450px; */
+            /* margin: 150px auto; */
+            padding: 0px 16px 16px 16px;
+        }
+
+        .wrapper .search-input {
+            background: transparent;
+            width: 100%;
+            border-radius: 2px;
+            position: relative;
+            /* box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12); */
+        }
+
+        .search-input input {
+            height: 40px;
+            background: transparent;
+            color: var(--search-input);
+            width: 100%;
+            outline: none;
+            border: solid var(--search-border);
+            border-width: 0 0 1px 0;
+            border-radius: 2px;
+            padding: 0 40px 0 5px;
+            /* font-size: 18px; */
+            /* box-shadow: 0px 1px 5px rgb(0 0 0 / 10%); */
+        }
+
+        .search-input.active input {
+            border-radius: 5px 5px 0 0;
+        }
+
+        .search-input .autocom-box {
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            max-height: 280px;
+            overflow-y: auto;
+            visibility: hidden;
+        }
+
+        .search-input.active .autocom-box {
+            padding: 10px 8px;
+            background: var(--search-sugg-background);
+            opacity: 1;
+            pointer-events: auto;
+            /* border: 1px solid white; */
+            border-radius: 0 0 3px 3px;
+            position: absolute;
+            width: 100%;
+            visibility: visible;
+            z-index: 1;
+        }
+
+        .autocom-box li {
+            list-style: none;
+            padding: 8px 12px;
+            display: none;
+            width: 100%;
+            cursor: default;
+            border-radius: 3px;
+            color: var(--search-sugg-text)
+        }
+
+        .search-input.active .autocom-box li {
+            display: block;
+        }
+
+        .autocom-box li:hover {
+            background: var(--search-sugg-background-hover);
+        }
+
+        .search-input .icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 40px;
+            width: 40px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 20px;
+            color: var(--sidenav-text);
+            cursor: pointer;
+        }
+    </style>
+    {# loader #}
+    <style>
+        #loader.loader {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 1;
+            width: 120px;
+            height: 120px;
+            margin: -76px 0 0 -76px;
+            border: 16px solid var(--loader-background);
+            border-radius: 50%;
+            border-top: 16px solid var(--accent-color);
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    {# range slider style #}
+    <style>
+        .slider-container output {
+            vertical-align: super;
+        }
+
+        input[type='range'] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        input[type='range']:focus {
+            outline: none;
+        }
+
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none;
+        }
+
+        input[type='range']::-moz-range-thumb {
+            border: none;
+        }
+
+        .range-style {
+            width: 170px;
+            padding: 8px 8px 8px 16px;
+            background: transparent;
+            border-radius: 10px;
+        }
+
+        .range-style::-webkit-slider-runnable-track {
+            display: flex;
+            align-items: center;
+            height: 8px;
+            border-radius: 10px;
+            background: var(--slider-off);
+        }
+
+        .range-style::-webkit-slider-thumb {
+            position: relative;
+            top: -50%;
+            width: 20px;
+            height: 20px;
+            background-color: var(--slider-circle);
+        {#background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.8), transparent);// 3D effect#} border-radius: 50%;
+            box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
+        }
+
+        .range-style::-moz-range-track {
+            display: flex;
+            align-items: center;
+            height: 20px;
+            border-radius: 10px;
+            box-shadow: inset -2px -2px 8px white, inset 2px 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .range-style::-moz-range-thumb {
+            position: relative;
+            top: -50%;
+            width: 40px;
+            height: 40px;
+            background-color: #e0e0e0;
+            background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50%;
+            box-shadow: -1px -1px 2px white, 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+    </style>
+    {# accordion #}
+    <style>
+        .accordion {
+            background-color: var(--accordion-btn);
+            color: var(--sidenav-text);
+            cursor: pointer;
+            padding: 8px 8px 8px 16px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+
+        .accordion:hover {
+            background-color: var(--accordion-btn-hover);
+        }
+
+        .accordion:after {
+            content: '\002B';
+            color: var(--sidenav-text);
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
+
+        .active.accordion:after {
+            content: "\2212";
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: var(--accordion-background);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+    </style>
+    {# checklist #}
+    <style>
+
+        #nodeChecklist.disable, #infoMenu.disable {
+            display: none;
+        }
+
+        /* Remove margins and padding from the list */
+        #nodeChecklist > ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Style the list items */
+        #nodeChecklist ul li {
+            cursor: pointer;
+            position: relative;
+            padding: 12px 8px 12px 40px;
+            list-style-type: none;
+            font-size: 18px;
+            transition: 0.2s;
+            color: var(--sidenav-text);
+            /* make the list items unselectable */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Darker background-color on hover */
+        #nodeChecklist ul li:hover {
+            background: var(--search-sugg-background-hover);
+        }
+
+        /* When clicked on, add a background color and strike out text */
+        #nodeChecklist ul li.checked {
+            background: var(--accordion-btn);
+            color: var(--search-input);
+        }
+
+        /* Add a "checked" mark when clicked on */
+        #nodeChecklist ul li.checked::before {
+            content: '';
+            position: absolute;
+            border-color: var(--search-input);
+            border-style: solid;
+            border-width: 0 2px 2px 0;
+            top: 10px;
+            left: 16px;
+            transform: rotate(45deg);
+            height: 15px;
+            width: 7px;
+        }
+
+        /* Style the close button */
+        #nodeChecklist > .close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 12px 16px 12px 16px;
+        }
+
+        {##nodeChecklist > .close:hover {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Style the header */
+        #nodeChecklist > .header {
+            background-color: #f44336;
+            padding: 30px 40px;
+            color: white;
+            text-align: center;
+        }
+
+        /* Clear floats after the header */
+        #nodeChecklist > .header:after {
+            content: "";
+            display: table;
+            clear: both;
+        }#}
+
+        {#
+            /* Style the input */
+            input {
+                margin: 0;
+                border: none;
+                border-radius: 0;
+                width: 75%;
+                padding: 10px;
+                float: left;
+                font-size: 16px;
+            }
+
+            /* Style the "Add" button */
+            .addBtn {
+                padding: 10px;
+                width: 25%;
+                background: #d9d9d9;
+                color: #555;
+                float: left;
+                text-align: center;
+                font-size: 16px;
+                cursor: pointer;
+                transition: 0.3s;
+                border-radius: 0;
+            }
+
+            .addBtn:hover {
+                background-color: #bbb;
+            }#}
+    </style>
+
+    <style> body {
+        margin: 0;
+    } </style>
+
+{#    <script src="//unpkg.com/three"></script>#}
+{#    <script src="//unpkg.com/three/examples/js/renderers/CSS2DRenderer.js"></script>#}
+{#    <script src="//unpkg.com/three-spritetext"></script>#}
+    <script src="./static/js/three/three.js"></script>
+    <script src="./static/js/three/CSS2DRenderer.js"></script>
+    <script src="./static/js/sprite/three-spritetext.js"></script>
+
+    {#   <style>
+        .node-label {
+            font-size: 12px;
+            padding: 1px 4px;
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.5);
+            user-select: none;
+        }
+    </style>#}
+
+    {% block head %}{% endblock %}
+
+{% endblock %}
+
+{#{% block title %}#}
+<title>{{ request.args.get("path") }} Graph</title>
+{#{% endblock %}#}
+
+{% block body %}
+
+    <span id="optionBtn" class="option-btn">&#9776; Options</span>
+    <div id="mySidenav" class="sidenav leftnav closeLeftNav">
+        <div id="search-wrapper" class="wrapper">
+            <div class="search-input">
+                <a href="" target="_blank" hidden></a>
+                <input type="text" placeholder="Search for Shape..">
+                <div class="autocom-box">
+                </div>
+                <div class="icon"><i class="fas fa-search"></i></div>
+            </div>
+        </div>
+        <a href="javascript:void(0)" id="hideUnrelatedClasses"><i class=''></i>Show Selected Shape Only
+            <label class="switch">
+                <input type="checkbox" disabled="disabled">
+                <span class="slider round"></span>
+            </label>
+        </a>
+        <a href="javascript:void(0)" id="highlightSelectedNode"><i class=''></i>Highlight Selected
+            <label class="switch">
+                <input type="checkbox" disabled="disabled" checked="true">
+                <span class="slider round"></span>
+            </label>
+        </a>
+        <a href="javascript:void(0)" id="focusNode"><i class="fas fa-crosshairs option-icon"></i> Focus Selected
+            Shape</a>
+        <a href="javascript:void(0)" id="centerGraph"><i class="fas fa-expand option-icon"></i> Center Graph</a>
+        <a href="javascript:void(0)" id="expandAll"><i class="fa fa-expand-arrows-alt option-icon"
+                                                       aria-hidden="true"></i>
+            Expand All</a>
+        <a href="javascript:void(0)" id="collapseAll"><i class='fas fa-compress-arrows-alt option-icon'></i> Collapse
+            All</a>
+        <a href="javascript:void(0)" id="hideAttributes"><i class=''></i>Hide Intra-Constraints
+            <label class="switch">
+                <input type="checkbox" disabled="disabled">
+                <span class="slider round"></span>
+            </label>
+        </a>
+        <button class="accordion">Links Length</button>
+        <div class="slider-container panel">
+            <p>Shape to Shape link</p>
+            <input type="range" class="range-style" id="class2classLinkSlider" min="0" max="200">
+            <output>150</output>
+            <p>Shape to Intra-Constraint link</p>
+            <input type="range" class="range-style" id="attributeLinkSlider" min="0" max="200">
+            <output>150</output>
+            <p>Shape to Inter-Constraint link</p>
+            <input type="range" class="range-style" id="toConstraintLinkSlider" min="0" max="200">
+            <output>150</output>
+            <p>Inter-Constraint to Shape link</p>
+            <input type="range" class="range-style" id="fromConstraintLinkSlider" min="0" max="200">
+            <output>150</output>
+        </div>
+        {#    <a href="javascript:void(0)" id="shapesDropdown"><i class=''></i>Shapes#}
+        {#        <label class="switch">#}
+        {#            <input type="checkbox" disabled="disabled">#}
+        {#            <span class="slider round"></span>#}
+        {#        </label>#}
+        {#    </a>#}
+        {#        {% block optionMenu %}#}
+        {#        #}
+        {#        {% endblock %}#}
+    </div>
+    <div id="rightTabs">
+        <span id="infoBtn" class="right-tab-btn" onclick="toggleRightNav('info')">Info</span>
+        <span id="shapeBtn" class="right-tab-btn" onclick="toggleRightNav('shapes')">Shapes</span>
+    </div>
+    <div id="myRightSidenav" class="sidenav rightnav closeRightNav">
+        <div id="infoMenu">
+            <button class="accordion active">Meta Data</button>
+            <div class="slider-container panel">
+                <div id="infoStatistic"></div>
+            </div>
+            <button class="accordion active">Constraints</button>
+            <div class="slider-container panel">
+                <div id="infoTree"></div>
+            </div>
+        </div>
+        <div id="nodeChecklist">
+            <ul></ul>
+        </div>
+        {#        {% block infoMenu %}#}
+        {#        #}
+        {#        {% endblock %}#}
+    </div>
+    <div id="main">
+        <div id="3d-graph" style="position: absolute;top: 0;"></div>
+        <div id="loader" class="loader"></div>
+        <script type="module">
+            {#$('#flash').append(flashMessage('graph size => {{ graph|length }}', 'info'));#}
+            {#console.log({{ graph }})#}
+
+            const nodes = [];
+            const GROUPS = 1;
+            const links = [];
+            const none = 'None'
+            {#let local_links_count = 0;#}
+            let currentNode;
+            let selectedNode;
+
+            {#
+            linkType:
+             0: class to class
+             1: class to attribute
+             2: attribute to same class
+             3: class to constraint
+             4: constraint to other class
+             #}
+
+            {% for node in graph %}
+                {# add class node #}
+                currentNode = {
+                    id: '{{ node.id }}',
+                    group: '{{ node.id }}',
+                    text: '{{ node.id }}',
+                    isClass: true,
+                    expanded: false,
+                    isHidden: false,
+                    highlighted: false,
+                    childLinks: [],
+                    parentLinks: []
+                }
+                nodes.push(currentNode);
+
+                {% set same_curv = namespace(value=20) %}
+                {% set same_rot = namespace(value=0) %}
+                {% set link_count = namespace(value=-1) %}
+                {% set curv = namespace(value=0) %}
+                {% set rot = namespace(value=0) %}
+                {% for link in node.get_constraints() %}
+
+
+                    {% set link_node_name = link.path %}
+                    {# set constraint node name with min and max to fix unlinked nodes#}
+                    {#                {% if none != link.min %}#}
+                    {#                    {% set link_node_name = link_node_name ~ ' > ' ~ link.min %}#}
+                    {#                {% endif %}#}
+                    {#                {% if none != link.max %}#}
+                    {#                    {% set link_node_name = link_node_name ~ ' < ' ~ link.max %}#}
+                    {#                {% endif %}#}
+
+
+                    {% set link_count.value = link_count.value + 1 %}
+
+                    {% if none == link.shapeRef %}
+                        {# link goes to the same node #}
+                        {% set same_curv.value = same_curv.value + 2 %}
+                        {% set same_rot.value = same_rot.value + 2 %}
+                        {#local_links_count++; {# debug #}
+                        {# add constraint as node #}
+                        nodes.push({
+                            id: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            group: '{{ node.id }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass: false,
+                            expanded: true,
+                            isHidden: false,
+                            highlighted: false,
+                            childLinks: [],
+                            parentLinks: [],
+                            isAttribute: true
+                        });
+                        links.push({
+                            id: '1|linkOutToConstraint,{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            source: '{{ node.id }}',
+                            target: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass2Class: false,
+                            collapsed: true,
+                            isHidden: false,
+                            highlighted: false,
+                            {#particles: 2,#}
+                            {#curvature: {{ same_curv.value/100 }},#}
+                            {#rotation:{{ same_rot.value/10 }},#}
+                            length: 25,
+                            isAttribute: true,
+                            linkType: 1
+                        });
+                        {#links.push({
+                            id:'linkBackFromConstraint,{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            source: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            target: '{{ node.id }}',
+                            text: '{{ link_node_name }}',
+                            isClass2Class: false,
+                            collapsed: true,
+                            isHidden: false,
+                            highlighted: false,
+                            particles: 2,
+                            curvature: {{ same_curv.value/100 }},
+                            rotation:{{ same_rot.value/10 }},
+                            length: 25,
+                            isAttribute: true,
+                            linkType:2
+                        })#}
+                    {% else %}
+                        {# link goes to another node #}
+                        links.push({
+                            id: '0|{{ link_count.value }}.linkClass:{{ node.id }},toClass:{{ link.shapeRef }}',
+                            source: '{{ node.id }}',
+                            target: '{{ link.shapeRef }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass2Class: true,
+                            collapsed: false,
+                            isHidden: false,
+                            highlighted: false,
+                            particles: 0,
+                            {#curvature: {{ curv.value/10 }},#}
+                            curvature: 0.2,
+                            rotation:{{ rot.value/10 }},
+                            length: 100,
+                            {#rotation:0#}
+                            isAttribute: false,
+                            linkType: 0
+                        })
+
+                        {# add a constraint as a node and connect it both classes #}
+                        nodes.push({
+                            id: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            group: '{{ node.id }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass: false,
+                            expanded: true,
+                            isHidden: false,
+                            highlighted: false,
+                            childLinks: [],
+                            parentLinks: [],
+                            isAttribute: false
+                        });
+                        links.push({
+                            id: '3|linkToConstraintFrom,{{ node.id }},To,{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            source: '{{ node.id }}',
+                            target: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            finalTarget: '{{ link.shapeRef }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass2Class: false,
+                            collapsed: true,
+                            isHidden: false,
+                            highlighted: false,
+                            particles: 2,
+                            {#curvature: {{ curv.value/10 }},#}
+                            {#curvature: 0.2,#}
+                            {#rotation:{{ rot.value/10 }},#}
+                            length: 25,
+                            {#rotation:0#}
+                            isAttribute: false,
+                            linkType: 3
+                        })
+                        links.push({
+                            id: '4|linkFromConstraint,{{ node.id }},{{ link_count.value }}-{{ link.path }},To,{{ link.shapeRef }}',
+                            source: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
+                            target: '{{ link.shapeRef }}',
+                            text: '{{ link_node_name }}',
+                            min: '{{ link.min }}',
+                            max: '{{ link.max }}',
+                            isClass2Class: false,
+                            collapsed: true,
+                            isHidden: false,
+                            highlighted: false,
+                            particles: 2,
+                            {#curvature: {{ curv.value/10 }},#}
+                            {#curvature: 0.2,#}
+                            {#rotation:{{ rot.value/10 }},#}
+                            length: 50,
+                            {#rotation:0#}
+                            isAttribute: false,
+                            linkType: 4
+                        })
+                        {% set curv.value = curv.value + 1 %}
+                        {% set rot.value = rot.value + 12 %}
+                    {% endif %}
+
+                    {#   shapeRef = '{{ link.shapeRef }}'
+                       #}{#console.log(`link.shapeRef= ${shapeRef}`)#}{#
+                       if (shapeRef.localeCompare('None') != 0) {
+                           #}{#console.log(`True`)#}{#
+                           links.push({
+                               source: '{{ node.id }}',
+                               target: shapeRef
+                           })
+                       } else
+                           local_links_count++;
+                       links.push({
+                           source: '{{ node.id }}',
+                           target: '{{ node.id }}'
+                       })
+                       #}{#console.log(`false`)#}{#
+                       #}
+
+                {% endfor %}
+            {% endfor %}
+
+            class Statistics {
+                attributes = 0;
+                constraints = 0;
+                partOff = 0;
+
+                constructor() {
+                }
+            }
+
+            const nodesById = Object.fromEntries(nodes.map(node => [node.id, node]));
+            links.forEach(link => {
+                nodesById[link.source].childLinks.push(link);
+                {#if(nodesById[link.target] === undefined)#}
+                {#    alert('');#}
+                nodesById[link.target].parentLinks.push(link);
+            });
+            const linksById = Object.fromEntries(links.map(link => [link.id, link]));
+            nodes.forEach(node => {
+                const stat = new Statistics();
+                node.childLinks.forEach(link => {
+                    if (link.isClass2Class)
+                        stat.constraints++;
+                    else if (link.isAttribute)
+                        stat.attributes++;
+                })
+                node.parentLinks.forEach(link => {
+                    if (link.isClass2Class)
+                        stat.partOff++;
+                })
+                node.statistics = stat;
+            })
+
+            function updateClassState(node) {
+                {#updateNode3d(node)#}
+
+                {# foreach link to this node show/hide the links to classes and hide/show links to constraint and their links #}
+                node.childLinks.forEach(link => {
+                    {#link.isHidden = false; {# by default show all links that's been hidden by other functions #}
+
+                    if (link.isClass2Class) {
+                        {# if node not expanded => show link to other classes #}
+                        link.collapsed = node.expanded;
+
+                        if (hideUnrelatedClasses) {
+                            link.isHidden = false;
+                        }
+                    } else {  {# links to constraint #}
+                        link.collapsed = !node.expanded;
+                        let constraint = getNodeFromLink(link.target);
+                        constraint.expanded = !node.expanded;
+                        if (!constraint.isClass){# so when clicking on constraint it wont highlight all links of the target node #}
+                            constraint.childLinks.forEach(l => {
+                                l.collapsed = !node.expanded
+
+                                if (hideUnrelatedClasses) { {# show links and constraints of clicked nodes because now they are related #}
+                                    l.isHidden = false;
+                                    let target = getNodeFromLink(l.target);
+                                    target.isHidden = false;
+
+                                    target.childLinks.forEach(cl => { {# show links to already shown nodes #}
+                                        if (cl.isClass2Class) {
+                                            cl.isHidden = getNodeFromLink(cl.target).isHidden
+                                        }
+                                    });
+                                    target.parentLinks.forEach(cl => { {# show links to already shown nodes #}
+                                        if (cl.isClass2Class) {
+                                            cl.isHidden = getNodeFromLink(cl.source).isHidden
+                                        }
+                                    });
+                                }
+                            });
+
+                        if (hideUnrelatedClasses) { {# show links and constraints of clicked nodes because now they are related #}
+                            link.isHidden = false;
+                            constraint.isHidden = false;
+                        }
+
+                        {#if (hideAttributes && link.isAttribute) {
+                            link.isHidden = true;
+                            constraint.isHidden = true;
+                        }#}
+                    }
+                })
+
+                updateGraph();
+            };
+
+            function getNodeFromLink(node) {
+                {# before drawing for the first time the link.target is just a string, after that it will be an object #}
+                let res = ((typeof node) === 'object') ? node : nodesById[node]
+                return res;
+            }
+
+            function highlightNode(node) {
+                if (highlightSelectedNode) {
+                    nodes.forEach(n => n.highlighted = false)
+                    links.forEach(l => l.highlighted = false)
+                    node.highlighted = true;
+                    if (node.isClass) {
+                        node.childLinks.forEach(link => {
+                            link.highlighted = true;
+                            if (!link.isClass2Class) {
+                                let constraintNode = getNodeFromLink(link.target);
+                                constraintNode.highlighted = true;
+                                constraintNode.childLinks.forEach(l => l.highlighted = true)
+                            }
+                        })
+                    } else {
+                        node.childLinks.forEach(link => link.highlighted = true);
+                        node.parentLinks.forEach(link => link.highlighted = true);
+                    }
+
+                    updateNode3d()
+                }
+            }
+
+            let hideAttributes = false;
+
+            function updateGraph() {
+                Graph.graphData(getVisibleLists())
+            }
+
+            function getVisibleLists() {
+                const visibleNodes = [];
+                const visibleLinks = [];
+
+                let enableUpdate = false;
+
+                if (document.getElementById('nodeChecklist').getElementsByTagName('ul')[0].innerHTML != "")
+                    enableUpdate = true;
+
+                nodes.forEach(node => {
+                    // check hideAttributes feature
+                    if (!node.isAttribute || (node.isAttribute && !hideAttributes))
+                        if (!node.isHidden)
+                            if (!node.expanded || node.isClass)
+                                visibleNodes.push(node)
+
+                    // update check list
+                    if (enableUpdate && node.isClass)
+                        if (node.isHidden)
+                            shapeCheckList[node.id].classList.remove('checked');
+                        else
+                            shapeCheckList[node.id].classList.add('checked');
+                });
+                links.forEach(link => {
+                    // check hideAttributes feature
+                    if (!link.isAttribute || (link.isAttribute && !hideAttributes))
+                        if (!link.isHidden && !link.collapsed)
+                            visibleLinks.push(link)
+                });
+
+                updateNode3d();
+                return {nodes: visibleNodes, links: visibleLinks};
+            }
+
+            function debugNode(node) {
+                console.log('debugNode|')
+                console.log(node)
+                {#console.log(JSON.stringify(node.id))#}
+                {#console.log(links.filter(link => link.source.id === node.id || link.target.id === node.id));#}
+            }
+
+            function debugLink(link) {
+                {#return nodes.filter(node => node.id === link.source.id || node.id === link.target.id);#}
+                console.log('debugLink|')
+                console.log(link)
+                {#console.log('source: ' + link.source)#}
+                {#console.log('target: ' + link.target)#}
+            }
+
+            {#        function getNodeShape(node, parameters) {
+                        if (parameters === undefined) parameters = {};
+                        var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
+                        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 58;
+                        var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
+                        var borderColor = parameters.hasOwnProperty("borderColor") ? parameters["borderColor"] : {
+                            r: 255,
+                            g: 0,
+                            b: 0,
+                            a: 1.0
+                        };
+                        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ? parameters["backgroundColor"] : {
+                            r: 255,
+                            g: 255,
+                            b: 255,
+                            a: 1.0
+                        };
+                        var textColor = parameters.hasOwnProperty("textColor") ? parameters["textColor"] : {
+                            r: 0,
+                            g: 0,
+                            b: 0,
+                            a: 1.0
+                        };
+
+                        var canvas = document.createElement('canvas');
+                        var context = canvas.getContext('2d');
+                        context.font = "Bold " + fontsize + "px " + fontface;
+                        var metrics = context.measureText(node.text);
+                        var textWidth = metrics.width;
+
+                        context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+                        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+
+                        context.lineWidth = borderThickness;
+                        roundRect(context, borderThickness / 2, borderThickness / 2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
+
+                        context.fillStyle = "rgba(" + textColor.r + ", " + textColor.g + ", " + textColor.b + ", 1.0)";
+                        context.fillText(node.text, borderThickness, fontsize + borderThickness);
+
+                        var texture = new THREE.Texture(canvas)
+                        texture.needsUpdate = true;
+
+                        var spriteMaterial = new THREE.SpriteMaterial({map: texture, useScreenCoordinates: false});
+                        var sprite = new THREE.Sprite(spriteMaterial);
+                        sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
+                        return sprite;
+                    }
+
+                    function roundRect(ctx, x, y, w, h, r) {
+                        ctx.beginPath();
+                        ctx.moveTo(x + r, y);
+                        ctx.lineTo(x + w - r, y);
+                        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                        ctx.lineTo(x + w, y + h - r);
+                        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                        ctx.lineTo(x + r, y + h);
+                        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                        ctx.lineTo(x, y + r);
+                        ctx.quadraticCurveTo(x, y, x + r, y);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    }#}
+
+            {# debug #}
+            $('#flash').append(flashMessage(`Shapes= {{ graph|length }} | Nodes= ${nodes.length} | Links= ${links.length}`, 'info'));
+            {#console.log(JSON.stringify(nodes))#}
+            {#console.log(JSON.stringify(links))#}
+
+
+            {% block graph_implementation %}
+
+            {% endblock %}
+
+            // link length
+            const linkForce =
+                Graph.d3Force('link').distance(link => getLinkLength(link));
+
+            function getLinkLength(link) {
+                switch (link.linkType) {
+                    case 0:
+                        return settings.linkLengthClass2Class
+                    case 1:
+                        return settings.linkLengthAttribute
+                    case 3:
+                        return settings.linkLengthToConstraint
+                    case 4:
+                        return settings.linkLengthFromConstraint
+                    default:
+                        return 1
+                }
+            }
+
+            function onNodeClicked(node) {
+                {#debug#}
+                console.log('onNodeClick|')
+                debugNode(node)
+
+                if (node == selectedNode && node.isClass) {
+                    node.expanded = !node.expanded; // toggle collapse state
+                    console.log('if node.isClass| ' + node.id + '.expanded ' + node.expanded)
+                    updateClassState(node);
+                }
+
+                {# show all edges on node focus that was been hidden #}
+                if (hideUnrelatedClasses) {
+                    console.log("onNodeClicked | hideUnrelatedClasses | show all edges")
+                    node.childLinks.forEach(link => {
+                        if (node.expanded) {
+                            if (link.linkType == 3) {
+                                link.isHidden = false;
+                                getNodeFromLink(link.target).isHidden = false;
+                                getNodeFromLink(link.finalTarget).isHidden = false;
+                            }
+                        } else {
+                            if (link.linkType == 0) {
+                                link.isHidden = false;
+                                getNodeFromLink(link.target).isHidden = false;
+                            }
+                        }
+                    })
+                    updateHiddenLinks();
+                    {# to show links between the new shown classes #}
+                    updateGraph();
+                }
+
+                openRightNav('info', node)
+
+                highlightNode(node)
+            }
+
+            // Info navigation
+            {#import {BootstrapTreeView} from 'https://unpkg.com/simple-treeview/dist/treeview.bootstrap.js';#}
+
+            import {BootstrapTreeView} from './static/js/treeview/treeview.bootstrap.js';
+
+            let isInfoNavOpened = false
+
+            {# fill info menu #}
+
+            function viewNodeInfo(node) {
+                // open info panel for the first time
+                if (!isInfoNavOpened) {
+                    openRightNav('info');
+                    isInfoNavOpened = true;
+                }
+
+                // fill statistics
+                let stat = document.getElementById('infoStatistic')
+                if (node.isClass) {
+                    stat.innerHTML = '<p>Intra-Constraints: '
+                        + node.statistics.attributes
+                        + '</p><p>Inter-Constraints: '
+                        + node.statistics.constraints
+                        + '</p><p>Constraints targeting this shape: '
+                        + node.statistics.partOff + '</p>';
+                } else {
+                    let range = "<p>"
+                    if (node.min != "-1") {
+                        range += "min: " + node.min
+                        if (node.max != "-1") {
+                            range += "</p><p>max: " + node.max
+                        }
+                    } else if (node.max != "-1") {
+                        range += "max: " + node.max
+                    }
+                    stat.innerHTML = range + '</p>';
+                }
+
+
+                // fill constraints
+                document.getElementById('infoTree').innerHTML = "";
+
+                // show info menu and hide node check list
+                {#document.getElementById('infoMenu').classList.remove('disable')#}
+                {#document.getElementById('nodeChecklist').classList.add('disable')#}
+
+                let tree = new BootstrapTreeView(document.getElementById('infoTree'), {
+                    provider: {
+                        async getChildren(id) {
+                            console.log('Info navigation| id: ' + id)
+                            if (!id) { {# a node on the graph is clicked #}
+                                selectedNode = node;
+                                return [
+                                    {
+                                        id: node.id,
+                                        label: node.text,
+                                        icon: {classes: ['fa', 'fa-project-diagram']},
+                                        state: 'expanded'
+                                    }
+                                ];
+                            } else {
+                                {#if the clicked element is a node#}
+                                const res = [];
+                                const resSelf = [];
+                                const n = nodesById[id];
+                                if (n) {
+                                    if (n.isHidden) {
+                                        n.isHidden = false;
+                                        updateHiddenLinks();
+                                        updateClassState(n);
+                                    } else if (n != selectedNode && !n.expanded) { {# expand the node in graph #}
+                                        n.expanded = true;
+                                        updateClassState(n);
+                                    }
+
+                                    {# fill info menu with node connections #}
+                                    if (n.isClass) {
+                                        n.childLinks.forEach(link => {
+                                            if (!link.isClass2Class) { {# if the link goes to a constraint #}
+                                                if (link.isAttribute) { {# if the link goes to self constaint #}
+                                                    resSelf.push({
+                                                        id: link.id,
+                                                        label: link.text,
+                                                        icon: {classes: ['bi', 'bi-align-middle']},
+                                                        state: 'collapsed'
+                                                    })
+                                                } else { {# the link goes to another class #}
+                                                    res.push({
+                                                        id: link.id,
+                                                        label: link.text,
+                                                        icon: {classes: ['bi', 'bi-arrow-left-right']},
+                                                        state: 'collapsed'
+                                                    });
+                                                }
+                                            }
+                                        })
+                                        resSelf.push(...res)
+                                        return resSelf;
+                                    } else { {# the node is a constraint => show attributes #}
+                                        id = n.parentLinks[0].id
+                                    }
+                                }
+
+                                {#if the clicked element is a link#}
+                                const l = linksById[id];
+                                if (l) {
+                                    console.log('if the clicked element is a link| ' + l)
+                                    let return_list = []
+
+                                    let range = ""
+                                    if (l.min != "-1") {
+                                        range += "min: " + l.min
+                                        if (l.max != "-1") {
+                                            range += ", max: " + l.max
+                                        }
+                                    } else if (l.max != "-1") {
+                                        range += "max: " + l.max
+                                    }
+
+                                    if (range != "") {
+                                        return_list.push({
+                                            id: l.id + ",range",
+                                            label: range,
+                                            icon: {classes: ['fa', 'fa-drafting-compass']}
+                                        })
+                                    }
+
+                                    if (l.finalTarget) { {# if the link goes to constraint #}
+                                        const ft = nodesById[l.finalTarget];
+                                        {# to-do check ft undefinde when clicking on constraint: id: ft.id, #}
+                                        return_list.push({
+                                            id: ft.id,
+                                            label: ft.text,
+                                            icon: {classes: ['fa', 'fa-project-diagram']},
+                                            state: 'collapsed'
+                                        })
+                                    }
+
+                                    return return_list;
+                                }
+
+                                {#if not found#}
+                                return [];
+
+                            }
+
+
+                        }
+                    }
+                });
+            }
+
+            // shape check list
+            const shapeCheckList = {};
+            fillShapeCheckList();
+
+            function fillShapeCheckList() {
+                const checklist = document.getElementById('nodeChecklist').getElementsByTagName('ul');
+
+                checklist[0].innerHTML = "";
+
+                // show node check list and hide info menu
+                {#document.getElementById('nodeChecklist').classList.remove('disable')#}
+                {#document.getElementById('infoMenu').classList.add('disable')#}
+
+
+                // Add a "checked" symbol on click
+                checklist[0].addEventListener('click', function (ev) {
+                    if (ev.target.tagName === 'LI') {
+                        ev.target.classList.toggle('checked');
+
+                        if (ev.target.classList.contains('checked')) {
+                            let node = nodesById[ev.target.getAttribute('nodeId')]
+
+                            node.isHidden = false;
+                            {#updateClassState(node)#}
+                        } else {
+                            let node = nodesById[ev.target.getAttribute('nodeId')]
+
+                            node.isHidden = true;
+                            node.childLinks.forEach(link => {
+                                link.isHidden = true;
+                                switch (link.linkType) {
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        getNodeFromLink(link.target).isHidden = true;
+                                        break;
+                                    case 3:
+                                        let constraint = getNodeFromLink(link.target);
+                                        constraint.isHidden = true;
+                                        constraint.childLinks[0].isHidden = true;
+                                        break;
+                                }
+                            })
+                            {#updateGraph();#}
+                        }
+                        updateHiddenLinks();
+                        updateGraph();
+                    }
+                }, false);
+
+                nodes.forEach(node => {
+                    if (node.isClass) {
+                        const li = document.createElement("li");
+                        li.setAttribute('nodeId', node.id);
+                        li.appendChild(document.createTextNode(node.text));
+                        checklist[0].appendChild(li);
+
+                        if (!node.isHidden) {
+                            li.classList.add('checked')
+                        }
+
+                        shapeCheckList[node.id] = li;
+                    }
+                });
+
+                console.log(shapeCheckList);
+            }
+
+            function updateHiddenLinks() {
+                links.forEach(link => {
+                    // update links if the nodes are hidden or not
+                    switch (link.linkType) {
+                        case 3:
+                            let source = getNodeFromLink(link.source)
+                            let constraint = getNodeFromLink(link.target)
+                            let finalTarget = getNodeFromLink(link.finalTarget)
+                            if (source.isHidden || finalTarget.isHidden) {
+                                {#source.isHidden = true;#}
+                                constraint.isHidden = true;
+                                {#finalTarget.isHidden = true;#}
+                                constraint.parentLinks.forEach(l => l.isHidden = true)
+                                constraint.childLinks.forEach(l => l.isHidden = true)
+                            } else {
+                                constraint.isHidden = false;
+                                constraint.parentLinks.forEach(l => l.isHidden = false)
+                                constraint.childLinks.forEach(l => l.isHidden = false)
+                            }
+                            break;
+                        case 1: {# do nothing to attributes #}
+                        {#if (!hideAttributes) {
+                            link.isHidden = false;
+                            getNodeFromLink(link.target).isHidden = false;
+                        } else {
+                            link.isHidden = true;
+                            getNodeFromLink(link.target).isHidden = true;
+                        }#}
+                            if (getNodeFromLink(link.source).isHidden) {
+                                link.isHidden = true;
+                                getNodeFromLink(link.target).isHidden = true;
+                            } else {
+                                link.isHidden = false;
+                                getNodeFromLink(link.target).isHidden = false;
+                            }
+                            break;
+                        default:
+                            if (getNodeFromLink(link.source).isHidden || getNodeFromLink(link.target).isHidden) {
+                                link.isHidden = true;
+                            } else {
+                                link.isHidden = false
+                            }
+                            break;
+                    }
+
+                });
+            }
+
+            // HTML calls
+            document.querySelector("#collapseAll").onclick = () => {
+                nodes.forEach(node => node.isClass ? node.expanded = false : node.expanded = true);
+                links.forEach(link => link.isClass2Class ? link.collapsed = false : link.collapsed = true);
+                updateGraph();
+            }
+
+            document.querySelector("#expandAll").onclick = () => {
+                nodes.forEach(node => node.isClass ? node.expanded = true : node.expanded = false);
+                {#nodes.forEach(node => node.expanded = true);#}
+                links.forEach(link => link.isClass2Class ? link.collapsed = true : link.collapsed = false);
+                updateGraph();
+            }
+
+            document.querySelector("#centerGraph").onclick = () => {
+                Graph.zoomToFit(400);
+            }
+
+            document.querySelector("#focusNode").onclick = () => {
+                {# check selected node #}
+                if (null == selectedNode) {
+                    $('#flash').append(flashMessage(`Select a Shape first`, 'warning'));
+                } else {
+                    focusNode(selectedNode);
+                }
+
+            }
+
+            let hideUnrelatedClasses = false;
+            document.querySelector('#hideUnrelatedClasses').onclick = () => {
+
+                const checkbox = $("#hideUnrelatedClasses").find('input:checkbox:first');
+                console.log('hideUnrelatedClasses| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
+
+                {# check selected node #}
+                if (null == selectedNode) {
+                    $('#flash').append(flashMessage(`Select a Shape first`, 'warning'));
+                    return;
+                }
+
+                if (hideUnrelatedClasses) {
+                    checkbox.prop('checked', false);
+                    hideUnrelatedClasses = false;
+
+                    nodes.forEach(node => node.isHidden = false)
+                    links.forEach(link => link.isHidden = false)
+
+                    {#updateClassState(selectedNode)#}
+                    updateGraph();
+                } else {
+                    checkbox.prop('checked', true);
+                    hideUnrelatedClasses = true;
+
+                    hideAllButSelectedNode();
+                }
+
+                // open node checklist and fill it
+                openRightNav('shape');
+
+            }
+
+            function hideAllButSelectedNode() {
+                {# hide all nodes and links #}
+                nodes.forEach(node => node.isHidden = true)
+                {#links.forEach(link => link.isHidden = true)#}{# debricated #}
+
+                selectedNode.isHidden = false;
+                {# get class to class links and show classes #}
+                {# debricated #}
+                {#selectedNode.childLinks.forEach(link => {
+
+                    if (link.isClass2Class) { #}{# show all links not class to class #}{#
+                        #}{#console.log("selectedNode| id: " + selectedNode.id + " .expanded: " + selectedNode.expanded)#}{#
+
+                        #}{#if (!selectedNode.expanded) #}{# alwasy show, .expanded will take care of it#}{#
+                        link.isHidden = false;
+
+                    } else { #}{# show constraints classes #}{#
+                        link.isHidden = false;
+
+                        let constraintNode = getNodeFromLink(link.target);
+                        constraintNode.isHidden = false;
+                        if (!constraintNode.isClass)#}{# meaning the selected node is not a constraint #}{#
+                            constraintNode.childLinks.forEach(l => {
+                                l.isHidden = false
+                            });
+
+                        if (link.finalTarget) {
+                            getNodeFromLink(link.finalTarget).isHidden = false;
+                        }
+                    }
+                });#}
+                selectedNode.childLinks.forEach(link => {
+                    if (link.isClass2Class) {
+                        getNodeFromLink(link.target).isHidden = false;
+                    }
+                });
+                updateHiddenLinks();
+
+                updateGraph();
+            }
+
+            let highlightSelectedNode = true;
+            document.querySelector('#highlightSelectedNode').onclick = () => {
+
+                const checkbox = $("#highlightSelectedNode").find('input:checkbox:first');
+                console.log('highlightSelectedNode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
+
+                if (highlightSelectedNode) {
+                    checkbox.prop('checked', false);
+                    highlightSelectedNode = false;
+
+                    nodes.forEach(node => node.highlighted = false)
+                    links.forEach(link => link.highlighted = false)
+                    updateNode3d();
+                } else {
+                    checkbox.prop('checked', true);
+                    highlightSelectedNode = true;
+
+                    highlightNode(selectedNode)
+                }
+
+            }
+
+            {#Search box#}
+            let suggestions = [];
+            nodes.forEach(node => node.isClass ? suggestions.push(node.text) : null);
+            {#console.log(suggestions)#}
+
+            // getting all required elements
+            const searchWrapper = document.querySelector(".search-input");
+            const inputBox = searchWrapper.querySelector("input");
+            const suggBox = searchWrapper.querySelector(".autocom-box");
+            const icon = searchWrapper.querySelector(".icon");
+            let linkTag = searchWrapper.querySelector("a");
+            let webLink;
+
+            // if user press any key and release
+            inputBox.onkeyup = (e) => {
+                suggest(e);
+            }
+            inputBox.onfocus = (e) => {
+                inputBox.value = '';
+                suggest(e);
+            }
+
+            function suggest(e) {
+                let userData = e.target.value; //user entered data
+                let emptyArray = [];
+                {#if (userData) {#}
+                icon.onclick = () => {
+
+                }
+                emptyArray = suggestions.filter((data) => {
+                    {#console.log("inputBox.onkeyup.userData = " + userData)#}
+                    if (userData)
+                        //filtering array value and user characters to lowercase and return only those words which are start with user entered chars
+                        return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+                    else
+                        return data;
+                });
+                emptyArray = emptyArray.map((data) => {
+                    // passing return data inside li tag
+                    return data = `<li>${data}</li>`;
+                });
+                searchWrapper.classList.add("active"); //show autocomplete box
+                showSuggestions(emptyArray.sort());
+                let allList = suggBox.querySelectorAll("li");
+                let clicked = false;
+                {# fix on mouse out will hide the highlight after clicking #}
+                for (let i = 0; i < allList.length; i++) {
+                    //adding onclick attribute in all li tag
+                    allList[i].onclick = () => {
+                        clicked = true;
+                        select(allList[i])
+                        viewNodeInfo(nodesById[allList[i].textContent])
+                        {# viewNodeInfo will set selectedNode #}
+                        if (nodesById[allList[i].textContent].isHidden) {
+                            if (hideUnrelatedClasses)
+                                hideAllButSelectedNode();
+                            else {
+                                nodesById[allList[i].textContent].isHidden = false;
+                                updateHiddenLinks()
+                                updateGraph();
+                            }
+                        } else {
+                            updateClassState(nodesById[allList[i].textContent])
+                        }
+                    };
+                    allList[i].onmouseover = () => {
+                        highlightSelectedNode ? highlightNode(nodesById[allList[i].textContent]) : null
+                    }
+                }
+                suggBox.onmouseout = () => {
+                    if (highlightSelectedNode) {
+                        if (clicked) { {# when an item is clicked and searchWrapper disappear dont remove highlight #}
+                            clicked = false;
+                            return;
+                        }
+
+                        nodes.forEach(node => node.highlighted = false)
+                        links.forEach(link => link.highlighted = false)
+                        updateNode3d();
+                    }
+                }
+                {# } else {
+                     searchWrapper.classList.remove("active"); //hide autocomplete box
+                 }#}
+            }
+
+            var mouse_is_inside = false;
+            document.querySelector("#search-wrapper").onmouseover = () => {
+                mouse_is_inside = true;
+            }
+            document.querySelector("#search-wrapper").onmouseout = () => {
+                mouse_is_inside = false;
+            }
+
+            document.querySelector("body").onmouseup = () => {
+                {#console.log("body.onmouseup.mouse_is_inside = " + mouse_is_inside)#}
+                if (!mouse_is_inside) searchWrapper.classList.remove("active"); //hide autocomplete box
+            }
+
+            function select(element) {
+                let selectData = element.textContent;
+                inputBox.value = selectData;
+                icon.onclick = () => {
+                    {#highlightNode(nodesById[selectData])#}
+                    updateClassState(nodesById[selectData])
+                    viewNodeInfo(nodesById[selectData])
+                }
+                searchWrapper.classList.remove("active");
+            }
+
+            function showSuggestions(list) {
+                let listData;
+                if (!list.length) {
+                    userValue = inputBox.value;
+                    listData = `<li>${userValue}</li>`;
+                } else {
+                    listData = list.join('');
+
+                    {#listData = `<li>${suggestions}</li>`;#}
+                }
+                suggBox.innerHTML = listData;
+            }
+
+            document.querySelector('#hideAttributes').onclick = () => {
+
+                const checkbox = $("#hideAttributes").find('input:checkbox:first');
+                console.log('hideAttributes| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
+
+                if (hideAttributes) {
+                    checkbox.prop('checked', false);
+                    hideAttributes = false;
+
+                    {#nodes.forEach(node => node.isAttribute ? node.isHidden = false : null)#}
+                    {#links.forEach(link => link.isAttribute ? link.isHidden = false : null)#}
+
+                    updateGraph();
+                } else {
+                    checkbox.prop('checked', true);
+                    hideAttributes = true;
+
+                    {#nodes.forEach(node => node.isAttribute ? node.isHidden = true : null)#}
+                    {#links.forEach(link => link.isAttribute ? link.isHidden = true : null)#}
+
+                    updateGraph();
+                }
+            }
+
+            // link length slider update value from default settings
+            document.querySelector('#class2classLinkSlider').value = settings.linkLengthClass2Class
+            document.querySelector('#attributeLinkSlider').value = settings.linkLengthAttribute
+            document.querySelector('#toConstraintLinkSlider').value = settings.linkLengthToConstraint
+            document.querySelector('#fromConstraintLinkSlider').value = settings.linkLengthFromConstraint
+            document.querySelector('#class2classLinkSlider').nextElementSibling.value = settings.linkLengthClass2Class
+            document.querySelector('#attributeLinkSlider').nextElementSibling.value = settings.linkLengthAttribute
+            document.querySelector('#toConstraintLinkSlider').nextElementSibling.value = settings.linkLengthToConstraint
+            document.querySelector('#fromConstraintLinkSlider').nextElementSibling.value = settings.linkLengthFromConstraint
+            // link length slider listeners
+            document.querySelector('#class2classLinkSlider').oninput = function () {
+                this.nextElementSibling.value = this.value
+                settings.linkLengthClass2Class = this.value
+                updateLinkDistance();
+            }
+            document.querySelector('#attributeLinkSlider').oninput = function () {
+                this.nextElementSibling.value = this.value
+                settings.linkLengthAttribute = this.value
+                updateLinkDistance();
+            }
+            document.querySelector('#toConstraintLinkSlider').oninput = function () {
+                this.nextElementSibling.value = this.value
+                settings.linkLengthToConstraint = this.value
+                updateLinkDistance();
+            }
+            document.querySelector('#fromConstraintLinkSlider').oninput = function () {
+                this.nextElementSibling.value = this.value
+                settings.linkLengthFromConstraint = this.value
+                updateLinkDistance();
+            }
+
+            {# add accordion button listeners #}
+            let acc = document.querySelectorAll(".accordion");
+            for (let i = 0; i < acc.length; i++) {
+                toggleAccordion(acc[i])
+                acc[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    toggleAccordion(this);
+                    {#let panel = this.nextElementSibling;
+                    if (panel.style.maxHeight) {
+                        panel.style.maxHeight = null;
+                    } else {
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }#}
+                });
+            }
+
+            function toggleAccordion(accordionBtn) {
+                let panel = accordionBtn.nextElementSibling;
+                if (accordionBtn.classList.contains("active")) {
+                    {#panel.style.maxHeight = panel.scrollHeight + "px";#}
+                    panel.style.maxHeight = "fit-content";
+                } else {
+                    panel.style.maxHeight = null;
+                }
+            }
+
+            {# navigation panels #}
+            // Sidenav Push Content
+            let isNavOpen = false;
+
+            /* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
+            function openNav() {
+                isNavOpen = true;
+                document.getElementById("mySidenav").classList.remove("closeLeftNav");
+                {#document.getElementById("main").style.marginLeft = "250px";#}
+            }
+
+            /* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
+            function closeNav() {
+                isNavOpen = false;
+                document.getElementById("mySidenav").classList.add("closeLeftNav");
+                {#document.getElementById("main").style.marginLeft = "0";#}
+            }
+
+            document.querySelector('#optionBtn').onclick = () => {
+                if (isNavOpen) {
+                    closeNav()
+                } else {
+                    openNav()
+                }
+            }
+
+            let isRightNavOpen = false;
+
+            function openRightNav(selectedTab, node) {
+                isRightNavOpen = true;
+                document.getElementById("myRightSidenav").classList.remove("closeRightNav");
+                document.getElementById("rightTabs").classList.add("tabs-openRightNav");
+                switch (selectedTab) {
+                    case 'info':
+                        document.getElementById('infoBtn').classList.add('selected')
+                        document.getElementById('shapeBtn').classList.remove('selected')
+
+                        // show info menu and hide node check list
+                        document.getElementById('infoMenu').classList.remove('disable')
+                        document.getElementById('nodeChecklist').classList.add('disable')
+
+                        if (node) viewNodeInfo(node)
+                        break;
+
+                    case 'shape':
+                        document.getElementById('shapeBtn').classList.add('selected')
+                        document.getElementById('infoBtn').classList.remove('selected')
+
+                        // show node check list and hide info menu
+                        document.getElementById('nodeChecklist').classList.remove('disable')
+                        document.getElementById('infoMenu').classList.add('disable')
+
+                        break;
+                }
+            }
+
+            function closeRightNav() {
+                isRightNavOpen = false;
+                document.getElementById("myRightSidenav").classList.add("closeRightNav");
+                document.getElementById("rightTabs").classList.remove("tabs-openRightNav");
+
+                document.getElementById('infoBtn').classList.remove('selected')
+                document.getElementById('shapeBtn').classList.remove('selected')
+            }
+
+            document.querySelector('#infoBtn').onclick = () => {
+                if (isRightNavOpen && !document.getElementById("infoBtn").classList.contains("selected")) {
+                    openRightNav('info')
+                } else if (isRightNavOpen && document.getElementById("infoBtn").classList.contains("selected")) {
+                    closeRightNav()
+                } else { //it is closed
+                    openRightNav('info')
+                }
+            }
+            document.querySelector('#shapeBtn').onclick = () => {
+                if (isRightNavOpen && !document.getElementById("shapeBtn").classList.contains("selected")) {
+                    openRightNav('shape')
+                } else if (isRightNavOpen && document.getElementById("shapeBtn").classList.contains("selected")) {
+                    closeRightNav()
+                } else { //it is closed
+                    openRightNav('shape')
+                }
+            }
+
+            let darkMode = true;
+            document.querySelector('#darkMode').onclick = () => {
+
+                const checkbox = $("#darkMode").find('input:checkbox:first');
+                console.log('darkMode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
+
+                if (darkMode) {
+                    checkbox.prop('checked', false);
+                    darkMode = false;
+
+                    document.documentElement.setAttribute('data-theme', 'light');
+
+                } else {
+                    checkbox.prop('checked', true);
+                    darkMode = true;
+
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+
+                // update graph
+                Graph.backgroundColor(getComputedStyle(document.documentElement).getPropertyValue('--main-background').trim());
+                updateNode3d();
+            }
+
+            {# remove loader #}
+            document.querySelector('#loader').removeAttribute("class");
+
+
+            {# to-do
+
+
+             #}
+
+
+        </script>
+
+    </div>
+
+{% endblock %}

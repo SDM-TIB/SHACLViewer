@@ -1,0 +1,19 @@
+{
+	"name": "Film",
+	"targetDef": {
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/Film>}",
+		"class": "<http://dbpedia.org/ontology/Film>"
+	},
+	"constraintDef": {
+		"conjunctions": [
+			[
+				{ "path": "<http://dbpedia.org/ontology/producer>", "min": 1, "shape": "Person" },
+				{ "path": "<http://dbpedia.org/ontology/director>", "min": 1, "shape": "Person" },
+				{ "path": "<http://dbpedia.org/ontology/writer>", "min": 1, "shape": "Person" },
+				{ "path": "<http://dbpedia.org/ontology/country>", "min": 1, "shape": "Country" },
+				{ "path": "<http://dbpedia.org/ontology/recorded>", "min": 1, "shape": "Country" },
+				{ "path": "<http://dbpedia.org/ontology/genre>", "min": 1, "shape": "Genre" }
+			]
+		]
+	}
+}

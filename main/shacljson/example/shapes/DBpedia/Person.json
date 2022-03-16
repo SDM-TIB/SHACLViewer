@@ -1,0 +1,19 @@
+{
+	"name": "Person",
+	"targetDef": {
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/Person>}",
+		"class": "<http://dbpedia.org/ontology/Person>"
+	},
+	"constraintDef": {
+		"conjunctions": [
+			[
+				{ "path": "<http://dbpedia.org/ontology/parent>", "max": 2, "shape": "Person" },
+				{ "path": "<http://dbpedia.org/ontology/spouse>", "max": 1, "shape": "Person" },
+				{ "path": "<http://dbpedia.org/ontology/birthDate>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/nationality>", "min": 1, "shape": "Country" },
+				{ "path": "<http://dbpedia.org/ontology/deathCause>", "max": 0, "shape": "FPerson" },
+				{ "path": "<http://dbpedia.org/ontology/deathCause>", "max": 0, "shape": "Drug" }
+			]
+		]
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"name": "ChemicalSubstance",
+	"targetDef": {
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/ChemicalSubstance>}",
+		"class": "<http://dbpedia.org/ontology/ChemicalSubstance>"
+	},
+	"constraintDef": {
+		"conjunctions": [
+			[
+				{ "path": "<http://dbpedia.org/property/tradename>", "min": 1, "shape": "Drug" },
+				{ "path": "<http://dbpedia.org/property/name>", "min": 1 }
+			]
+		]
+	}
+}

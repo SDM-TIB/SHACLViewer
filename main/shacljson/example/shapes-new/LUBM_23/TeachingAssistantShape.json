@@ -1,0 +1,49 @@
+{
+    "name": "TeachingAssistantShape",
+    "targetDef": {
+        "class": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#TeachingAssistant",
+        "query": "SELECT ?x WHERE { ?x a <http://swat.cse.lehigh.edu/onto/univ-bench.owl#TeachingAssistant> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#degreeFrom>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#name>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#teachingAssistantOf>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone>",
+                    "min": 1
+                },
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#undergraduateDegreeFrom>",
+                    "min": 1
+                }
+            ]
+        ]
+    }
+}

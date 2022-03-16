@@ -1,0 +1,17 @@
+{
+	"name": "Drug",
+	"targetDef": {
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/Drug>}",
+		"class": "<http://dbpedia.org/ontology/Drug>"
+	},
+	"constraintDef": {
+		"conjunctions": [
+			[
+				{ "path": "<http://dbpedia.org/property/drugName>", "min": 1 },
+				{ "path": "<http://dbpedia.org/property/chemicalFormula>", "min": 1 },
+				{ "path": "<http://www.w3.org/2000/01/rdf-schema#label>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/drugs.com>", "min": 1 }
+			]
+		]
+	}
+}

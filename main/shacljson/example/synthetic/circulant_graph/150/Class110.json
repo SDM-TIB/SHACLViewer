@@ -1,0 +1,33 @@
+{
+    "name": "Class110",
+    "targetDef": {
+        "class": "http://example.com/Class110",
+        "query": "SELECT ?x WHERE { ?x a <http://example.com/Class110> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://example.com/edge110-100>",
+                    "min": 1,
+                    "shape": "Class100"
+                },
+                {
+                    "path": "<http://example.com/edge110-105>",
+                    "min": 1,
+                    "shape": "Class105"
+                },
+                {
+                    "path": "<http://example.com/edge110-115>",
+                    "min": 1,
+                    "shape": "Class115"
+                },
+                {
+                    "path": "<http://example.com/edge110-120>",
+                    "min": 1,
+                    "shape": "Class120"
+                }
+            ]
+        ]
+    }
+}

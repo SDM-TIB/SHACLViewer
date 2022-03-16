@@ -1,0 +1,15 @@
+{
+	"name": "Disease",
+	"targetDef": {
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/Disease>}",
+		"class": "<http://dbpedia.org/ontology/Disease>"
+	},
+	"constraintDef": {
+		"conjunctions": [
+			[
+				{ "path": "<http://dbpedia.org/ontology/treatment>", "min": 1, "shape": "Drug" },
+				{ "path": "<http://dbpedia.org/property/name>", "min": 1 }
+			]
+		]
+	}
+}

@@ -1,0 +1,17 @@
+{
+    "name": "UniversityShape",
+    "targetDef": {
+        "class": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#University",
+        "query": "SELECT ?x WHERE { ?x a <http://swat.cse.lehigh.edu/onto/univ-bench.owl#University> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#hasAlumnus>",
+                    "min": 1
+                }
+            ]
+        ]
+    }
+}

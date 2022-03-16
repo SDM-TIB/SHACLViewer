@@ -1,0 +1,135 @@
+{% extends 'basegraph.html' %}
+
+{% block head %}
+    {#    <script src="//unpkg.com/3d-force-graph"></script>#}
+    {#    <script type="text/javascript" src="static/js/3d/3d-force-graph.js"></script>#}
+    <script type="text/javascript" src="static/js/3d/3d-force-graph.min.js"></script>
+{% endblock %}
+
+{#{% block title %}
+    3D Graph
+{% endblock %}#}
+
+{#{% block optionMenu %}#}
+{##}
+{#{% endblock %}#}
+
+{#{% block infoMenu %}#}
+{#    #}
+{#{% endblock %}#}
+
+{% block graph_implementation %}
+{#    <script type="module">#}
+        document.querySelector('#navigationBar').innerHTML = '<li class="nav-item active"><a class="nav-link" href="{{ url_for("graph2d") }}?path={{ request.args.get("path") }}">2D <span class="sr-only">(current)</span></a></li>';
+
+        {# to avoid "temporal dead zone" when using Graph for node update #}
+        let isGraphInit = false;
+
+        const elem = document.getElementById('3d-graph');
+        const Graph = ForceGraph3D({
+            extraRenderers: [new THREE.CSS2DRenderer()]
+        })
+        (elem)
+            .graphData(getVisibleLists())
+            .linkCurvature('curvature')
+            .linkCurveRotation('rotation')
+            .nodeAutoColorBy('group')
+            .linkOpacity(1)
+            .backgroundColor('#212121')
+            .linkColor((link) => link.highlighted ? 'rgb(255,64,0)' : '#909090')
+            .linkWidth((link) => link.highlighted ? 2 : 0)
+            .linkDirectionalParticles('particles')
+            .linkDirectionalParticleSpeed(d => d.particles * 0.002)
+            .linkDirectionalParticleWidth(link => link.highlighted ? 4 : 2)
+            .nodeThreeObject(node => {
+                {#HTML Node#}
+                {# const nodeEl = document.createElement('div');
+                                 #}{#nodeEl.appendChild(getNodeShape(node))#}{#
+                                 nodeEl.textContent = node.text;
+                                 nodeEl.style.color = node.color;
+                                 nodeEl.style.border = node.isClass ? 'solid rgb(255,255,0,0.5) 2px' : '';
+                                 nodeEl.className = 'node-label';
+                                 nodeEl.onclick = function() { alert('blah'); };
+                                 return new THREE.CSS2DObject(nodeEl);#}
+
+                {#Image Node#}
+                {#  const imgTexture = new THREE.TextureLoader().load(`./imgs/${img}`);
+                                  const material = new THREE.SpriteMaterial({map: imgTexture});
+                                  const sprite = new THREE.Sprite(material);
+                                  sprite.scale.set(12, 12);
+                                  return sprite;#}
+
+                const sprite = new SpriteText(node.text);
+                sprite.material.depthWrite = false; // make sprite background transparent
+                sprite.color = darkMode ? node.color : '#000';
+                sprite.backgroundColor = darkMode ? '#000' : node.color;
+                sprite.textHeight = 8;
+                sprite.padding = 2;
+                sprite.borderRadius = 2;
+                sprite.borderWidth = node.highlighted ? 2 : 1;
+                if (node.isClass) {
+                    sprite.borderColor = node.expanded ? 'rgb(0,255,0,1)' : 'rgb(255,255,0,1)';
+                } else if (node.isAttribute) {
+                    {#sprite.borderWidth = 1;#}
+                    sprite.borderColor = 'rgb(0,0,0,1)';
+                } else {
+                    {#sprite.borderWidth = 1;#}
+                    sprite.borderColor = 'rgb(0,0,255,1)';
+                }
+                return sprite;
+
+                {#return getNodeShape(node)#}
+            })
+            {#.nodeThreeObjectExtend(true)#}
+            .onNodeHover(node => elem.style.cursor = node && node.isClass ? 'pointer' : 'unset')
+            .onNodeClick(node => {
+                onNodeClicked(node);
+            });
+
+        {#    let bcolor = getComputedStyle(document.documentElement).getPropertyValue('--main-background');#}
+        {#    Graph.backgroundColor("#181818")#}
+        {#    console.log("getComputedStyle(document.documentElement).getPropertyValue('--main-background')"+bcolor)#}
+
+        let settings = new function () {
+            this.linkLengthClass2Class = 100;
+            this.linkLengthAttribute = 25;
+            this.linkLengthToConstraint = 25;
+            this.linkLengthFromConstraint = 50;
+        }
+
+        // call on slider change
+        function updateLinkDistance() {
+            linkForce.distance(link => getLinkLength(link));
+            Graph.numDimensions(3); // Re-heat simulation
+        }
+
+        // Spread nodes a little wider
+        Graph.d3Force('charge').strength(-220);
+
+        isGraphInit = true;
+
+        function updateNode3d() {
+            {# get node 3d object and update based of it is expanded #}
+            {#node.__threeObj.borderColor = node.expanded ? 'rgb(0,255,0,0.5)' : 'rgb(255,255,0,0.5)';#}
+            if (isGraphInit)
+                Graph
+                    .nodeThreeObject(Graph.nodeThreeObject())
+                    .linkWidth(Graph.linkWidth())
+                    .linkDirectionalParticleWidth(Graph.linkDirectionalParticleWidth())
+        }
+
+        function focusNode(node) {
+
+            // Aim at node from outside it
+            const distance = 400;
+            const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+
+            Graph.cameraPosition(
+                {x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio}, // new position
+                node, // lookAt ({ x, y, z })
+                1000  // ms transition duration
+            );
+        }
+
+{#    </script>#}
+{% endblock %}

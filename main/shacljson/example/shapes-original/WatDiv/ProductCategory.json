@@ -1,0 +1,38 @@
+{
+  "name": "ProductCategory",
+  "targetDef": {
+    "query": "SELECT ?x WHERE { ?x a <http://db.uwaterloo.ca/~galuc/wsdbm/ProductCategory> }",
+    "class": "<http://db.uwaterloo.ca/~galuc/wsdbm/ProductCategory>"
+  },
+  "constraintDef": {
+    "conjunctions": [
+      [
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre>", "min": "1", "shape": "Genre" },
+        { "path": "<http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre>", "max": "4" },
+        { "path": "<http://ogp.me/ns#tag>", "min": "2" },
+        { "path": "<http://ogp.me/ns#tag>", "max": "16" },
+        { "path": "<http://ogp.me/ns#title>", "min": "1" },
+        { "path": "<http://ogp.me/ns#title>", "max": "1" },
+        { "path": "<http://purl.org/stuff/rev#hasReview>", "min": "3" },
+        { "path": "<http://purl.org/stuff/rev#hasReview>", "max": "50" },
+        { "path": "<http://schema.org/caption>", "min": "1" },
+        { "path": "<http://schema.org/caption>", "max": "1" },
+        { "path": "<http://schema.org/contentRating>", "min": "1" },
+        { "path": "<http://schema.org/contentRating>", "max": "1" },
+        { "path": "<http://schema.org/contentSize>", "min": "1" },
+        { "path": "<http://schema.org/contentSize>", "max": "1" },
+        { "path": "<http://schema.org/description>", "min": "1" },
+        { "path": "<http://schema.org/description>", "max": "1" },
+        { "path": "<http://schema.org/expires>", "min": "1" },
+        { "path": "<http://schema.org/expires>", "max": "1" },
+        { "path": "<http://schema.org/keywords>", "min": "1" },
+        { "path": "<http://schema.org/keywords>", "max": "1" },
+        { "path": "<http://schema.org/text>", "min": "1" },
+        { "path": "<http://schema.org/text>", "max": "1" },
+        { "path": "<http://xmlns.com/foaf/homepage>", "min": "1" },
+        { "path": "<http://xmlns.com/foaf/homepage>", "max": "1" }
+      ]
+    ]
+  }
+}
+
