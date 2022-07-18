@@ -25,6 +25,22 @@
         {# to avoid "temporal dead zone" when using Graph for node update #}
         let isGraphInit = false;
 
+        let settings = new function () {
+            this.linkLengthClass2Class = 100;
+            this.linkLengthAttribute = 25;
+            this.linkLengthToConstraint = 25;
+            this.linkLengthFromConstraint = 50;
+
+            this.nodeColorDark = '#0af'
+            this.nodeColorLight = '#000'
+            this.nodeBackgroundColorDark = '#000'
+            this.nodeBackgroundColorLight = '#0af'
+            this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
+            this.nodeBorderColor = '#0af'
+            this.attributeBorderColor = 'rgb(0,0,0,1)'
+            this.linkNodeBorderColor = 'rgb(255,64,0)'
+        }
+
         const elem = document.getElementById('3d-graph');
         const Graph = ForceGraph3D({
             extraRenderers: [new THREE.CSS2DRenderer()]
@@ -61,21 +77,48 @@
 
                 const sprite = new SpriteText(node.text);
                 sprite.material.depthWrite = false; // make sprite background transparent
-                sprite.color = darkMode ? node.color : '#000';
-                sprite.backgroundColor = darkMode ? '#000' : node.color;
+                sprite.color = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
+                sprite.backgroundColor = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
                 sprite.textHeight = 8;
                 sprite.padding = 2;
                 sprite.borderRadius = 2;
                 sprite.borderWidth = node.highlighted ? 2 : 1;
                 if (node.isClass) {
-                    sprite.borderColor = node.expanded ? 'rgb(0,255,0,1)' : 'rgb(255,255,0,1)';
+                    sprite.borderColor = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
                 } else if (node.isAttribute) {
-                    {#sprite.borderWidth = 1;#}
-                    sprite.borderColor = 'rgb(0,0,0,1)';
+                    sprite.borderColor = settings.attributeBorderColor;
                 } else {
-                    {#sprite.borderWidth = 1;#}
-                    sprite.borderColor = 'rgb(0,0,255,1)';
+                    sprite.borderColor = settings.linkNodeBorderColor;
                 }
+
+                {#   validation coloring   #}
+                {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high #}
+                let color = '#aaa'
+                switch (node.colorRange) {
+                    case 0:
+                        color = "#0af"
+                        break;
+                    case 1:
+                        color = "#0c0"
+                        break;
+                    case 2:
+                        color = "#ff0"
+                        break;
+                    case 3:
+                        color = "#f80"
+                        break;
+                    case 4:
+                        color = "#c00"
+                        break;
+                }
+                if (!darkMode)
+                    sprite.backgroundColor = color;
+                else
+                    sprite.color = color;
+
+                sprite.borderColor = color;
+
+
                 return sprite;
 
                 {#return getNodeShape(node)#}
@@ -89,13 +132,6 @@
         {#    let bcolor = getComputedStyle(document.documentElement).getPropertyValue('--main-background');#}
         {#    Graph.backgroundColor("#181818")#}
         {#    console.log("getComputedStyle(document.documentElement).getPropertyValue('--main-background')"+bcolor)#}
-
-        let settings = new function () {
-            this.linkLengthClass2Class = 100;
-            this.linkLengthAttribute = 25;
-            this.linkLengthToConstraint = 25;
-            this.linkLengthFromConstraint = 50;
-        }
 
         // call on slider change
         function updateLinkDistance() {
@@ -113,6 +149,7 @@
             {#node.__threeObj.borderColor = node.expanded ? 'rgb(0,255,0,0.5)' : 'rgb(255,255,0,0.5)';#}
             if (isGraphInit)
                 Graph
+                    .nodeColor(Graph.nodeColor())
                     .nodeThreeObject(Graph.nodeThreeObject())
                     .linkWidth(Graph.linkWidth())
                     .linkDirectionalParticleWidth(Graph.linkDirectionalParticleWidth())
@@ -131,5 +168,5 @@
             );
         }
 
-{#    </script>#}
+        {#    </script>#}
 {% endblock %}

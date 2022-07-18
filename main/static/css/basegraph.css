@@ -1,0 +1,503 @@
+/*alert*/
+#flash {
+    position: absolute;
+}
+
+.alert {
+    z-index: 1;
+    margin-left: 50vw;
+    transform: translateX(-50%);
+}
+
+.alert > button > span {
+    padding-left: 1rem;
+}
+
+/*navigation panels*/
+.icon.bi::before, .icon.fa::before {
+    padding: 4px;
+}
+
+.navbar {
+    z-index: 3;
+}
+
+.option-btn {
+    cursor: pointer;
+    position: absolute;
+    z-index: 2;
+    padding: 1em;
+}
+
+#rightTabs {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    transition: 0.5s;
+    display: flex;
+    writing-mode: vertical-lr;
+}
+
+.right-tab-btn {
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: var(--sidenav-background-inactive);
+    padding: 10px;
+    flex: 1;
+    transition: 0.5s;
+    transform: rotate(180deg);
+}
+
+.selected {
+    background-color: var(--sidenav-background);
+    box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.16);
+}
+
+.closeLeftNav {
+    transform: translateX(-285px);
+}
+
+.closeRightNav {
+    transform: translateX(400px);
+}
+
+.tabs-openRightNav {
+    transform: translateX(-400px);
+}
+
+/* The side navigation menu */
+.sidenav {
+    height: calc(100vh - 50px); /* 100% Full-height - 50px navigation bar*/
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    background-color: var(--sidenav-background);; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    margin-top: 56px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
+}
+
+.leftnav {
+    padding-top: 50px;
+    left: 0;
+    width: 285px;
+}
+
+.rightnav {
+    right: 0;
+    width: 400px;
+    padding: 10px 10px 0px 10px;
+}
+
+.option-icon {
+    padding-right: 5px;
+    width: 20px;
+}
+
+/* The navigation menu links */
+.sidenav a, .sidenav p {
+    padding: 8px 8px 8px 16px;
+    text-decoration: none;
+    color: var(--sidenav-text);
+    display: block;
+    transition: 0.3s;
+    margin-bottom: 0px;
+}
+
+/**/
+.sidenav table {
+    width: 100%;
+    width: -moz-available; /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+    text-align: center;
+    color: var(--sidenav-text);
+    margin-bottom: 10px;
+}
+
+.sidenav .powerbar {
+    margin: 0px 8px 0px 16px;
+    height: 16px;
+    border-radius: 10px;
+    padding: 0px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+    color: var(--sidenav-text-hover);
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+
+    .sidenav a {
+        font-size: 18px;
+    }
+}
+
+/*treeview*/
+.list-group-item {
+    color: var(--sidenav-text);
+    background: transparent;
+    border: 0;
+}
+
+.list-group-item-action:focus, .list-group-item-action:hover {
+    z-index: 1;
+    color: var(--search-input);
+    text-decoration: none;
+    background-color: var(--accordion-btn);
+}
+
+/*search bar*/
+
+.wrapper {
+    /* max-width: 450px; */
+    /* margin: 150px auto; */
+    padding: 0px 16px 16px 16px;
+}
+
+.wrapper .search-input {
+    background: transparent;
+    width: 100%;
+    border-radius: 2px;
+    position: relative;
+    /* box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12); */
+}
+
+.search-input input {
+    height: 40px;
+    background: transparent;
+    color: var(--search-input);
+    width: 100%;
+    outline: none;
+    border: solid var(--search-border);
+    border-width: 0 0 1px 0;
+    border-radius: 2px;
+    padding: 0 40px 0 5px;
+    /* font-size: 18px; */
+    /* box-shadow: 0px 1px 5px rgb(0 0 0 / 10%); */
+}
+
+.search-input.active input {
+    border-radius: 5px 5px 0 0;
+}
+
+.search-input .autocom-box {
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+    visibility: hidden;
+}
+
+.search-input.active .autocom-box {
+    padding: 10px 8px;
+    background: var(--search-sugg-background);
+    opacity: 1;
+    pointer-events: auto;
+    /* border: 1px solid white; */
+    border-radius: 0 0 3px 3px;
+    position: absolute;
+    width: 100%;
+    visibility: visible;
+    z-index: 1;
+}
+
+.autocom-box li {
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+    color: var(--search-sugg-text)
+}
+
+.search-input.active .autocom-box li {
+    display: block;
+}
+
+.autocom-box li:hover {
+    background: var(--search-sugg-background-hover);
+}
+
+.search-input .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    color: var(--sidenav-text);
+    cursor: pointer;
+}
+
+/*loader*/
+#loader.loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 120px;
+    height: 120px;
+    margin: -76px 0 0 -76px;
+    border: 16px solid var(--loader-background);
+    border-radius: 50%;
+    border-top: 16px solid var(--accent-color);
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*range slider style*/
+.slider-container output {
+    vertical-align: super;
+}
+
+input[type='range'] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type='range']:focus {
+    outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+
+input[type='range']::-moz-range-thumb {
+    border: none;
+}
+
+.range-style {
+    width: 170px;
+    padding: 8px 8px 8px 16px;
+    background: transparent;
+}
+
+.range-style::-webkit-slider-runnable-track {
+    display: flex;
+    align-items: center;
+    height: 8px;
+    border-radius: 10px;
+    background: var(--slider-off);
+}
+
+.range-style::-webkit-slider-thumb {
+    position: relative;
+    top: -50%;
+    width: 20px;
+    height: 20px;
+    background-color: var(--slider-circle);
+    border-radius: 50%;
+    box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
+}
+
+.range-style::-moz-range-track {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    border-radius: 10px;
+    box-shadow: inset -2px -2px 8px white, inset 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.range-style::-moz-range-thumb {
+    position: relative;
+    top: -50%;
+    width: 40px;
+    height: 40px;
+    background-color: #e0e0e0;
+    background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.8), transparent);
+    border-radius: 50%;
+    box-shadow: -1px -1px 2px white, 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+.double-slider{
+    position: absolute;
+}
+
+/*accordion*/
+.accordion {
+    background-color: var(--accordion-btn);
+    color: var(--sidenav-text);
+    cursor: pointer;
+    padding: 8px 8px 8px 16px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+
+.accordion:hover {
+    background-color: var(--accordion-btn-hover);
+}
+
+.accordion:after {
+    content: '\002B';
+    color: var(--sidenav-text);
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.active.accordion:after {
+    content: "\2212";
+}
+
+.panel {
+    padding: 0 18px;
+    background-color: var(--accordion-background);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+/*checklist*/
+#nodeChecklist.disable, #infoMenu.disable, #validationMenu.disable {
+    display: none;
+}
+
+/* Remove margins and padding from the list */
+#nodeChecklist > ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the list items */
+#nodeChecklist ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    list-style-type: none;
+    font-size: 18px;
+    transition: 0.2s;
+    color: var(--sidenav-text);
+    /* make the list items unselectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Darker background-color on hover */
+#nodeChecklist ul li:hover {
+    background: var(--search-sugg-background-hover);
+}
+
+/* When clicked on, add a background color and strike out text */
+#nodeChecklist ul li.checked {
+    background: var(--accordion-btn);
+    color: var(--search-input);
+}
+
+/* Add a "checked" mark when clicked on */
+#nodeChecklist ul li.checked::before {
+    content: '';
+    position: absolute;
+    border-color: var(--search-input);
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    top: 10px;
+    left: 16px;
+    transform: rotate(45deg);
+    height: 15px;
+    width: 7px;
+}
+
+/* Style the close button */
+#nodeChecklist > .close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 12px 16px 12px 16px;
+}
+
+/* request validation button */
+#requestValidationBtn {
+    position: relative;
+    margin: 10px 0px;
+}
+
+#requestValidationBtn:before {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    margin-top: -12px;
+    width: 24px;
+    height: 24px;
+    border: 2px solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s;
+    animation: 0.8s linear infinite rotate;
+}
+
+#requestValidationBtn.sending {
+    /*pointer-events: none;
+    cursor: not-allowed;*/
+}
+
+#requestValidationBtn.sending:before {
+    transition-delay: 0.5s;
+    transition-duration: 1s;
+    opacity: 1;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

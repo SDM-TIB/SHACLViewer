@@ -24,6 +24,7 @@
 
     <!-- custom script -->
     <script>
+        {# category: info,warning,danger,success,primary,secondary,light,dark #}
         var flashMessage = function (data, category) {
             html = '';
             <!-- for (i = 0; i < data.length; i++) { -->
@@ -35,135 +36,12 @@
 
     </script>
 
-    <style>
-        :root {
-            --accent-color: #2196F3;
-            --main-background: #212121;
-            --sidenav-background: #111;
-            --sidenav-background-inactive: #333;
-            --sidenav-text: #c5c5c5;
-            --sidenav-text-hover: #f1f1f1;
-            --slider-circle: white;
-            --slider-off: #444;
-            --search-input: white;
-            --search-border: white;
-            --search-sugg-text: white;
-            --search-sugg-background: #212121;
-            --search-sugg-background-hover: #444444;
-            --loader-background: #aaa;
-            --accordion-btn: rgb(34, 36, 38);
-            --accordion-btn-hover: rgb(53, 57, 59);
-            --accordion-background: rgb(24, 26, 27);
-        }
-
-        [data-theme="light"] {
-            --accent-color: #2196F3;
-            --main-background: #f9f9f9;
-            --sidenav-background: #fff;
-            --sidenav-background-inactive: #bbb;
-            --sidenav-text: #030303;
-            --sidenav-text-hover: #404040;
-            --slider-circle: white;
-            --slider-off: #444;
-            --search-input: #000;
-            --search-border: #000;
-            --search-sugg-text: #000;
-            --search-sugg-background: #f9f9f9;
-            --search-sugg-background-hover: #e5e5e5;
-            --loader-background: #aaa;
-            --accordion-btn: #e5e5e5;
-            --accordion-btn-hover: #aaa;
-            --accordion-background: #f2f2f2;
-        }
-    </style>
-    {# Switch toggle style #}
-    <style>
-
-        .switch {
-            position: absolute;
-            display: inline-block;
-            width: 40px;
-            height: 23px;
-            padding: 0px;
-            margin: 0px;
-            right: 0;
-            margin-right: 15px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--slider-off);
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 19px;
-            width: 19px;
-            left: 4px;
-            bottom: 2px;
-            background-color: var(--slider-circle);
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-        input:checked + .slider {
-            background-color: var(--accent-color);
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--accent-color);
-        }
-
-        input:checked + .slider:before {
-            -webkit-transform: translateX(14px);
-            -ms-transform: translateX(14px);
-            transform: translateX(14px);
-        }
-
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 12px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        .switch-header {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 23px;
-            padding: 0;
-            margin: 0;
-            right: 0;
-        }
-
-        .switch-header input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="./static/css/basemain.css">
 
     {% block headbase %}{% endblock %}
-{#    <title>#}
-        {% block title %}{% endblock %}
-{#    </title>#}
+    {#    <title>#}
+    {% block title %}{% endblock %}
+    {#    </title>#}
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">

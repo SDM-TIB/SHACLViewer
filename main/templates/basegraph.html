@@ -1,514 +1,15 @@
 {% include 'basemain.html' %}
 {% block headbase %}
-    {# alert #}
-    <style>
-        #flash {
-            position: absolute;
-        }
 
-        .alert {
-            z-index: 1;
-            margin-left: 50vw;
-            transform: translateX(-50%);
-        }
-
-        .alert > button > span {
-            padding-left: 1rem;
-        }
-    </style>
-    {# navigation panels #}
-    <style>
-        .icon.bi::before, .icon.fa::before {
-            padding: 4px;
-        }
-
-        .navbar {
-            z-index: 3;
-        }
-
-        .option-btn {
-            cursor: pointer;
-            position: absolute;
-            z-index: 2;
-            padding: 1em;
-        }
-
-        #rightTabs {
-            position: absolute;
-            z-index: 2;
-            right: 0;
-            transition: 0.5s;
-            display: flex;
-            writing-mode: vertical-lr;
-        }
-
-        .right-tab-btn {
-            margin-bottom: 20px;
-            cursor: pointer;
-            background-color: var(--sidenav-background-inactive);
-            padding: 10px;
-            flex: 1;
-            transition: 0.5s;
-            transform: rotate(180deg);
-        }
-
-        .selected {
-            background-color: var(--sidenav-background);
-            box-shadow: 3px 0px 6px 0px rgba(0, 0, 0, 0.16);
-        }
-
-        .closeLeftNav {
-            transform: translateX(-285px);
-        }
-
-        .closeRightNav {
-            transform: translateX(400px);
-        }
-
-        .tabs-openRightNav {
-            transform: translateX(-400px);
-        }
-
-        /* The side navigation menu */
-        .sidenav {
-            height: calc(100vh - 50px); /* 100% Full-height - 50px navigation bar*/
-            width: 0; /* 0 width - change this with JavaScript */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Stay on top */
-            top: 0; /* Stay at the top */
-            background-color: var(--sidenav-background);; /* Black*/
-            overflow-x: hidden; /* Disable horizontal scroll */
-            margin-top: 56px; /* Place content 60px from the top */
-            transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
-            box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
-        }
-
-        .leftnav {
-            padding-top: 50px;
-            left: 0;
-            width: 285px;
-        }
-
-        .rightnav {
-            right: 0;
-            width: 400px;
-            padding: 10px 10px 0px 10px;
-        }
-
-        .option-icon {
-            padding-right: 5px;
-            width: 20px;
-        }
-
-        /* The navigation menu links */
-        .sidenav a, .sidenav p {
-            padding: 8px 8px 8px 16px;
-            text-decoration: none;
-        {#color: #818181;#} color: var(--sidenav-text);
-            display: block;
-            transition: 0.3s;
-            margin-bottom: 0px;
-        }
-
-        /* When you mouse over the navigation links, change their color */
-        .sidenav a:hover {
-            color: var(--sidenav-text-hover);
-        }
-
-        /* Position and style the close button (top right corner) */
-        .sidenav .closebtn {
-            position: absolute;
-            top: 0;
-            right: 25px;
-            font-size: 36px;
-            margin-left: 50px;
-        }
-
-        /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
-        #main {
-            transition: margin-left .5s;
-        {#padding: 20 px;#}
-        }
-
-        /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-        @media screen and (max-height: 450px) {
-            .sidenav {
-                padding-top: 15px;
-            }
-
-            .sidenav a {
-                font-size: 18px;
-            }
-        }
-    </style>
-    {#treeview#}
-    <style>
-
-        .list-group-item {
-            color: var(--sidenav-text);
-            background: transparent;
-            border: 0;
-        }
-
-        .list-group-item-action:focus, .list-group-item-action:hover {
-            z-index: 1;
-            color: var(--search-input);
-            text-decoration: none;
-            background-color: var(--accordion-btn);
-        }
-
-    </style>
-    {# search bar #}
-    <style>
-
-        .wrapper {
-            /* max-width: 450px; */
-            /* margin: 150px auto; */
-            padding: 0px 16px 16px 16px;
-        }
-
-        .wrapper .search-input {
-            background: transparent;
-            width: 100%;
-            border-radius: 2px;
-            position: relative;
-            /* box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12); */
-        }
-
-        .search-input input {
-            height: 40px;
-            background: transparent;
-            color: var(--search-input);
-            width: 100%;
-            outline: none;
-            border: solid var(--search-border);
-            border-width: 0 0 1px 0;
-            border-radius: 2px;
-            padding: 0 40px 0 5px;
-            /* font-size: 18px; */
-            /* box-shadow: 0px 1px 5px rgb(0 0 0 / 10%); */
-        }
-
-        .search-input.active input {
-            border-radius: 5px 5px 0 0;
-        }
-
-        .search-input .autocom-box {
-            padding: 0;
-            opacity: 0;
-            pointer-events: none;
-            max-height: 280px;
-            overflow-y: auto;
-            visibility: hidden;
-        }
-
-        .search-input.active .autocom-box {
-            padding: 10px 8px;
-            background: var(--search-sugg-background);
-            opacity: 1;
-            pointer-events: auto;
-            /* border: 1px solid white; */
-            border-radius: 0 0 3px 3px;
-            position: absolute;
-            width: 100%;
-            visibility: visible;
-            z-index: 1;
-        }
-
-        .autocom-box li {
-            list-style: none;
-            padding: 8px 12px;
-            display: none;
-            width: 100%;
-            cursor: default;
-            border-radius: 3px;
-            color: var(--search-sugg-text)
-        }
-
-        .search-input.active .autocom-box li {
-            display: block;
-        }
-
-        .autocom-box li:hover {
-            background: var(--search-sugg-background-hover);
-        }
-
-        .search-input .icon {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 40px;
-            width: 40px;
-            text-align: center;
-            line-height: 40px;
-            font-size: 20px;
-            color: var(--sidenav-text);
-            cursor: pointer;
-        }
-    </style>
-    {# loader #}
-    <style>
-        #loader.loader {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            z-index: 1;
-            width: 120px;
-            height: 120px;
-            margin: -76px 0 0 -76px;
-            border: 16px solid var(--loader-background);
-            border-radius: 50%;
-            border-top: 16px solid var(--accent-color);
-            -webkit-animation: spin 2s linear infinite;
-            animation: spin 2s linear infinite;
-        }
-
-        @-webkit-keyframes spin {
-            0% {
-                -webkit-transform: rotate(0deg);
-            }
-            100% {
-                -webkit-transform: rotate(360deg);
-            }
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-    {# range slider style #}
-    <style>
-        .slider-container output {
-            vertical-align: super;
-        }
-
-        input[type='range'] {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
-        input[type='range']:focus {
-            outline: none;
-        }
-
-        input[type='range']::-webkit-slider-thumb {
-            -webkit-appearance: none;
-        }
-
-        input[type='range']::-moz-range-thumb {
-            border: none;
-        }
-
-        .range-style {
-            width: 170px;
-            padding: 8px 8px 8px 16px;
-            background: transparent;
-            border-radius: 10px;
-        }
-
-        .range-style::-webkit-slider-runnable-track {
-            display: flex;
-            align-items: center;
-            height: 8px;
-            border-radius: 10px;
-            background: var(--slider-off);
-        }
-
-        .range-style::-webkit-slider-thumb {
-            position: relative;
-            top: -50%;
-            width: 20px;
-            height: 20px;
-            background-color: var(--slider-circle);
-        {#background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.8), transparent);// 3D effect#} border-radius: 50%;
-            box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.16);
-        }
-
-        .range-style::-moz-range-track {
-            display: flex;
-            align-items: center;
-            height: 20px;
-            border-radius: 10px;
-            box-shadow: inset -2px -2px 8px white, inset 2px 2px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .range-style::-moz-range-thumb {
-            position: relative;
-            top: -50%;
-            width: 40px;
-            height: 40px;
-            background-color: #e0e0e0;
-            background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.8), transparent);
-            border-radius: 50%;
-            box-shadow: -1px -1px 2px white, 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-    </style>
-    {# accordion #}
-    <style>
-        .accordion {
-            background-color: var(--accordion-btn);
-            color: var(--sidenav-text);
-            cursor: pointer;
-            padding: 8px 8px 8px 16px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-            transition: 0.4s;
-        }
-
-        .accordion:hover {
-            background-color: var(--accordion-btn-hover);
-        }
-
-        .accordion:after {
-            content: '\002B';
-            color: var(--sidenav-text);
-            font-weight: bold;
-            float: right;
-            margin-left: 5px;
-        }
-
-        .active.accordion:after {
-            content: "\2212";
-        }
-
-        .panel {
-            padding: 0 18px;
-            background-color: var(--accordion-background);
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
-        }
-    </style>
-    {# checklist #}
-    <style>
-
-        #nodeChecklist.disable, #infoMenu.disable {
-            display: none;
-        }
-
-        /* Remove margins and padding from the list */
-        #nodeChecklist > ul {
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Style the list items */
-        #nodeChecklist ul li {
-            cursor: pointer;
-            position: relative;
-            padding: 12px 8px 12px 40px;
-            list-style-type: none;
-            font-size: 18px;
-            transition: 0.2s;
-            color: var(--sidenav-text);
-            /* make the list items unselectable */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* Darker background-color on hover */
-        #nodeChecklist ul li:hover {
-            background: var(--search-sugg-background-hover);
-        }
-
-        /* When clicked on, add a background color and strike out text */
-        #nodeChecklist ul li.checked {
-            background: var(--accordion-btn);
-            color: var(--search-input);
-        }
-
-        /* Add a "checked" mark when clicked on */
-        #nodeChecklist ul li.checked::before {
-            content: '';
-            position: absolute;
-            border-color: var(--search-input);
-            border-style: solid;
-            border-width: 0 2px 2px 0;
-            top: 10px;
-            left: 16px;
-            transform: rotate(45deg);
-            height: 15px;
-            width: 7px;
-        }
-
-        /* Style the close button */
-        #nodeChecklist > .close {
-            position: absolute;
-            right: 0;
-            top: 0;
-            padding: 12px 16px 12px 16px;
-        }
-
-        {##nodeChecklist > .close:hover {
-            background-color: #f44336;
-            color: white;
-        }
-
-        /* Style the header */
-        #nodeChecklist > .header {
-            background-color: #f44336;
-            padding: 30px 40px;
-            color: white;
-            text-align: center;
-        }
-
-        /* Clear floats after the header */
-        #nodeChecklist > .header:after {
-            content: "";
-            display: table;
-            clear: both;
-        }#}
-
-        {#
-            /* Style the input */
-            input {
-                margin: 0;
-                border: none;
-                border-radius: 0;
-                width: 75%;
-                padding: 10px;
-                float: left;
-                font-size: 16px;
-            }
-
-            /* Style the "Add" button */
-            .addBtn {
-                padding: 10px;
-                width: 25%;
-                background: #d9d9d9;
-                color: #555;
-                float: left;
-                text-align: center;
-                font-size: 16px;
-                cursor: pointer;
-                transition: 0.3s;
-                border-radius: 0;
-            }
-
-            .addBtn:hover {
-                background-color: #bbb;
-            }#}
-    </style>
+    <link rel="stylesheet" href="./static/css/basegraph.css">
 
     <style> body {
         margin: 0;
     } </style>
 
-{#    <script src="//unpkg.com/three"></script>#}
-{#    <script src="//unpkg.com/three/examples/js/renderers/CSS2DRenderer.js"></script>#}
-{#    <script src="//unpkg.com/three-spritetext"></script>#}
+    {#    <script src="//unpkg.com/three"></script>#}
+    {#    <script src="//unpkg.com/three/examples/js/renderers/CSS2DRenderer.js"></script>#}
+    {#    <script src="//unpkg.com/three-spritetext"></script>#}
     <script src="./static/js/three/three.js"></script>
     <script src="./static/js/three/CSS2DRenderer.js"></script>
     <script src="./static/js/sprite/three-spritetext.js"></script>
@@ -585,6 +86,15 @@
             <input type="range" class="range-style" id="fromConstraintLinkSlider" min="0" max="200">
             <output>150</output>
         </div>
+        <button class="accordion">Validation Intensity Categorization</button>
+        <div class="slider-container panel">
+            <p>Low Invalid Percentage</p>
+            <input type="range" class="range-style" id="lowValidationPercentage" min="0" max="100">
+            <output>60</output>
+            <p>High Invalid Percentage</p>
+            <input type="range" class="range-style" id="HighValidationPercentage" min="0" max="100">
+            <output>90</output>
+        </div>
         {#    <a href="javascript:void(0)" id="shapesDropdown"><i class=''></i>Shapes#}
         {#        <label class="switch">#}
         {#            <input type="checkbox" disabled="disabled">#}
@@ -598,6 +108,7 @@
     <div id="rightTabs">
         <span id="infoBtn" class="right-tab-btn" onclick="toggleRightNav('info')">Info</span>
         <span id="shapeBtn" class="right-tab-btn" onclick="toggleRightNav('shapes')">Shapes</span>
+        <span id="validationBtn" class="right-tab-btn" onclick="toggleRightNav('validation')">Validation</span>
     </div>
     <div id="myRightSidenav" class="sidenav rightnav closeRightNav">
         <div id="infoMenu">
@@ -612,6 +123,21 @@
         </div>
         <div id="nodeChecklist">
             <ul></ul>
+        </div>
+        <div id="validationMenu">
+            <button class="accordion active">Total Validation Data</button>
+            <div class="slider-container panel">
+                <div id="totalValidationData"></div>
+            </div>
+            <button class="accordion active">Selected Shape Data</button>
+            <div class="slider-container panel">
+                <div id="selectedValidationRequest">
+                    <button id="requestValidationBtn" class="btn btn-primary btn-block" style="display:none;">Request
+                        Validation
+                    </button>
+                </div>
+                <div id="selectedValidationData"></div>
+            </div>
         </div>
         {#        {% block infoMenu %}#}
         {#        #}
@@ -652,7 +178,11 @@
                     isHidden: false,
                     highlighted: false,
                     childLinks: [],
-                    parentLinks: []
+                    parentLinks: [],
+                    query: "{{ node.targetQuery }}",
+                    valid: -1,
+                    invalid: -1,
+                    colorRange: 0 {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high #}
                 }
                 nodes.push(currentNode);
 
@@ -1069,7 +599,7 @@
                     }#}
 
             {# debug #}
-            $('#flash').append(flashMessage(`Shapes= {{ graph|length }} | Nodes= ${nodes.length} | Links= ${links.length}`, 'info'));
+            {#$('#flash').append(flashMessage(`Shapes= {{ graph|length }} | Nodes= ${nodes.length} | Links= ${links.length}`, 'info'));#}
             {#console.log(JSON.stringify(nodes))#}
             {#console.log(JSON.stringify(links))#}
 
@@ -1097,12 +627,14 @@
                 }
             }
 
+            let isRightNavOpenedBefore = false
+
             function onNodeClicked(node) {
                 {#debug#}
                 console.log('onNodeClick|')
                 debugNode(node)
 
-                if (node == selectedNode && node.isClass) {
+                if (node === selectedNode && node.isClass) {
                     node.expanded = !node.expanded; // toggle collapse state
                     console.log('if node.isClass| ' + node.id + '.expanded ' + node.expanded)
                     updateClassState(node);
@@ -1130,9 +662,14 @@
                     updateGraph();
                 }
 
-                {#openRightNav('info', node)#}
-                viewNodeInfo(node)
+                // open info panel for the first time
+                if (!isRightNavOpenedBefore) {
+                    openRightNav('info');
+                    isRightNavOpenedBefore = true;
+                }
 
+                viewNodeInfo(node)
+                fillValidationData()
                 highlightNode(node)
             }
 
@@ -1141,16 +678,9 @@
 
             import {BootstrapTreeView} from './static/js/treeview/treeview.bootstrap.js';
 
-            let isInfoNavOpened = false
-
             {# fill info menu #}
 
             function viewNodeInfo(node) {
-                // open info panel for the first time
-                if (!isInfoNavOpened) {
-                    openRightNav('info');
-                    isInfoNavOpened = true;
-                }
 
                 // fill statistics
                 let stat = document.getElementById('infoStatistic')
@@ -1353,7 +883,7 @@
                     }
                 });
 
-                console.log(shapeCheckList);
+                {#console.log(shapeCheckList);#}
             }
 
             function updateHiddenLinks() {
@@ -1403,6 +933,305 @@
 
                 });
             }
+
+            {# validation #}
+
+            function requestValidationData(node) {
+
+                {#let config = {
+                    external_endpoint: "http://dbpedia.org/sparql",
+                    outputDirectory: "./output/",
+                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX dbo:<http://dbpedia.org/ontology/>\nPREFIX dbr:<http://dbpedia.org/resource/>\nPREFIX dbp:<http://dbpedia.org/property/>\nPREFIX yago:<http://dbpedia.org/class/yago/>\nPREFIX foaf:<http://xmlns.com/foaf/0.1/>\nPREFIX :<http://example.org/>\nSELECT DISTINCT ?x WHERE {\n    ?x a dbo:Film. \n    ?x dbo:starring ?varnameistegal.\n    ?x dbo:imdbId ?p_2.\n    ?x dbp:studio dbr:Walt_Disney_Pictures\n}\n\n",
+                    schemaDir: "./examples/dbpedia/shapes/",
+                    targetShape: "MovieShape",
+                    backend: "travshacl",
+                    output_format: "test"
+                }#}
+                {#let config = {
+                    external_endpoint: "http://shacl_api_testdata:8890/sparql",
+                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX :<http://example.com/>\n\nSELECT ?prof ?email ?uni WHERE {\n  ?prof a ub:FullProfessor .\n  ?prof ub:email ?email .\n  ?prof ub:worksFor :Dept0 .\n ?prof ub:doctoralDegreeFrom ?uni\n}",
+                    schemaDir: "./examples/lubm/shapes/",
+                    targetShape: "FullProfessor",
+                    backend: "travshacl",
+                    start_with_target_shape: false,
+                    replace_target_query: false,
+                    remove_constraints: false
+                }#}
+                {#let config = {
+                    external_endpoint: "http://shacl_api_testdata:8890/sparql",
+                    outputDirectory: "./output/",
+                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/> SELECT ?x WHERE { ?x a ub:FullProfessor}",
+                    schemaDir: "./examples/lubm/shapes/",
+                    targetShape: "FullProfessor",
+                    backend: "travshacl",
+                    output_format: "test"
+                }#}
+
+                let config = {
+                    {#external_endpoint: "http://shacl_api_testdata:8890/sparql",#}
+                    external_endpoint: "http://192.168.111.1:14000/sparql",
+                    outputDirectory: "./output/",
+                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
+                    schemaDir: "./examples/lubm_extended/shapes/",
+                    targetShape: node.id,
+                    backend: "travshacl",
+                    output_format: "test"
+                }
+
+                {# let post_config = '{' +
+                    '    "backend": "travshacl",' +
+                    '    "start_with_target_shape": true,' +
+                    '    "replace_target_query": true,' +
+                    '    "prune_shape_network": true,' +
+                    '    "output_format": "simple",' +
+                    '    "join_implementation": "Xgjoin",' +
+                    '    "reasoning": false,' +
+                    '    "run_in_serial": false' +
+                    '}'#}
+
+
+                console.log("requestValidationData")
+                let request = $.ajax({
+                    {#url: "http://127.0.0.1:9999/validation",#}
+                    url: "http://192.168.111.128:9999/validation",
+                    type: "POST",
+                    data: config,
+                    success: function (data, textStatus, jqXHR) {
+                        console.log("success")
+                        console.log(data)
+                        console.log(textStatus)
+                        console.log(jqXHR)
+
+                        Object.keys(data).forEach(shapeId => {
+                            let shape = nodesById[shapeId]
+                            shape.valid = data[shapeId].valid
+                            shape.invalid = data[shapeId].invalid
+                            if (shape.valid === 0 && shape.invalid === 0)
+                                shape.validPercent = 100
+                            else
+                                shape.validPercent = Math.floor(100 * shape.valid / (shape.valid + shape.invalid));
+                            validationData.add(shape)
+                        })
+
+                        {# request returned so remove it from request map #}
+                        delete requestMap[node.id];
+
+                        let currentNode;
+                        if (selectedNode.isClass)
+                            currentNode = selectedNode;
+                        else
+                            currentNode = selectedNode.parentLinks[0];
+
+                        if (node.id === currentNode.id) {
+                            fillValidationData()
+                            isRequestBtnClicked(false)
+                        } else
+                            updateTotalValidation()
+                    },
+                    error: function (jqXHR, exception) {
+                        console.log("$.ajax error:")
+                        console.log(jqXHR.status)
+                        console.log(exception)
+                        let msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = ': Cannot connect to ShaclAPI';
+                        } else if (jqXHR.status === 404) {
+                            msg = ': Requested page not found. [404]';
+                        } else if (jqXHR.status === 500) {
+                            msg = ': Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = ': Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = ': Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = ': Ajax request aborted.';
+                        } else {
+                            msg = ': Uncaught Error.\n' + jqXHR.responseText;
+                        }
+                        $('#flash').append(flashMessage(node.id + msg, 'warning'));
+
+                        {# request returned so remove it from request map #}
+                        delete requestMap[node.id];
+
+                        let currentNode;
+                        if (selectedNode.isClass)
+                            currentNode = selectedNode;
+                        else
+                            currentNode = selectedNode.parentLinks[0];
+
+                        if (node.id === currentNode.id) {
+                            isRequestBtnClicked(false)
+                        }
+                    }
+                });
+                return request;
+            }
+
+            let validationData = {
+
+                settings: {
+                    highValidPercent: 10,
+                    lowValidPercent: 40
+                },
+                validatedNodes: [],
+                totalShapes: {{ graph|length }},
+                totalValid: 0,
+                totalInvalid: 0,
+                low: 0,
+                med: 0,
+                high: 0,
+                allValid: 0,
+                add: function (node) { {# colorRange[ 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high ] #}
+                    if (!this.validatedNodes.includes(node)) {
+                        switch (true) {
+                            case (node.validPercent < this.settings.highValidPercent):
+                                this.high++;
+                                node.colorRange = 4;
+                                break;
+                            case (node.validPercent < this.settings.lowValidPercent):
+                                this.med++;
+                                node.colorRange = 3;
+                                break;
+                            case (node.validPercent < 100):
+                                this.low++;
+                                node.colorRange = 2;
+                                break;
+                            case (node.validPercent === 100):
+                                this.allValid++;
+                                node.colorRange = 1;
+                                break;
+                        }
+                        updateNode3d();
+                        this.totalValid += node.valid
+                        this.totalInvalid += node.invalid
+                        this.validatedNodes.push(node)
+                    }
+                },
+                updateRange: function () {
+                    {# recalculate low/med/high #}
+                    this.low = this.med = this.high = this.allValid = this.totalValid = this.totalInvalid = 0
+                    this.validatedNodes.forEach(node => {
+                        switch (true) {
+                            case (node.validPercent < this.settings.highValidPercent):
+                                this.high++;
+                                node.colorRange = 4;
+                                break;
+                            case (node.validPercent < this.settings.lowValidPercent):
+                                this.med++;
+                                node.colorRange = 3;
+                                break;
+                            case (node.validPercent < 100):
+                                this.low++;
+                                node.colorRange = 2;
+                                break;
+                            case (node.validPercent === 100):
+                                this.allValid++;
+                                node.colorRange = 1;
+                                break;
+                        }
+                        this.totalValid += node.valid
+                        this.totalInvalid += node.invalid
+                    })
+                }
+            }
+
+            let requestMap = {}
+
+            function fillValidationData() {
+                console.log("fillValidationData")
+
+                {# fill total validation #}
+                updateTotalValidation()
+
+                {# fill selected validation #}
+
+                let shapeNode;
+                if (selectedNode.isClass)
+                    shapeNode = selectedNode;
+                else
+                    shapeNode = selectedNode.parentLinks[0];
+
+                let statNode = document.getElementById('selectedValidationData')
+                if (shapeNode.valid < 0) {
+                    {# show request button #}
+                    document.getElementById('requestValidationBtn').style.display = "block"
+                    {# check if already requested or not #}
+                    if (requestMap[shapeNode.id]) {
+                        isRequestBtnClicked(true)
+                    } else {
+                        isRequestBtnClicked(false)
+                    }
+                    {# clear validation data #}
+                    statNode.innerHTML = ''
+                } else {
+                    {# hide request button #}
+                    document.getElementById('requestValidationBtn').style.display = "none"
+
+                    {# fill validation data #}
+                    statNode.innerHTML =
+                        '<p>Valid Percentage:</p>'
+                        + "<p style=\'background: linear-gradient(90deg, rgb(0 90 255) 0%, rgb(0 90 255) " + shapeNode.validPercent + "%, rgb(192 0 0) " + shapeNode.validPercent + "%, rgb(192 0 0) 100%);\'"
+                        + " class=\'powerbar\'>"
+                        + shapeNode.validPercent + "%</p>"
+                        + "<table><tr><td>Valid: " + shapeNode.valid + "</td><td>"
+                        + "Invalid: " + shapeNode.invalid + "</td></tr></table>";
+                }
+            }
+
+            function updateTotalValidation() {
+                {# fill total validation #}
+                let statTotal = document.getElementById('totalValidationData')
+
+                {# calculate low,med,high percent #}
+                let total = validationData.allValid + validationData.low + validationData.med + validationData.high
+                let allValidP = 100 * validationData.allValid / total;
+                let lowP = 100 * (validationData.allValid + validationData.low) / total;
+                let medP = 100 * (validationData.allValid + validationData.low + validationData.med) / total;
+
+                let validDataPercent = Math.floor(100 * validationData.totalValid / (validationData.totalValid + validationData.totalInvalid))
+                if (validationData.totalValid === 0 && validationData.totalInvalid === 0)
+                    validDataPercent = 100;
+
+                statTotal.innerHTML =
+                    '<p>Shapes processed: ' + validationData.validatedNodes.length + '/' + validationData.totalShapes +
+                    '</p>'
+                    + "<p style=\'background: linear-gradient(90deg, rgb(0 192 0) 0%, rgb(0 192 0) " + allValidP
+                    + "%, rgb(255 255 0) " + allValidP
+                    + "%, rgb(255 255 0) " + lowP
+                    + "%, rgb(255 128 0) " + lowP
+                    + "%, rgb(255 128 0) " + medP
+                    + "%, rgb(192 0 0) " + medP
+                    + "%, rgb(192 0 0) 100%);\'"
+                    + " class=\'powerbar\'>"
+                    + "</p>"
+                    + "<table><tr><td>Low: " + validationData.low + "</td><td>"
+                    + "Medium: " + validationData.med + "</td><td>"
+                    + "High: " + validationData.high + "</td></tr></table>"
+                    + '<p>Validation Data:</p>'
+                    + "<p style=\'background: linear-gradient(90deg, rgb(13 110 253) 0%, rgb(13 110 253) " + validDataPercent
+                    + "%, rgb(192 0 0) " + validDataPercent
+                    + "%, rgb(192 0 0) 100%);\'"
+                    + " class=\'powerbar\'>"
+                    + validDataPercent + "%</p>"
+                    + "<table><tr><td>Valid: " + validationData.totalValid + "</td><td>"
+                    + "Invalid: " + validationData.totalInvalid + "</td></tr></table>";
+            }
+
+            function isRequestBtnClicked(clicked) {
+                let btn = document.getElementById('requestValidationBtn');
+                if (clicked) {
+                    btn.classList.add("sending", "btn-secondary")
+                    btn.classList.remove("btn-primary")
+                    btn.textContent = "Validating, click to cancel"
+                    btn.blur()
+                } else {
+                    btn.classList.remove("sending", "btn-secondary")
+                    btn.classList.add("btn-primary")
+                    btn.textContent = "Request Validation"
+                    btn.blur()
+                }
+            }
+
 
             // HTML calls
             document.querySelector("#collapseAll").onclick = () => {
@@ -1462,6 +1291,9 @@
 
                 // open node checklist and fill it
                 openRightNav('shape');
+
+                // center graph without changing the zoom
+                {#setTimeout(() => Graph.zoomToFit(400),500)#}
 
             }
 
@@ -1706,6 +1538,27 @@
                 updateLinkDistance();
             }
 
+            // Validation percentage slider update value from default settings
+            document.querySelector('#lowValidationPercentage').value = 100 - validationData.settings.lowValidPercent
+            document.querySelector('#HighValidationPercentage').value = 100 - validationData.settings.highValidPercent
+            document.querySelector('#lowValidationPercentage').nextElementSibling.value = 100 - validationData.settings.lowValidPercent
+            document.querySelector('#HighValidationPercentage').nextElementSibling.value = 100 - validationData.settings.highValidPercent
+            // Validation percentage slider listeners
+            document.querySelector('#lowValidationPercentage').oninput = function () {
+                this.nextElementSibling.value = this.value
+                validationData.settings.lowValidPercent = 100 - this.value
+                validationData.updateRange()
+                updateNode3d();
+                updateTotalValidation()
+            }
+            document.querySelector('#HighValidationPercentage').oninput = function () {
+                this.nextElementSibling.value = this.value
+                validationData.settings.highValidPercent = 100 - this.value
+                validationData.updateRange()
+                updateNode3d();
+                updateTotalValidation()
+            }
+
             {# add accordion button listeners #}
             let acc = document.querySelectorAll(".accordion");
             for (let i = 0; i < acc.length; i++) {
@@ -1761,6 +1614,9 @@
             let isRightNavOpen = false;
 
             function openRightNav(selectedTab) {
+                {# the user know about the panel so no need to open it on 'info' tab for the first time click #}
+                isRightNavOpenedBefore = true;
+
                 isRightNavOpen = true;
                 document.getElementById("myRightSidenav").classList.remove("closeRightNav");
                 document.getElementById("rightTabs").classList.add("tabs-openRightNav");
@@ -1768,21 +1624,37 @@
                     case 'info':
                         document.getElementById('infoBtn').classList.add('selected')
                         document.getElementById('shapeBtn').classList.remove('selected')
+                        document.getElementById('validationBtn').classList.remove('selected')
 
                         // show info menu and hide node check list
                         document.getElementById('infoMenu').classList.remove('disable')
                         document.getElementById('nodeChecklist').classList.add('disable')
+                        document.getElementById('validationMenu').classList.add('disable')
 
-                        {#if (node) viewNodeInfo(node)#}
+                    {#if (node) viewNodeInfo(node)#}
                         break;
 
                     case 'shape':
-                        document.getElementById('shapeBtn').classList.add('selected')
                         document.getElementById('infoBtn').classList.remove('selected')
+                        document.getElementById('shapeBtn').classList.add('selected')
+                        document.getElementById('validationBtn').classList.remove('selected')
 
                         // show node check list and hide info menu
-                        document.getElementById('nodeChecklist').classList.remove('disable')
                         document.getElementById('infoMenu').classList.add('disable')
+                        document.getElementById('nodeChecklist').classList.remove('disable')
+                        document.getElementById('validationMenu').classList.add('disable')
+
+                        break;
+
+                    case 'validation':
+                        document.getElementById('infoBtn').classList.remove('selected')
+                        document.getElementById('shapeBtn').classList.remove('selected')
+                        document.getElementById('validationBtn').classList.add('selected')
+
+                        // show node check list and hide info menu
+                        document.getElementById('infoMenu').classList.add('disable')
+                        document.getElementById('nodeChecklist').classList.add('disable')
+                        document.getElementById('validationMenu').classList.remove('disable')
 
                         break;
                 }
@@ -1795,6 +1667,7 @@
 
                 document.getElementById('infoBtn').classList.remove('selected')
                 document.getElementById('shapeBtn').classList.remove('selected')
+                document.getElementById('validationBtn').classList.remove('selected')
             }
 
             document.querySelector('#infoBtn').onclick = () => {
@@ -1813,6 +1686,15 @@
                     closeRightNav()
                 } else { //it is closed
                     openRightNav('shape')
+                }
+            }
+            document.querySelector('#validationBtn').onclick = () => {
+                if (isRightNavOpen && !document.getElementById("validationBtn").classList.contains("selected")) {
+                    openRightNav('validation')
+                } else if (isRightNavOpen && document.getElementById("validationBtn").classList.contains("selected")) {
+                    closeRightNav()
+                } else { //it is closed
+                    openRightNav('validation')
                 }
             }
 
@@ -1840,15 +1722,28 @@
                 updateNode3d();
             }
 
+            document.querySelector('#requestValidationBtn').onclick = (e) => {
+                let shapeNode;
+                if (selectedNode.isClass)
+                    shapeNode = selectedNode;
+                else
+                    shapeNode = selectedNode.parentLinks[0];
+
+                {# check if the request is sent and abort it#}
+                if (requestMap[shapeNode.id]) {
+                    requestMap[shapeNode.id].abort();
+                    delete requestMap[shapeNode.id];
+                    {# change style #}
+                    isRequestBtnClicked(false)
+                } else {
+                    requestMap[shapeNode.id] = requestValidationData(shapeNode)
+                    {# change style #}
+                    isRequestBtnClicked(true)
+                }
+            }
+
             {# remove loader #}
             document.querySelector('#loader').removeAttribute("class");
-
-
-            {# to-do
-
-
-             #}
-
 
         </script>
 

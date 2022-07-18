@@ -25,6 +25,22 @@
         {# to avoid "temporal dead zone" when using Graph for node update #}
         let isGraphInit = false;
 
+        let settings = new function () {
+            this.linkLengthClass2Class = 100;
+            this.linkLengthAttribute = 25;
+            this.linkLengthToConstraint = 25;
+            this.linkLengthFromConstraint = 50;
+
+            this.nodeColorDark = '#0af'
+            this.nodeColorLight = '#000'
+            this.nodeBackgroundColorDark = '#000'
+            this.nodeBackgroundColorLight = '#0af'
+            this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
+            this.nodeBorderColor = '#0af'
+            this.attributeBorderColor = 'rgb(0,0,0,1)'
+            this.linkNodeBorderColor = 'rgb(255,64,0)'
+        }
+
         const elem = document.getElementById('3d-graph');
         const Graph = ForceGraph({
             extraRenderers: [new THREE.CSS2DRenderer()]
@@ -48,15 +64,15 @@
                 const textWidth = ctx.measureText(label).width;
                 const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.5); // some padding
 
-                ctx.fillStyle = darkMode ? '#000' : node.color;
-                ctx.strokeStyle = node.expanded ? 'rgb(0,255,0,1)' : 'rgb(255,255,0,1)';
+                ctx.fillStyle = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
+                ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
 
                 if (node.isClass) {
-                    ctx.strokeStyle = node.expanded ? 'rgb(0,255,0,1)' : 'rgb(255,255,0,1)';
+                    ctx.strokeStyle = node.expanded ?  settings.nodeBorderColorExpanded : settings.nodeBorderColor;
                 } else if (node.isAttribute) {
-                    ctx.strokeStyle = 'rgb(0,0,0,1)';
+                    ctx.strokeStyle = settings.attributeBorderColor;
                 } else {
-                    ctx.strokeStyle = 'rgb(0,0,255,1)';
+                    ctx.strokeStyle = settings.linkNodeBorderColor;
                 }
 
                 let borderThickness = 4;
@@ -71,7 +87,7 @@
 
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = darkMode ? node.color : '#000';
+                ctx.fillStyle = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
                 ctx.fillText(label, node.x, node.y);
 
                 node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
@@ -106,12 +122,14 @@
             ctx.stroke();
         }
 
-        let settings = new function () {
-            this.linkLengthClass2Class = 100;
-            this.linkLengthAttribute = 25;
-            this.linkLengthToConstraint = 25;
-            this.linkLengthFromConstraint = 50;
-        }
+{#        var link = Graph.selectAll(".link")#}
+{#
+        Graph.d3Force("tick", function() {
+            link.attr("x1", function(d) { return d.source.x })
+                .attr("y1", function(d) { return d.source.y })
+                .attr("x2", function(d) { return d.target.x })
+                .attr("y2", function(d) { return d.target.y })
+       })#}
 
         // call on slider change
         function updateLinkDistance() {
