@@ -460,7 +460,7 @@ input[type='range']::-moz-range-thumb {
 }
 
 /* request validation button */
-#requestValidationBtn {
+.btn-right-nav {
     position: relative;
     margin: 10px 0px;
 }
@@ -500,4 +500,17 @@ input[type='range']::-moz-range-thumb {
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* validation endpoint */
+#validationEndpointDropdown {
+    /*width: 75px;*/
+    height: 30px;
+}
+
+#validationEndpointTextBox {
+    /*width: 54px;*/
+    /*margin-left: -78px;*/
+    height: 25px;
+    border: none;
 }

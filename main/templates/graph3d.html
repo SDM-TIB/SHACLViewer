@@ -42,24 +42,26 @@
         }
 
         const elem = document.getElementById('3d-graph');
-        const Graph = ForceGraph3D({
-            extraRenderers: [new THREE.CSS2DRenderer()]
-        })
-        (elem)
-            .graphData(getVisibleLists())
-            .linkCurvature('curvature')
-            .linkCurveRotation('rotation')
-            .nodeAutoColorBy('group')
-            .linkOpacity(1)
-            .backgroundColor('#212121')
-            .linkColor((link) => link.highlighted ? 'rgb(255,64,0)' : '#909090')
-            .linkWidth((link) => link.highlighted ? 2 : 0)
-            .linkDirectionalParticles('particles')
-            .linkDirectionalParticleSpeed(d => d.particles * 0.002)
-            .linkDirectionalParticleWidth(link => link.highlighted ? 4 : 2)
-            .nodeThreeObject(node => {
-                {#HTML Node#}
-                {# const nodeEl = document.createElement('div');
+        let Graph = ForceGraph3D()
+        function drawGraph() {
+            Graph = ForceGraph3D({
+                extraRenderers: [new THREE.CSS2DRenderer()]
+            })
+            (elem)
+                .graphData(getVisibleLists())
+                .linkCurvature('curvature')
+                .linkCurveRotation('rotation')
+                .nodeAutoColorBy('group')
+                .linkOpacity(1)
+                .backgroundColor('#212121')
+                .linkColor((link) => link.highlighted ? 'rgb(255,64,0)' : '#909090')
+                .linkWidth((link) => link.highlighted ? 2 : 0)
+                .linkDirectionalParticles('particles')
+                .linkDirectionalParticleSpeed(d => d.particles * 0.002)
+                .linkDirectionalParticleWidth(link => link.highlighted ? 4 : 2)
+                .nodeThreeObject(node => {
+                    {#HTML Node#}
+                    {# const nodeEl = document.createElement('div');
                                  #}{#nodeEl.appendChild(getNodeShape(node))#}{#
                                  nodeEl.textContent = node.text;
                                  nodeEl.style.color = node.color;
@@ -68,79 +70,84 @@
                                  nodeEl.onclick = function() { alert('blah'); };
                                  return new THREE.CSS2DObject(nodeEl);#}
 
-                {#Image Node#}
-                {#  const imgTexture = new THREE.TextureLoader().load(`./imgs/${img}`);
+                    {#Image Node#}
+                    {#  const imgTexture = new THREE.TextureLoader().load(`./imgs/${img}`);
                                   const material = new THREE.SpriteMaterial({map: imgTexture});
                                   const sprite = new THREE.Sprite(material);
                                   sprite.scale.set(12, 12);
                                   return sprite;#}
 
-                const sprite = new SpriteText(node.text);
-                sprite.material.depthWrite = false; // make sprite background transparent
-                sprite.color = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
-                sprite.backgroundColor = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
-                sprite.textHeight = 8;
-                sprite.padding = 2;
-                sprite.borderRadius = 2;
-                sprite.borderWidth = node.highlighted ? 2 : 1;
-                if (node.isClass) {
-                    sprite.borderColor = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
-                } else if (node.isAttribute) {
-                    sprite.borderColor = settings.attributeBorderColor;
-                } else {
-                    sprite.borderColor = settings.linkNodeBorderColor;
-                }
+                    const sprite = new SpriteText(node.text);
+                    sprite.material.depthWrite = false; // make sprite background transparent
+                    sprite.color = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
+                    sprite.backgroundColor = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
+                    sprite.textHeight = 8;
+                    sprite.padding = 2;
+                    sprite.borderRadius = 2;
+                    sprite.borderWidth = node.highlighted ? 2 : 1;
+                    if (node.isClass) {
+                        sprite.borderColor = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
+                    } else if (node.isAttribute) {
+                        sprite.borderColor = settings.attributeBorderColor;
+                    } else {
+                        sprite.borderColor = settings.linkNodeBorderColor;
+                    }
 
-                {#   validation coloring   #}
-                {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high #}
-                let color = '#aaa'
-                switch (node.colorRange) {
-                    case 0:
-                        color = "#0af"
-                        break;
-                    case 1:
-                        color = "#0c0"
-                        break;
-                    case 2:
-                        color = "#ff0"
-                        break;
-                    case 3:
-                        color = "#f80"
-                        break;
-                    case 4:
-                        color = "#c00"
-                        break;
-                }
-                if (!darkMode)
-                    sprite.backgroundColor = color;
-                else
-                    sprite.color = color;
+                    {#   validation coloring   #}
+                    {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
+                    let color = '#aaa'
+                    switch (node.colorRange) {
+                        case 0:
+                            color = "#0af"
+                            break;
+                        case 1:
+                            color = "#0c0"
+                            break;
+                        case 2:
+                            color = "#ff0"
+                            break;
+                        case 3:
+                            color = "#f80"
+                            break;
+                        case 4:
+                            color = "#c00"
+                            break;
+                        case 5:
+                            if (darkMode)
+                                color = "#ccc"
+                            else
+                                color = "#666"
+                            break;
+                    }
+                    if (!darkMode)
+                        sprite.backgroundColor = color;
+                    else
+                        sprite.color = color;
 
-                sprite.borderColor = color;
+                    sprite.borderColor = color;
 
 
-                return sprite;
+                    return sprite;
 
-                {#return getNodeShape(node)#}
-            })
-            {#.nodeThreeObjectExtend(true)#}
-            .onNodeHover(node => elem.style.cursor = node && node.isClass ? 'pointer' : 'unset')
-            .onNodeClick(node => {
-                onNodeClicked(node);
-            });
+                    {#return getNodeShape(node)#}
+                })
+                {#.nodeThreeObjectExtend(true)#}
+                .onNodeHover(node => elem.style.cursor = node && node.isClass ? 'pointer' : 'unset')
+                .onNodeClick(node => {
+                    onNodeClicked(node);
+                });
 
-        {#    let bcolor = getComputedStyle(document.documentElement).getPropertyValue('--main-background');#}
-        {#    Graph.backgroundColor("#181818")#}
-        {#    console.log("getComputedStyle(document.documentElement).getPropertyValue('--main-background')"+bcolor)#}
-
+            {#    let bcolor = getComputedStyle(document.documentElement).getPropertyValue('--main-background');#}
+            {#    Graph.backgroundColor("#181818")#}
+            {#    console.log("getComputedStyle(document.documentElement).getPropertyValue('--main-background')"+bcolor)#}
+        }
         // call on slider change
         function updateLinkDistance() {
             linkForce.distance(link => getLinkLength(link));
             Graph.numDimensions(3); // Re-heat simulation
         }
 
-        // Spread nodes a little wider
-        Graph.d3Force('charge').strength(-220);
+        drawGraph()
 
         isGraphInit = true;
 

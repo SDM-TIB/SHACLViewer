@@ -2,6 +2,7 @@
 {% block headbase %}
 
     <link rel="stylesheet" href="./static/css/basegraph.css">
+    <link rel="stylesheet" href="./static/css/jquery.dataTables.min.css">
 
     <style> body {
         margin: 0;
@@ -13,16 +14,12 @@
     <script src="./static/js/three/three.js"></script>
     <script src="./static/js/three/CSS2DRenderer.js"></script>
     <script src="./static/js/sprite/three-spritetext.js"></script>
+    <script src="./static/js/dataTable/jquery.dataTables.min.js"></script>
 
-    {#   <style>
-        .node-label {
-            font-size: 12px;
-            padding: 1px 4px;
-            border-radius: 4px;
-            background-color: rgba(0, 0, 0, 0.5);
-            user-select: none;
-        }
-    </style>#}
+    {#    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">#}
+    {#    <script type="text/javascript" charset="utf8"#}
+    {#            src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>#}
+
 
     {% block head %}{% endblock %}
 
@@ -36,13 +33,13 @@
 
     <span id="optionBtn" class="option-btn">&#9776; Options</span>
     <div id="mySidenav" class="sidenav leftnav closeLeftNav">
-        <div id="search-wrapper" class="wrapper">
-            <div class="search-input">
-                <a href="" target="_blank" hidden></a>
-                <input type="text" placeholder="Search for Shape..">
-                <div class="autocom-box">
+        <div class="wrapper">
+            <div id="search-wrapper" class="search-input">
+                <a id="search-linkTag" href="" target="_blank" hidden></a>
+                <input id="search-input" type="text" placeholder="Search for Shape..">
+                <div id="search-sugg" class="autocom-box">
                 </div>
-                <div class="icon"><i class="fas fa-search"></i></div>
+                <div id="search-icon" class="icon"><i class="fas fa-search"></i></div>
             </div>
         </div>
         <a href="javascript:void(0)" id="hideUnrelatedClasses"><i class=''></i>Show Selected Shape Only
@@ -95,15 +92,6 @@
             <input type="range" class="range-style" id="HighValidationPercentage" min="0" max="100">
             <output>90</output>
         </div>
-        {#    <a href="javascript:void(0)" id="shapesDropdown"><i class=''></i>Shapes#}
-        {#        <label class="switch">#}
-        {#            <input type="checkbox" disabled="disabled">#}
-        {#            <span class="slider round"></span>#}
-        {#        </label>#}
-        {#    </a>#}
-        {#        {% block optionMenu %}#}
-        {#        #}
-        {#        {% endblock %}#}
     </div>
     <div id="rightTabs">
         <span id="infoBtn" class="right-tab-btn" onclick="toggleRightNav('info')">Info</span>
@@ -125,6 +113,30 @@
             <ul></ul>
         </div>
         <div id="validationMenu">
+            <button id="ValidationEndpointAccordion" class="accordion active">Validation Endpoint</button>
+            <div id="validationEndpointWrapper" class="wrapper slider-container panel"
+                 style="overflow: visible;">
+                <div style="padding: 10px 0px;">
+                    <div id="endpointWrapper" class="search-input">
+                        <a id="endpointLinkTag" href="" target="_blank" hidden></a>
+                        <input id="endpointInputBox" type="text" placeholder="Endpoint Address..">
+                        <div id="endpointSuggBox" class="autocom-box">
+                        </div>
+                        <div id="endpointIcon" class="icon"><i class="fas fa-angle-down"></i></div>
+                    </div>
+                </div>
+            </div>
+            {#<div class="slider-container panel">
+                <select id="validationEndpointDropdown">
+                    <option selected="selected" value="http://192.168.111.1:14000/sparql">
+                        http://192.168.111.1:14000/sparql
+                    </option>
+                    <option value="https://labs.tib.eu/sdm/clarify-kg-7/sparql">
+                        https://labs.tib.eu/sdm/clarify-kg-7/sparql
+                    </option>
+                </select>
+                <input id="validationEndpointTextBox"/>
+            </div>#}
             <button class="accordion active">Total Validation Data</button>
             <div class="slider-container panel">
                 <div id="totalValidationData"></div>
@@ -132,11 +144,15 @@
             <button class="accordion active">Selected Shape Data</button>
             <div class="slider-container panel">
                 <div id="selectedValidationRequest">
-                    <button id="requestValidationBtn" class="btn btn-primary btn-block" style="display:none;">Request
+                    <button id="requestValidationBtn" class="btn btn-primary btn-block btn-right-nav"
+                            style="display:none;">Request
                         Validation
                     </button>
                 </div>
                 <div id="selectedValidationData"></div>
+                <button id="ViewDataBtn" class="btn btn-primary btn-block btn-right-nav" style="display:none;">View
+                    Data
+                </button>
             </div>
         </div>
         {#        {% block infoMenu %}#}
@@ -145,6 +161,13 @@
     </div>
     <div id="main">
         <div id="3d-graph" style="position: absolute;top: 0;"></div>
+        <div id="data-table-container"
+             style="display: none; padding: 0px 60px 15px 15px; transition: margin 0.5s ease 0s;">
+            <button id="close-table-btn" class="btn btn-primary btn-block"
+                    style="display: block;max-width: 96px;right: 0;float: right;margin: 10px 0px;">Close
+            </button>
+            <div id="data-table"></div>
+        </div>
         <div id="loader" class="loader"></div>
         <script type="module">
             {#$('#flash').append(flashMessage('graph size => {{ graph|length }}', 'info'));#}
@@ -179,10 +202,12 @@
                     highlighted: false,
                     childLinks: [],
                     parentLinks: [],
-                    query: "{{ node.targetQuery }}",
+                    query: '{{ node.targetQuery|safe }}',
                     valid: -1,
                     invalid: -1,
-                    colorRange: 0 {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high #}
+                    columns: [],
+                    data: [],
+                    colorRange: 0 {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
                 }
                 nodes.push(currentNode);
 
@@ -937,6 +962,7 @@
             {# validation #}
 
             function requestValidationData(node) {
+                console.log("requestValidationData")
 
                 {#let config = {
                     external_endpoint: "http://dbpedia.org/sparql",
@@ -967,16 +993,41 @@
                     output_format: "test"
                 }#}
 
+                //get endpoint
+                let endpoint = endpointInputBox.value
+                if (endpoint === "") {
+                    $('#flash').append(flashMessage("Select the validation endpoint", 'warning'));
+                    openAccordion(document.querySelector('#ValidationEndpointAccordion'))
+                    endpointInputBox.focus();
+                    return false;
+                }
+
                 let config = {
                     {#external_endpoint: "http://shacl_api_testdata:8890/sparql",#}
-                    external_endpoint: "http://192.168.111.1:14000/sparql",
+                    {#external_endpoint: "http://192.168.111.1:14000/sparql",#}
+                    {#external_endpoint: "https://labs.tib.eu/sdm/clarify-kg-7/sparql",#}
+                    external_endpoint: endpoint,
                     outputDirectory: "./output/",
                     query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
                     schemaDir: "./examples/lubm_extended/shapes/",
+                    {#schemaDir: "./examples/Shapes_CLARIFY/shapes/",#}
                     targetShape: node.id,
                     backend: "travshacl",
                     output_format: "test"
                 }
+
+                {#"external_endpoint": "http://192.168.111.1:14000/sparql",
+                "query": "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX :<http://example.com/>\n\nSELECT ?x WHERE {?x a ub:FullProfessor}",
+                "schemaDir": "./examples/lubm_extended/shapes/",
+                "targetShape": "FullProfessor",
+                "backend": "travshacl",
+                "replace_target_query": false,
+                "remove_constraints": false,
+                "output_format": "test"#}
+
+                console.log("query:" + config.query)
+                console.log("node.query:" + node.query)
+                console.log("targetShape:" + config.targetShape)
 
                 {# let post_config = '{' +
                     '    "backend": "travshacl",' +
@@ -990,46 +1041,55 @@
                     '}'#}
 
 
-                console.log("requestValidationData")
-                let request = $.ajax({
+                let request_validation = $.ajax({
                     {#url: "http://127.0.0.1:9999/validation",#}
                     url: "http://192.168.111.128:9999/validation",
                     type: "POST",
                     data: config,
                     success: function (data, textStatus, jqXHR) {
-                        console.log("success")
+                        console.log("validation request success")
                         console.log(data)
                         console.log(textStatus)
                         console.log(jqXHR)
 
-                        Object.keys(data).forEach(shapeId => {
-                            let shape = nodesById[shapeId]
-                            shape.valid = data[shapeId].valid
-                            shape.invalid = data[shapeId].invalid
-                            if (shape.valid === 0 && shape.invalid === 0)
-                                shape.validPercent = 100
-                            else
-                                shape.validPercent = Math.floor(100 * shape.valid / (shape.valid + shape.invalid));
-                            validationData.add(shape)
-                        })
-
-                        {# request returned so remove it from request map #}
-                        delete requestMap[node.id];
-
+                        {# get current shape node #}
                         let currentNode;
                         if (selectedNode.isClass)
                             currentNode = selectedNode;
                         else
                             currentNode = selectedNode.parentLinks[0];
 
-                        if (node.id === currentNode.id) {
-                            fillValidationData()
-                            isRequestBtnClicked(false)
-                        } else
-                            updateTotalValidation()
+                        Object.keys(data).forEach(shapeId => {
+                            let shape = nodesById[shapeId]
+                            {# fill valid/invalid count #}
+                            shape.valid = data[shapeId].valid
+                            shape.invalid = data[shapeId].invalid
+                            {# cacluate validation percent #}
+                            if (shape.valid === 0 && shape.invalid === 0)
+                                shape.validPercent = 100
+                            else
+                                shape.validPercent = Math.floor(100 * shape.valid / (shape.valid + shape.invalid));
+                            {# fill data #}
+                            shape.columns = data[shapeId].columns
+                            shape.data = data[shapeId].results
+
+                            validationData.add(shape)
+
+                            {# request returned so remove it from request map #}
+                            delete requestMap[shapeId];
+
+                            {# update validation tab #}
+                            if (shapeId === currentNode.id) {
+                                fillValidationData()
+                                requestBtnClicked(false)
+                            } else
+                                {# only update total validation data in the validation tab #}
+                                updateTotalValidation()
+                        })
+
                     },
                     error: function (jqXHR, exception) {
-                        console.log("$.ajax error:")
+                        console.log("validation request error:")
                         console.log(jqXHR.status)
                         console.log(exception)
                         let msg = '';
@@ -1060,11 +1120,72 @@
                             currentNode = selectedNode.parentLinks[0];
 
                         if (node.id === currentNode.id) {
-                            isRequestBtnClicked(false)
+                            requestBtnClicked(false)
                         }
                     }
                 });
-                return request;
+
+                requestMap[node.id] = request_validation
+                node.colorRange = 5
+
+                let request_node_list = $.ajax({
+                    {#url: "http://127.0.0.1:9999/validation",#}
+                    url: "http://192.168.111.128:9999/reduce",
+                    type: "POST",
+                    data: config,
+                    success: function (data, textStatus, jqXHR) {
+                        console.log("reduce result success")
+                        console.log(data)
+                        console.log(textStatus)
+                        console.log(jqXHR)
+
+                        data['shapes'].forEach(shapeId => {
+                            let shape = nodesById[shapeId]
+                            if (shape.valid === -1 || shape.invalid === -1) {
+                                requestMap[shapeId] = request_validation
+                                shape.colorRange = 5
+                            }
+                        })
+                        updateNode3d();
+                    },
+                    error: function (jqXHR, exception) {
+                        console.log("reduce result error:")
+                        console.log(jqXHR.status)
+                        console.log(exception)
+                        let msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = ': Cannot connect to ShaclAPI';
+                        } else if (jqXHR.status === 404) {
+                            msg = ': Requested page not found. [404]';
+                        } else if (jqXHR.status === 500) {
+                            msg = ': Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = ': Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = ': Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = ': Ajax request aborted.';
+                        } else {
+                            msg = ': Uncaught Error.\n' + jqXHR.responseText;
+                        }
+                        $('#flash').append(flashMessage(node.id + msg, 'warning'));
+
+                        {# request returned so remove it from request map #}
+                        delete requestMap[node.id];
+
+                        let currentNode;
+                        if (selectedNode.isClass)
+                            currentNode = selectedNode;
+                        else
+                            currentNode = selectedNode.parentLinks[0];
+
+                        if (node.id === currentNode.id) {
+                            requestBtnClicked(false)
+                        }
+                    }
+                });
+
+                return true;
             }
 
             let validationData = {
@@ -1129,6 +1250,9 @@
                                 node.colorRange = 1;
                                 break;
                         }
+                        if (requestMap[node.id]) // node is validating
+                            node.colorRange = 5
+
                         this.totalValid += node.valid
                         this.totalInvalid += node.invalid
                     })
@@ -1149,23 +1273,31 @@
                 if (selectedNode.isClass)
                     shapeNode = selectedNode;
                 else
-                    shapeNode = selectedNode.parentLinks[0];
+                    shapeNode = getNodeFromLink(selectedNode.parentLinks[0].source);
+
+
+                console.log("selectedNode: " + selectedNode.text)
+                console.log("selectedNode.isClass: " + selectedNode.isClass)
+                console.log("shapeNode: " + shapeNode.text)
 
                 let statNode = document.getElementById('selectedValidationData')
                 if (shapeNode.valid < 0) {
                     {# show request button #}
                     document.getElementById('requestValidationBtn').style.display = "block"
+                    document.getElementById('ViewDataBtn').style.display = "none"
+
                     {# check if already requested or not #}
                     if (requestMap[shapeNode.id]) {
-                        isRequestBtnClicked(true)
+                        requestBtnClicked(true)
                     } else {
-                        isRequestBtnClicked(false)
+                        requestBtnClicked(false)
                     }
                     {# clear validation data #}
                     statNode.innerHTML = ''
                 } else {
                     {# hide request button #}
                     document.getElementById('requestValidationBtn').style.display = "none"
+                    document.getElementById('ViewDataBtn').style.display = "block"
 
                     {# fill validation data #}
                     statNode.innerHTML =
@@ -1217,7 +1349,7 @@
                     + "Invalid: " + validationData.totalInvalid + "</td></tr></table>";
             }
 
-            function isRequestBtnClicked(clicked) {
+            function requestBtnClicked(clicked) {
                 let btn = document.getElementById('requestValidationBtn');
                 if (clicked) {
                     btn.classList.add("sending", "btn-secondary")
@@ -1366,12 +1498,11 @@
             {#console.log(suggestions)#}
 
             // getting all required elements
-            const searchWrapper = document.querySelector(".search-input");
-            const inputBox = searchWrapper.querySelector("input");
-            const suggBox = searchWrapper.querySelector(".autocom-box");
-            const icon = searchWrapper.querySelector(".icon");
-            let linkTag = searchWrapper.querySelector("a");
-            let webLink;
+            const searchWrapper = document.querySelector("#search-wrapper");
+            const inputBox = searchWrapper.querySelector("#search-input");
+            const suggBox = searchWrapper.querySelector("#search-sugg");
+            const icon = searchWrapper.querySelector("#search-icon");
+            let linkTag = searchWrapper.querySelector("#search-linkTag");
 
             // if user press any key and release
             inputBox.onkeyup = (e) => {
@@ -1447,10 +1578,10 @@
             }
 
             var mouse_is_inside = false;
-            document.querySelector("#search-wrapper").onmouseover = () => {
+            searchWrapper.onmouseover = () => {
                 mouse_is_inside = true;
             }
-            document.querySelector("#search-wrapper").onmouseout = () => {
+            searchWrapper.onmouseout = () => {
                 mouse_is_inside = false;
             }
 
@@ -1580,9 +1711,20 @@
                 if (accordionBtn.classList.contains("active")) {
                     {#panel.style.maxHeight = panel.scrollHeight + "px";#}
                     panel.style.maxHeight = "fit-content";
+                    if (panel.style.overflow)
+                        panel.style.overflow = "visible";
                 } else {
                     panel.style.maxHeight = null;
+                    if (panel.style.overflow)
+                        panel.style.overflow = 'hidden';
                 }
+            }
+
+            function openAccordion(accordionBtn) {
+                let panel = accordionBtn.nextElementSibling;
+                panel.style.maxHeight = "fit-content";
+                if (panel.style.overflow)
+                    panel.style.overflow = "visible";
             }
 
             {# navigation panels #}
@@ -1593,14 +1735,14 @@
             function openNav() {
                 isNavOpen = true;
                 document.getElementById("mySidenav").classList.remove("closeLeftNav");
-                {#document.getElementById("main").style.marginLeft = "250px";#}
+                document.getElementById("data-table-container").style.marginLeft = "285px";
             }
 
             /* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
             function closeNav() {
                 isNavOpen = false;
                 document.getElementById("mySidenav").classList.add("closeLeftNav");
-                {#document.getElementById("main").style.marginLeft = "0";#}
+                document.getElementById("data-table-container").style.marginLeft = "0";
             }
 
             document.querySelector('#optionBtn').onclick = () => {
@@ -1620,6 +1762,7 @@
                 isRightNavOpen = true;
                 document.getElementById("myRightSidenav").classList.remove("closeRightNav");
                 document.getElementById("rightTabs").classList.add("tabs-openRightNav");
+                document.getElementById("data-table-container").style.marginRight = "400px";
                 switch (selectedTab) {
                     case 'info':
                         document.getElementById('infoBtn').classList.add('selected')
@@ -1664,6 +1807,7 @@
                 isRightNavOpen = false;
                 document.getElementById("myRightSidenav").classList.add("closeRightNav");
                 document.getElementById("rightTabs").classList.remove("tabs-openRightNav");
+                document.getElementById("data-table-container").style.marginRight = "0px";
 
                 document.getElementById('infoBtn').classList.remove('selected')
                 document.getElementById('shapeBtn').classList.remove('selected')
@@ -1727,19 +1871,184 @@
                 if (selectedNode.isClass)
                     shapeNode = selectedNode;
                 else
-                    shapeNode = selectedNode.parentLinks[0];
+                    shapeNode = getNodeFromLink(selectedNode.parentLinks[0].source);
 
                 {# check if the request is sent and abort it#}
                 if (requestMap[shapeNode.id]) {
-                    requestMap[shapeNode.id].abort();
+                    {#requestMap[shapeNode.id].abort();#}
                     delete requestMap[shapeNode.id];
                     {# change style #}
-                    isRequestBtnClicked(false)
+                    requestBtnClicked(false)
                 } else {
-                    requestMap[shapeNode.id] = requestValidationData(shapeNode)
-                    {# change style #}
-                    isRequestBtnClicked(true)
+                    if (requestValidationData(shapeNode))
+                        {# change style #}
+                        requestBtnClicked(true)
                 }
+            }
+
+            document.querySelector('#ViewDataBtn').onclick = (e) => {
+                {# view selected node data#}
+                let html = '<table id="myTable" class="display"><thead><tr>'
+
+                selectedNode.columns.forEach(col => {
+                    html += '<th>' + col + '</th>'
+                })
+
+                html += '</tr></thead><tbody>'
+
+                selectedNode.data.forEach(row => {
+                    html += '<tr>'
+
+                    row.forEach(cell => {
+                        html += '<td>' + cell + '</td>'
+                    })
+
+                    html += '</tr>'
+                })
+
+                html += '</tbody></table>'
+
+                document.getElementById('data-table').innerHTML = html
+                $('#myTable').DataTable();
+
+                {# show table #}
+                elem.style.display = "none";
+                document.getElementById('data-table-container').style.display = "block";
+                Graph.pauseAnimation()
+            }
+
+            document.querySelector('#close-table-btn').onclick = (e) => {
+                elem.style.display = "block";
+                document.getElementById('data-table-container').style.display = "none";
+                Graph.resumeAnimation()
+            }
+
+            {#document.querySelector('#validationEndpointDropdown').onchange = () => {
+                let dropdown = $("#validationEndpointDropdown")[0];
+                let val = dropdown.options[dropdown.selectedIndex].value;
+                $("#validationEndpointTextBox").val(val);
+            }#}
+
+            {#validation endpoint box#}
+            let endpointList = ["http://shacl_api_testdata:8890/sparql",
+                "http://192.168.111.1:14000/sparql",
+                "https://labs.tib.eu/sdm/clarify-kg-7/sparql"];
+
+            // getting all required elements
+            const endpointWrapper = document.querySelector("#endpointWrapper");
+            const endpointInputBox = endpointWrapper.querySelector("#endpointInputBox");
+            const endpointSuggBox = endpointWrapper.querySelector("#endpointSuggBox");
+            const endpointIcon = endpointWrapper.querySelector("#endpointIcon");
+            let endpointLinkTag = endpointWrapper.querySelector("#endpointLinkTag");
+
+            // if user press any key and release
+            endpointInputBox.onkeyup = (e) => {
+                endpointSuggest(e);
+            }
+            endpointInputBox.onfocus = (e) => {
+                endpointInputBox.value = '';
+                endpointSuggest(e);
+            }
+
+            function endpointSuggest(e) {
+                let userData = e.target.value; //user entered data
+                let emptyArray = [];
+                {#if (userData) {#}
+                endpointIcon.onclick = () => {
+
+                }
+                emptyArray = endpointList.filter((data) => {
+                    {#console.log("inputBox.onkeyup.userData = " + userData)#}
+                    if (userData)
+                        //filtering array value and user characters to lowercase and return only those words which are start with user entered chars
+                        return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+                    else
+                        return data;
+                });
+                emptyArray = emptyArray.map((data) => {
+                    // passing return data inside li tag
+                    return data = `<li>${data}</li>`;
+                });
+                endpointWrapper.classList.add("active"); //show autocomplete box
+                showEndpointSuggestions(emptyArray.sort());
+                let allList = endpointSuggBox.querySelectorAll("li");
+                let clicked = false;
+                {# fix on mouse out will hide the highlight after clicking #}
+                for (let i = 0; i < allList.length; i++) {
+                    //adding onclick attribute in all li tag
+                    allList[i].onclick = () => {
+                        clicked = true;
+                        selectEndpoint(allList[i])
+                        {#viewNodeInfo(nodesById[allList[i].textContent])
+                        #}{# viewNodeInfo will set selectedNode #}{#
+                        if (nodesById[allList[i].textContent].isHidden) {
+                            if (hideUnrelatedClasses)
+                                hideAllButSelectedNode();
+                            else {
+                                nodesById[allList[i].textContent].isHidden = false;
+                                updateHiddenLinks()
+                                updateGraph();
+                            }
+                        } else {
+                            updateClassState(nodesById[allList[i].textContent])
+                        }#}
+                    };
+                    {#allList[i].onmouseover = () => {
+                        highlightSelectedNode ? highlightNode(nodesById[allList[i].textContent]) : null
+                    }#}
+                }
+                {#endpointSuggBox.onmouseout = () => {
+                    if (highlightSelectedNode) {
+                        if (clicked) { #}{# when an item is clicked and searchWrapper disappear dont remove highlight #}{#
+                            clicked = false;
+                            return;
+                        }
+
+                        nodes.forEach(node => node.highlighted = false)
+                        links.forEach(link => link.highlighted = false)
+                        updateNode3d();
+                    }
+                }#}
+                {# } else {
+                     searchWrapper.classList.remove("active"); //hide autocomplete box
+                 }#}
+            }
+
+            var mouse_is_inside_endpoint = false;
+            endpointWrapper.onmouseover = () => {
+                mouse_is_inside_endpoint = true;
+            }
+            endpointWrapper.onmouseout = () => {
+                mouse_is_inside_endpoint = false;
+            }
+
+            document.querySelector("body").onmouseup = () => {
+                {#console.log("body.onmouseup.mouse_is_inside = " + mouse_is_inside)#}
+                if (!mouse_is_inside_endpoint) endpointWrapper.classList.remove("active"); //hide autocomplete box
+            }
+
+            function selectEndpoint(element) {
+                let selectData = element.textContent;
+                endpointInputBox.value = selectData;
+                endpointIcon.onclick = () => {
+                    {#highlightNode(nodesById[selectData])#}
+                    {#updateClassState(nodesById[selectData])
+                    viewNodeInfo(nodesById[selectData])#}
+                }
+                endpointWrapper.classList.remove("active");
+            }
+
+            function showEndpointSuggestions(list) {
+                let listData;
+                if (!list.length) {
+                    userValue = inputBox.value;
+                    listData = `<li>${userValue}</li>`;
+                } else {
+                    listData = list.join('');
+
+                    {#listData = `<li>${suggestions}</li>`;#}
+                }
+                endpointSuggBox.innerHTML = listData;
             }
 
             {# remove loader #}
