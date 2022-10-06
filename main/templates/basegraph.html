@@ -1009,7 +1009,8 @@
                     external_endpoint: endpoint,
                     outputDirectory: "./output/",
                     query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
-                    schemaDir: "./examples/lubm_extended/shapes/",
+                    {#schemaDir: "./examples/lubm_extended/shapes/",#}
+                    schemaDir: "./main/shacljson/example/shapes/LUBM_14/",
                     {#schemaDir: "./examples/Shapes_CLARIFY/shapes/",#}
                     targetShape: node.id,
                     backend: "travshacl",
@@ -1042,8 +1043,9 @@
 
 
                 let request_validation = $.ajax({
-                    {#url: "http://127.0.0.1:9999/validation",#}
-                    url: "http://192.168.111.128:9999/validation",
+                    {#url: "http://127.0.0.1:9999/validation",
+                    url: "http://192.168.111.128:9999/validation",#}
+                    url: "/validation",
                     type: "POST",
                     data: config,
                     success: function (data, textStatus, jqXHR) {
@@ -1129,8 +1131,9 @@
                 node.colorRange = 5
 
                 let request_node_list = $.ajax({
-                    {#url: "http://127.0.0.1:9999/validation",#}
-                    url: "http://192.168.111.128:9999/reduce",
+                    {#url: "http://127.0.0.1:9999/validation",
+                    url: "http://192.168.111.128:9999/reduce",#}
+                    url: "/reduce",
                     type: "POST",
                     data: config,
                     success: function (data, textStatus, jqXHR) {

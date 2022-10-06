@@ -1,10 +1,11 @@
 import os
 from main import app
-from flask import render_template, redirect, url_for, flash, json, request
-from main.forms import RegisterForm, LoginForm
-from main import db
-from flask_login import login_user
+from flask import render_template, redirect, url_for, flash, json, request, jsonify
+# from main.forms import RegisterForm, LoginForm
+# from main import db
+# from flask_login import login_user
 from main.shacljson.core.ShapeParser import ShapeParser
+from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
 
 @app.route("/graph3d")
@@ -64,3 +65,16 @@ def home_page():
         })
 
     return render_template('home.html', data=data)
+
+
+@app.route('/validation', methods=['POST'])
+def validation_shacl_api():
+    print('validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api')
+    validation_and_statistics(request.form)
+
+
+@app.route('/reduce', methods=['POST'])
+def reduce_shacl_api():
+    print('reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api')
+    node_order = only_reduce_shape_schema(request.form)
+    return jsonify({'shapes': node_order})
