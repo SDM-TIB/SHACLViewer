@@ -3,11 +3,11 @@
 	"constraintDef":{
 		"conjunctions":[
 			[
-				{ "path": "dbo:birthPlace", "min": 1, "shape": "LocationShape" },
-				{ "path": "dbo:activeYearsStartYear", "min": 1 },
-				{ "path": "dbo:occupation", "min": 1, "value":"dbr:Actor" },
-				{ "path": "dbo:imdbId", "min": 1 },
-				{ "path": "^dbo:starring", "min": 1 }
+				{ "path": "<http://dbpedia.org/ontology/birthPlace>", "min": 1, "shape": "LocationShape" },
+				{ "path": "<http://dbpedia.org/ontology/activeYearsStartYear>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/occupation>", "min": 1, "value":"dbr:Actor" },
+				{ "path": "<http://dbpedia.org/ontology/imdbId>", "min": 1 },
+				{ "path": "^<<http://dbpedia.org/ontology/dbo:starring>", "min": 1 }
 			]
 		]
 	}

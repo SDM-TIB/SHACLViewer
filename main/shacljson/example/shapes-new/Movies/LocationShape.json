@@ -3,9 +3,9 @@
 	"constraintDef":{
 		"conjunctions":[
 			[
-				{ "path": "dbo:country", "min": 1 },
-				{ "path": "dbo:leaderTitle", "min": 1 },
-				{ "path": "dbo:populationDensity", "min": 1 }
+				{ "path": "<http://dbpedia.org/ontology/country>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/leaderTitle>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/populationDensity>", "min": 1 }
 			]
 		]
 	}

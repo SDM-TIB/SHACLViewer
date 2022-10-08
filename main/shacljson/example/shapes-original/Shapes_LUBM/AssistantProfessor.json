@@ -4,6 +4,9 @@
 		"query":"SELECT ?x WHERE {?x a ub:AssistantProfessor}",
 		"class": "ub:AssistantProfessor"
 	},
+	"prefix": {
+		"ub": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>"
+	},
 	"constraintDef": {
 		"conjunctions": [
 			[

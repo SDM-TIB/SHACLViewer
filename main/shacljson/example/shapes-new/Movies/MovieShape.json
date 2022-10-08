@@ -1,17 +1,17 @@
 {
 	"name": "MovieShape",
 	"targetDef":{
-		"query":"SELECT ?x WHERE {?x a dbo:Film}"
+		"query":"SELECT ?x WHERE {?x a <http://dbpedia.org/ontology/Film>}"
 	},
 	"constraintDef":{
 		"conjunctions":[
 			[
-				{ "path": "dbo:writer", "min": 1 },
-				{ "path": "dbo:musicComposer", "min": 1 },
-				{ "path": "dbo:director", "min": 1, "shape":"DirectorShape" },
-				{ "path": "dbo:imdbId", "min": 1 },
-				{ "path": "dbo:imdbId", "max": 1 },
-				{ "path": "dbo:starring", "min": 1, "shape":"ActorShape" }
+				{ "path": "<http://dbpedia.org/ontology/writer>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/musicComposer>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/director>", "min": 1, "shape":"DirectorShape" },
+				{ "path": "<http://dbpedia.org/ontology/imdbId>", "min": 1 },
+				{ "path": "<http://dbpedia.org/ontology/imdbId>", "max": 1 },
+				{ "path": "<http://dbpedia.org/ontology/starring>", "min": 1, "shape":"ActorShape" }
 			]
 		]
 	}

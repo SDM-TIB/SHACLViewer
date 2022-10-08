@@ -4,6 +4,9 @@
 		"query":"SELECT ?x WHERE {?x a ub:GraduateStudent}",
 		"class": "ub:GraduateStudent"
 	},
+	"prefix": {
+		"ub": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>"
+	},
 	"constraintDef": {
 		"conjunctions": [
 			[

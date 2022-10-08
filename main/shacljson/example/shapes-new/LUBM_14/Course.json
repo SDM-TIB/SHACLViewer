@@ -4,6 +4,9 @@
 		"query":"SELECT ?x WHERE {?x a ub:Course}",
 		"class": "ub:Course"
 	},
+	"prefix": {
+		"ub": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>"
+	},
 	"constraintDef": {
 		"conjunctions": [
 			[

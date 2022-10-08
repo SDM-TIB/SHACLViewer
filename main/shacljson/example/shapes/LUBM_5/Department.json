@@ -5,8 +5,7 @@
 		"class": "ub:Department"
 	},
 	"prefix": {
-		"ub": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>",
-		"blah": "<http://some.prefix.com/blah/>"
+		"ub": "<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>"
 	},
 	"constraintDef": {
 		"conjunctions": [
