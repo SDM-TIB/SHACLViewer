@@ -70,7 +70,7 @@ def home_page():
 @app.route('/validation', methods=['POST'])
 def validation_shacl_api():
     print('validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api')
-    validation_and_statistics(request.form)
+    return validation_and_statistics(request.form)
 
 
 @app.route('/reduce', methods=['POST'])
