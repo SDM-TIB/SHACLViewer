@@ -1002,6 +1002,7 @@
                     return false;
                 }
 
+                let dir = "{{ request.args.get("path") }}";
                 let config = {
                     {#external_endpoint: "http://shacl_api_testdata:8890/sparql",#}
                     {#external_endpoint: "http://192.168.111.1:14000/sparql",#}
@@ -1010,8 +1011,9 @@
                     outputDirectory: "./output/",
                     query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
                     {#schemaDir: "./examples/lubm_extended/shapes/",#}
-                    schemaDir: "./main/shacljson/example/shapes/LUBM_14/",
                     {#schemaDir: "./examples/Shapes_CLARIFY/shapes/",#}
+                    {#schemaDir: "./main/shacljson/example/shapes/LUBM_14/",#}
+                    schemaDir: "./main/shacljson/example"+dir,
                     targetShape: node.id,
                     backend: "travshacl",
                     output_format: "test"
