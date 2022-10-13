@@ -419,7 +419,8 @@ table.dataTable th, table.dataTable td {
     border-radius: 3px;
     padding: 5px;
     background-color: transparent;
-    margin-left: 3px
+    margin-left: 3px;
+    color: var(--search-input);
 }
 
 .dataTables_wrapper .dataTables_info {

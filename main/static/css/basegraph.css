@@ -162,6 +162,7 @@
     color: var(--sidenav-text);
     background: transparent;
     border: 0;
+    word-break: break-all;
 }
 
 .list-group-item-action:focus, .list-group-item-action:hover {

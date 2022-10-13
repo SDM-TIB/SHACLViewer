@@ -719,9 +719,13 @@
                 } else {
                     let range = "<p>"
                     if (node.min != "-1") {
-                        range += "min: " + node.min
-                        if (node.max != "-1") {
-                            range += "</p><p>max: " + node.max
+                        if (node.min === node.max)
+                            range += "equal: " + node.min
+                        else {
+                            range += "min: " + node.min
+                            if (node.max != "-1") {
+                                range += "</p><p>max: " + node.max
+                            }
                         }
                     } else if (node.max != "-1") {
                         range += "max: " + node.max
@@ -802,9 +806,13 @@
 
                                     let range = ""
                                     if (l.min != "-1") {
-                                        range += "min: " + l.min
-                                        if (l.max != "-1") {
-                                            range += ", max: " + l.max
+                                        if (l.min === l.max)
+                                            range += "equal: " + l.min
+                                        else {
+                                            range += "min: " + l.min
+                                            if (l.max != "-1") {
+                                                range += ", max: " + l.max
+                                            }
                                         }
                                     } else if (l.max != "-1") {
                                         range += "max: " + l.max
@@ -1070,7 +1078,7 @@
                             if (shape.valid === 0 && shape.invalid === 0)
                                 shape.validPercent = 100
                             else
-                                shape.validPercent = Math.floor(100 * shape.valid / (shape.valid + shape.invalid));
+                                shape.validPercent = Math.floor(10000 * shape.valid / (shape.valid + shape.invalid)) / 100;
                             {# fill data #}
                             shape.columns = data[shapeId].columns
                             shape.data = data[shapeId].results
@@ -1323,7 +1331,7 @@
                 let lowP = 100 * (validationData.allValid + validationData.low) / total;
                 let medP = 100 * (validationData.allValid + validationData.low + validationData.med) / total;
 
-                let validDataPercent = Math.floor(100 * validationData.totalValid / (validationData.totalValid + validationData.totalInvalid))
+                let validDataPercent = Math.floor(10000 * validationData.totalValid / (validationData.totalValid + validationData.totalInvalid)) / 100
                 if (validationData.totalValid === 0 && validationData.totalInvalid === 0)
                     validDataPercent = 100;
 
@@ -1607,7 +1615,7 @@
             function showSuggestions(list) {
                 let listData;
                 if (!list.length) {
-                    userValue = inputBox.value;
+                    let userValue = inputBox.value;
                     listData = `<li>${userValue}</li>`;
                 } else {
                     listData = list.join('');
@@ -1946,20 +1954,21 @@
 
             // if user press any key and release
             endpointInputBox.onkeyup = (e) => {
-                endpointSuggest(e);
+                endpointSuggest(e.target.value);
             }
             endpointInputBox.onfocus = (e) => {
-                endpointInputBox.value = '';
-                endpointSuggest(e);
+                {#endpointInputBox.value = '';#}
+                endpointSuggest(e.target.value);
             }
 
-            function endpointSuggest(e) {
-                let userData = e.target.value; //user entered data
+            endpointIcon.onclick = () => {
+                endpointSuggest()
+            }
+
+            function endpointSuggest(userData) {
+                {#let userData = e.target.value; //user entered data#}
                 let emptyArray = [];
                 {#if (userData) {#}
-                endpointIcon.onclick = () => {
-
-                }
                 emptyArray = endpointList.filter((data) => {
                     {#console.log("inputBox.onkeyup.userData = " + userData)#}
                     if (userData)
@@ -2033,18 +2042,18 @@
             function selectEndpoint(element) {
                 let selectData = element.textContent;
                 endpointInputBox.value = selectData;
-                endpointIcon.onclick = () => {
-                    {#highlightNode(nodesById[selectData])#}
-                    {#updateClassState(nodesById[selectData])
-                    viewNodeInfo(nodesById[selectData])#}
-                }
+                {#endpointIcon.onclick = () => {
+                    #}{#highlightNode(nodesById[selectData])#}{#
+                    #}{#updateClassState(nodesById[selectData])
+                    viewNodeInfo(nodesById[selectData])#}{#
+                }#}
                 endpointWrapper.classList.remove("active");
             }
 
             function showEndpointSuggestions(list) {
                 let listData;
                 if (!list.length) {
-                    userValue = inputBox.value;
+                    let userValue = inputBox.value;
                     listData = `<li>${userValue}</li>`;
                 } else {
                     listData = list.join('');

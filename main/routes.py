@@ -18,8 +18,8 @@ def graph3d():
     # increase graph size to test performance
     # graph = shape_parser.duplicate_graph(graph, 4)
 
-    print(f'path => {path}')
-    print(f'graph => {len(graph)}')
+    # print(f'path => {path}')
+    # print(f'graph => {len(graph)}')
     return render_template('graph3d.html', graph=graph)
 
 
@@ -50,7 +50,7 @@ def home_page():
         path = path + "/"
         full_path = "./main/shacljson/example/" + path + "/"
 
-    folders = os.listdir(full_path)
+    folders = sorted(os.listdir(full_path))
     data = []
     for name in folders:
         isNetwork = True
@@ -69,12 +69,10 @@ def home_page():
 
 @app.route('/validation', methods=['POST'])
 def validation_shacl_api():
-    print('validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api validation_shacl_api')
     return validation_and_statistics(request.form)
 
 
 @app.route('/reduce', methods=['POST'])
 def reduce_shacl_api():
-    print('reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api reduce_shacl_api')
     node_order = only_reduce_shape_schema(request.form)
     return jsonify({'shapes': node_order})
