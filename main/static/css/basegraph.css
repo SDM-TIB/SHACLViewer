@@ -29,12 +29,14 @@
     padding: 1em;
 }
 
-#rightTabs {
+#rightTabs, #rightButtons {
     position: absolute;
     z-index: 2;
     right: 0;
     transition: 0.5s;
     display: flex;
+}
+#rightTabs{
     writing-mode: vertical-lr;
 }
 

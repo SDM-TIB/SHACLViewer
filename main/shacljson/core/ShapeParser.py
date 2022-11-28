@@ -462,6 +462,8 @@ class ShapeParser:
             for constraint in node.constraints:
                 if constraint.path.startswith('<http'):
                     constraint.path = constraint.path.split('/')[-1][:-1]
+                if constraint.path.startswith('ub:'):
+                    constraint.path = constraint.path.split(':')[-1]
 
     @staticmethod
     def duplicate_graph(graph, times):

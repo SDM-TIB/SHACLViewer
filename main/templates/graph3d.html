@@ -33,8 +33,12 @@
 
             this.nodeColorDark = '#0af'
             this.nodeColorLight = '#000'
+            this.nodeColorNotRetrievedDark = '#a0f'
+            this.nodeColorNotRetrievedLight = '#000'
             this.nodeBackgroundColorDark = '#000'
             this.nodeBackgroundColorLight = '#0af'
+            this.nodeBackgroundColorNotRetrievedDark = '#000'
+            this.nodeBackgroundColorNotRetrievedLight = '#a0f'
             this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
             this.nodeBorderColor = '#0af'
             this.attributeBorderColor = 'rgb(0,0,0,1)'
@@ -43,6 +47,7 @@
 
         const elem = document.getElementById('3d-graph');
         let Graph = ForceGraph3D()
+
         function drawGraph() {
             Graph = ForceGraph3D({
                 extraRenderers: [new THREE.CSS2DRenderer()]
@@ -79,19 +84,20 @@
 
                     const sprite = new SpriteText(node.text);
                     sprite.material.depthWrite = false; // make sprite background transparent
-                    sprite.color = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
+                    {#sprite.color = darkMode ? settings.nodeColorDark : settings.nodeColorLight;#}
                     sprite.backgroundColor = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
                     sprite.textHeight = 8;
                     sprite.padding = 2;
                     sprite.borderRadius = 2;
                     sprite.borderWidth = node.highlighted ? 2 : 1;
-                    if (node.isClass) {
+                        if (node.isClass) {
                         sprite.borderColor = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
                     } else if (node.isAttribute) {
                         sprite.borderColor = settings.attributeBorderColor;
                     } else {
                         sprite.borderColor = settings.linkNodeBorderColor;
                     }
+
 
                     {#   validation coloring   #}
                     {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
@@ -126,6 +132,29 @@
 
                     sprite.borderColor = color;
 
+                    if(node.isClass && isShowingDataGraph){
+                        if (darkMode) {
+                            if (isShowingDataGraph && !node.retrieved) {
+                                sprite.color = settings.nodeColorNotRetrievedDark
+                                sprite.borderColor = settings.nodeColorNotRetrievedDark
+                                sprite.backgroundColor = settings.nodeBackgroundColorNotRetrievedDark
+                            } else {
+                                sprite.color = settings.nodeColorDark
+                                sprite.borderColor = settings.nodeColorDark
+                                sprite.backgroundColor = settings.nodeBackgroundColorDark
+                            }
+                        } else {
+                            if (isShowingDataGraph && !node.retrieved) {
+                                sprite.color = settings.nodeColorNotRetrievedLight
+                                sprite.borderColor = settings.nodeColorNotRetrievedLight
+                                sprite.backgroundColor = settings.nodeBackgroundColorNotRetrievedLight
+                            } else {
+                                sprite.color = settings.nodeColorLight
+                                sprite.borderColor = settings.nodeColorLight
+                                sprite.backgroundColor = settings.nodeBackgroundColorLight
+                            }
+                        }
+                    }
 
                     return sprite;
 
@@ -141,9 +170,10 @@
             {#    Graph.backgroundColor("#181818")#}
             {#    console.log("getComputedStyle(document.documentElement).getPropertyValue('--main-background')"+bcolor)#}
         }
+
         // call on slider change
         function updateLinkDistance() {
-            linkForce.distance(link => getLinkLength(link));
+            linkForce.distance(link => getLinkLength(link.linkType));
             Graph.numDimensions(3); // Re-heat simulation
         }
 

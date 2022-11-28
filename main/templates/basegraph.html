@@ -92,11 +92,18 @@
             <input type="range" class="range-style" id="HighValidationPercentage" min="0" max="100">
             <output>90</output>
         </div>
+        {#<a href="javascript:void(0)" id="dataGraph"><i class='fas fa-compress-arrows-alt option-icon'></i> Data
+            Graph</a>#}
+    </div>
+    <div id="rightButtons" style="display: none;">
+        <button id="closeDataGraph" class="btn btn-block btn-right-nav btn-primary"
+                style="display: block;max-width: 180px;margin-right: 52px;">Back to Data Table
+        </button>
     </div>
     <div id="rightTabs">
-        <span id="infoBtn" class="right-tab-btn" onclick="toggleRightNav('info')">Info</span>
-        <span id="shapeBtn" class="right-tab-btn" onclick="toggleRightNav('shapes')">Shapes</span>
-        <span id="validationBtn" class="right-tab-btn" onclick="toggleRightNav('validation')">Validation</span>
+        <span id="infoBtn" class="right-tab-btn">Info</span>
+        <span id="shapeBtn" class="right-tab-btn">Shapes</span>
+        <span id="validationBtn" class="right-tab-btn">Validation</span>
     </div>
     <div id="myRightSidenav" class="sidenav rightnav closeRightNav">
         <div id="infoMenu">
@@ -181,6 +188,12 @@
             let currentNode;
             let selectedNode;
 
+            {# used for data graph #}
+            const backupNodes = []
+            const backupLinks = []
+            let bachupSelectedNode;
+            let isShowingDataGraph = false
+
             {#
             linkType:
              0: class to class
@@ -191,7 +204,7 @@
              #}
 
             {% for node in graph %}
-                {# add class node #}
+                {# add class/shape node #}
                 currentNode = {
                     id: '{{ node.id }}',
                     group: '{{ node.id }}',
@@ -203,6 +216,7 @@
                     childLinks: [],
                     parentLinks: [],
                     query: '{{ node.targetQuery|safe }}',
+                    prefix: '{{ node.prefixes['ub']|safe }}',
                     valid: -1,
                     invalid: -1,
                     columns: [],
@@ -397,28 +411,49 @@
                 }
             }
 
-            const nodesById = Object.fromEntries(nodes.map(node => [node.id, node]));
-            links.forEach(link => {
-                nodesById[link.source].childLinks.push(link);
-                {#if(nodesById[link.target] === undefined)#}
-                {#    alert('');#}
-                nodesById[link.target].parentLinks.push(link);
-            });
-            const linksById = Object.fromEntries(links.map(link => [link.id, link]));
-            nodes.forEach(node => {
-                const stat = new Statistics();
-                node.childLinks.forEach(link => {
-                    if (link.isClass2Class)
-                        stat.constraints++;
-                    else if (link.isAttribute)
-                        stat.attributes++;
+            const nodesById = {}
+            const linksById = {}
+            resetGraphMaps()
+
+            function resetGraphMaps(removeDuplicates) {
+                {# clear #}
+                Object.keys(nodesById).forEach(key => delete nodesById[key]);
+                Object.keys(linksById).forEach(key => delete linksById[key]);
+                {# refill #}
+                Object.assign(nodesById, Object.fromEntries(nodes.map(node => [node.id, node])));
+                Object.assign(linksById, Object.fromEntries(links.map(link => [link.id, link])));
+
+                if (removeDuplicates) {
+                    nodes.length = 0
+                    nodes.push(...Object.values(nodesById))
+                }
+
+                {# clear node lists #}
+                nodes.forEach(n => {
+                    n.childLinks = []
+                    n.parentLinks = []
                 })
-                node.parentLinks.forEach(link => {
-                    if (link.isClass2Class)
-                        stat.partOff++;
+                {# fill nodes' lists #}
+                links.forEach(link => {
+                    let source = nodesById[link.source]
+                    getNodeFromLink(link.source).childLinks.push(link);
+                    getNodeFromLink(link.target).parentLinks.push(link);
+                });
+                nodes.forEach(node => {
+                    const stat = new Statistics();
+                    node.childLinks.forEach(link => {
+                        if (link.isClass2Class)
+                            stat.constraints++;
+                        else if (link.isAttribute)
+                            stat.attributes++;
+                    })
+                    node.parentLinks.forEach(link => {
+                        if (link.isClass2Class)
+                            stat.partOff++;
+                    })
+                    node.statistics = stat;
                 })
-                node.statistics = stat;
-            })
+            }
 
             function updateClassState(node) {
                 {#updateNode3d(node)#}
@@ -475,10 +510,22 @@
                 updateGraph();
             };
 
-            function getNodeFromLink(node) {
+            function getNodeFromLink(linkTarget) {
                 {# before drawing for the first time the link.target is just a string, after that it will be an object #}
-                let res = ((typeof node) === 'object') ? node : nodesById[node]
-                return res;
+                if ((typeof linkTarget) === 'object') {
+                    return linkTarget
+                } else {
+                    let res = nodesById[linkTarget]
+                    if ((typeof res) === 'object')
+                        return nodesById[linkTarget]
+                    else {
+                        {# manual search because getNodeFromLink didn't work on the current nodesById map #}
+                        for (let i = 0; i < backupNodes.length; i++) {
+                            if (backupNodes[i].id == linkTarget)
+                                return backupNodes[i];
+                        }
+                    }
+                }
             }
 
             function highlightNode(node) {
@@ -635,10 +682,10 @@
 
             // link length
             const linkForce =
-                Graph.d3Force('link').distance(link => getLinkLength(link));
+                Graph.d3Force('link').distance(link => getLinkLength(link.linkType));
 
-            function getLinkLength(link) {
-                switch (link.linkType) {
+            function getLinkLength(linkType) {
+                switch (linkType) {
                     case 0:
                         return settings.linkLengthClass2Class
                     case 1:
@@ -656,8 +703,17 @@
 
             function onNodeClicked(node) {
                 {#debug#}
-                console.log('onNodeClick|')
-                debugNode(node)
+                {#console.log('onNodeClick|')#}
+                {#debugNode(node)#}
+
+                {# if shoding data grapn and the node is not retrieved #}
+                if (isShowingDataGraph && node.isClass && !node.retrieved) {
+                    {# get the shape data and recall this function #}
+                    updateDataGraph(node, function () {
+                        onNodeClicked(node)
+                    })
+                    return
+                }
 
                 if (node === selectedNode && node.isClass) {
                     node.expanded = !node.expanded; // toggle collapse state
@@ -835,7 +891,15 @@
                                             icon: {classes: ['fa', 'fa-project-diagram']},
                                             state: 'collapsed'
                                         })
+                                    } else if (isShowingDataGraph) {
+                                        if (l.linkType == 1)
+                                            return_list.push({
+                                                id: l.id + ",text",
+                                                label: getNodeFromLink(l.target).text,
+                                                icon: {classes: ['fa-regular', 'fa-file-lines']}
+                                            })
                                     }
+
 
                                     return return_list;
                                 }
@@ -853,9 +917,9 @@
 
             // shape check list
             const shapeCheckList = {};
-            fillShapeCheckList();
+            resetShapeCheckList();
 
-            function fillShapeCheckList() {
+            function resetShapeCheckList() {
                 const checklist = document.getElementById('nodeChecklist').getElementsByTagName('ul');
 
                 checklist[0].innerHTML = "";
@@ -972,35 +1036,6 @@
             function requestValidationData(node) {
                 console.log("requestValidationData")
 
-                {#let config = {
-                    external_endpoint: "http://dbpedia.org/sparql",
-                    outputDirectory: "./output/",
-                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX dbo:<http://dbpedia.org/ontology/>\nPREFIX dbr:<http://dbpedia.org/resource/>\nPREFIX dbp:<http://dbpedia.org/property/>\nPREFIX yago:<http://dbpedia.org/class/yago/>\nPREFIX foaf:<http://xmlns.com/foaf/0.1/>\nPREFIX :<http://example.org/>\nSELECT DISTINCT ?x WHERE {\n    ?x a dbo:Film. \n    ?x dbo:starring ?varnameistegal.\n    ?x dbo:imdbId ?p_2.\n    ?x dbp:studio dbr:Walt_Disney_Pictures\n}\n\n",
-                    schemaDir: "./examples/dbpedia/shapes/",
-                    targetShape: "MovieShape",
-                    backend: "travshacl",
-                    output_format: "test"
-                }#}
-                {#let config = {
-                    external_endpoint: "http://shacl_api_testdata:8890/sparql",
-                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX :<http://example.com/>\n\nSELECT ?prof ?email ?uni WHERE {\n  ?prof a ub:FullProfessor .\n  ?prof ub:email ?email .\n  ?prof ub:worksFor :Dept0 .\n ?prof ub:doctoralDegreeFrom ?uni\n}",
-                    schemaDir: "./examples/lubm/shapes/",
-                    targetShape: "FullProfessor",
-                    backend: "travshacl",
-                    start_with_target_shape: false,
-                    replace_target_query: false,
-                    remove_constraints: false
-                }#}
-                {#let config = {
-                    external_endpoint: "http://shacl_api_testdata:8890/sparql",
-                    outputDirectory: "./output/",
-                    query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/> SELECT ?x WHERE { ?x a ub:FullProfessor}",
-                    schemaDir: "./examples/lubm/shapes/",
-                    targetShape: "FullProfessor",
-                    backend: "travshacl",
-                    output_format: "test"
-                }#}
-
                 //get endpoint
                 let endpoint = endpointInputBox.value
                 if (endpoint === "") {
@@ -1012,49 +1047,32 @@
 
                 let dir = "{{ request.args.get("path") }}";
                 let config = {
-                    {#external_endpoint: "http://shacl_api_testdata:8890/sparql",#}
-                    {#external_endpoint: "http://192.168.111.1:14000/sparql",#}
-                    {#external_endpoint: "https://labs.tib.eu/sdm/clarify-kg-7/sparql",#}
                     external_endpoint: endpoint,
                     outputDirectory: "./output/",
                     query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
-                    {#schemaDir: "./examples/lubm_extended/shapes/",#}
-                    {#schemaDir: "./examples/Shapes_CLARIFY/shapes/",#}
-                    {#schemaDir: "./main/shacljson/example/shapes/LUBM_14/",#}
-                    schemaDir: "./main/shacljson/example"+dir,
+                    schemaDir: "./main/shacljson/example" + dir,
                     targetShape: node.id,
                     backend: "travshacl",
                     output_format: "test"
                 }
 
-                {#"external_endpoint": "http://192.168.111.1:14000/sparql",
-                "query": "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#>\nPREFIX :<http://example.com/>\n\nSELECT ?x WHERE {?x a ub:FullProfessor}",
-                "schemaDir": "./examples/lubm_extended/shapes/",
-                "targetShape": "FullProfessor",
-                "backend": "travshacl",
-                "replace_target_query": false,
-                "remove_constraints": false,
-                "output_format": "test"#}
-
                 console.log("query:" + config.query)
                 console.log("node.query:" + node.query)
                 console.log("targetShape:" + config.targetShape)
 
-                {# let post_config = '{' +
-                    '    "backend": "travshacl",' +
-                    '    "start_with_target_shape": true,' +
-                    '    "replace_target_query": true,' +
-                    '    "prune_shape_network": true,' +
-                    '    "output_format": "simple",' +
-                    '    "join_implementation": "Xgjoin",' +
-                    '    "reasoning": false,' +
-                    '    "run_in_serial": false' +
-                    '}'#}
-
-
+                {#
+                    JSON structure:
+                    {shape1:
+                        {valid: #valid instances,
+                        invalid: #invalid instances,
+                        columns: [column name 1, column name 2, ...],
+                        results: [[instance 1 data 1,instance 1 data 2, ...], [instance 2 data 1,instance 2 data 2, ...], ...]
+                        }
+                    shape2: {...}
+                    ...
+                    }
+                #}
                 let request_validation = $.ajax({
-                    {#url: "http://127.0.0.1:9999/validation",
-                    url: "http://192.168.111.128:9999/validation",#}
                     url: "/validation",
                     type: "POST",
                     data: config,
@@ -1141,8 +1159,6 @@
                 node.colorRange = 5
 
                 let request_node_list = $.ajax({
-                    {#url: "http://127.0.0.1:9999/validation",
-                    url: "http://192.168.111.128:9999/reduce",#}
                     url: "/reduce",
                     type: "POST",
                     data: config,
@@ -1775,6 +1791,7 @@
                 isRightNavOpen = true;
                 document.getElementById("myRightSidenav").classList.remove("closeRightNav");
                 document.getElementById("rightTabs").classList.add("tabs-openRightNav");
+                document.getElementById("rightButtons").classList.add("tabs-openRightNav");
                 document.getElementById("data-table-container").style.marginRight = "400px";
                 switch (selectedTab) {
                     case 'info':
@@ -1820,6 +1837,7 @@
                 isRightNavOpen = false;
                 document.getElementById("myRightSidenav").classList.add("closeRightNav");
                 document.getElementById("rightTabs").classList.remove("tabs-openRightNav");
+                document.getElementById("rightButtons").classList.remove("tabs-openRightNav");
                 document.getElementById("data-table-container").style.marginRight = "0px";
 
                 document.getElementById('infoBtn').classList.remove('selected')
@@ -1902,12 +1920,13 @@
             document.querySelector('#ViewDataBtn').onclick = (e) => {
                 {# view selected node data#}
                 let html = '<table id="myTable" class="display"><thead><tr>'
+                let dataIndex = selectedNode.columns.indexOf('Data')
 
                 selectedNode.columns.forEach(col => {
                     html += '<th>' + col + '</th>'
                 })
 
-                html += '</tr></thead><tbody>'
+                html += '<th>View Data</th></tr></thead><tbody>'
 
                 selectedNode.data.forEach(row => {
                     html += '<tr>'
@@ -1916,6 +1935,7 @@
                         html += '<td>' + cell + '</td>'
                     })
 
+                    html += '<td><button query-data="' + row[dataIndex] + '" class="btn btn-primary view-data-graph" style="display: block;">View</button></td>'
                     html += '</tr>'
                 })
 
@@ -1924,13 +1944,27 @@
                 document.getElementById('data-table').innerHTML = html
                 $('#myTable').DataTable();
 
+                // button click showDataGraph
+                $('#myTable').on('click', '.view-data-graph', function () {
+                    showDataGraph(selectedNode, $(this).attr("query-data"))
+                    closeDataTable()
+                });
+
                 {# show table #}
+                showDataTable()
+            }
+
+            document.querySelector('#close-table-btn').onclick = (e) => {
+                closeDataTable()
+            }
+
+            function showDataTable() {
                 elem.style.display = "none";
                 document.getElementById('data-table-container').style.display = "block";
                 Graph.pauseAnimation()
             }
 
-            document.querySelector('#close-table-btn').onclick = (e) => {
+            function closeDataTable() {
                 elem.style.display = "block";
                 document.getElementById('data-table-container').style.display = "none";
                 Graph.resumeAnimation()
@@ -1943,7 +1977,9 @@
             }#}
 
             {#validation endpoint box#}
-            let endpointList = ["http://shacl_api_testdata:8890/sparql",
+            let endpointList = [
+                "http://127.0.0.1:9000/sparql",
+                "http://shacl_api_testdata:8890/sparql",
                 "http://192.168.111.1:14000/sparql",
                 "https://labs.tib.eu/sdm/clarify-kg-7/sparql"];
 
@@ -1968,9 +2004,7 @@
             }
 
             function endpointSuggest(userData) {
-                {#let userData = e.target.value; //user entered data#}
                 let emptyArray = [];
-                {#if (userData) {#}
                 emptyArray = endpointList.filter((data) => {
                     {#console.log("inputBox.onkeyup.userData = " + userData)#}
                     if (userData)
@@ -1993,39 +2027,8 @@
                     allList[i].onclick = () => {
                         clicked = true;
                         selectEndpoint(allList[i])
-                        {#viewNodeInfo(nodesById[allList[i].textContent])
-                        #}{# viewNodeInfo will set selectedNode #}{#
-                        if (nodesById[allList[i].textContent].isHidden) {
-                            if (hideUnrelatedClasses)
-                                hideAllButSelectedNode();
-                            else {
-                                nodesById[allList[i].textContent].isHidden = false;
-                                updateHiddenLinks()
-                                updateGraph();
-                            }
-                        } else {
-                            updateClassState(nodesById[allList[i].textContent])
-                        }#}
                     };
-                    {#allList[i].onmouseover = () => {
-                        highlightSelectedNode ? highlightNode(nodesById[allList[i].textContent]) : null
-                    }#}
                 }
-                {#endpointSuggBox.onmouseout = () => {
-                    if (highlightSelectedNode) {
-                        if (clicked) { #}{# when an item is clicked and searchWrapper disappear dont remove highlight #}{#
-                            clicked = false;
-                            return;
-                        }
-
-                        nodes.forEach(node => node.highlighted = false)
-                        links.forEach(link => link.highlighted = false)
-                        updateNode3d();
-                    }
-                }#}
-                {# } else {
-                     searchWrapper.classList.remove("active"); //hide autocomplete box
-                 }#}
             }
 
             var mouse_is_inside_endpoint = false;
@@ -2063,6 +2066,395 @@
                     {#listData = `<li>${suggestions}</li>`;#}
                 }
                 endpointSuggBox.innerHTML = listData;
+            }
+
+            {# Data viewer #}
+
+            function showShapeGraph() {
+                {# restore #}
+                nodes.length = 0
+                links.length = 0
+                nodes.push(...backupNodes)
+                links.push(...backupLinks)
+                selectedNode = bachupSelectedNode
+                {# empty backup data #}
+                backupNodes.length = 0
+                backupLinks.length = 0
+                bachupSelectedNode = null
+
+                isShowingDataGraph = false
+                resetGraphMaps()
+                resetShapeCheckList()
+                updateGraph()
+                viewNodeInfo(selectedNode)
+                fillValidationData()
+            }
+
+            function showDataGraph(shape, id) {
+                loading(true)
+
+                requestDataNode(shape, id, function (json) {
+
+                    // show data graph
+                    let graph = creatDataNetwork(shape, id, json)
+                    {# backup #}
+                    backupNodes.length = 0
+                    backupLinks.length = 0
+                    backupNodes.push(...nodes)
+                    backupLinks.push(...links)
+                    bachupSelectedNode = selectedNode
+                    {# show #}
+                    nodes.length = 0
+                    links.length = 0
+                    nodes.push(graph.main)
+                    nodes.push(...graph.nodes)
+                    links.push(...graph.links)
+                    selectedNode = graph.main
+
+                    isShowingDataGraph = true
+                    resetGraphMaps(true)
+                    resetShapeCheckList()
+                    updateGraph()
+
+                    openRightNav('info')
+                    document.getElementById('validationBtn').style.display = "none"
+                    document.getElementById('rightButtons').style.display = "flex"
+
+                    loading(false)
+                }, function () {
+                    loading(false)
+                })
+            }
+
+            function requestDataNode(shape, id, callbackSuccess, callbackFail) {
+                let endpoint = endpointInputBox.value
+                let query = getQueryString(shape, id)
+                $.ajax({
+                    dataType: "jsonp",
+                    url: endpoint + "?query=" + encodeURIComponent(query) + "&format=json",
+                    success: function (json, textStatus, jqXHR) {
+                        console.log("Show Data Graph request success")
+                        console.log(json)
+                        console.log(textStatus)
+                        console.log(jqXHR)
+
+                        callback(json)
+                    },
+                    error: function (jqXHR, exception) {
+                        console.log("Show Data Graph request error:")
+                        console.log(jqXHR.status)
+                        console.log(exception)
+                        let msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = ': Cannot connect to ShaclAPI';
+                        } else if (jqXHR.status === 404) {
+                            msg = ': Requested page not found. [404]';
+                        } else if (jqXHR.status === 500) {
+                            msg = ': Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = ': Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = ': Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = ': Ajax request aborted.';
+                        } else {
+                            msg = ': Uncaught Error.\n' + jqXHR.responseText;
+                        }
+                        $('#flash').append(flashMessage(msg, 'warning'));
+
+                        callbackFail()
+
+                    }
+                });
+            }
+
+            function getQueryString(shape, data) {
+                let query = 'SELECT ?p ?o WHERE { VALUES ?p {'
+                let prefix = shape.prefix.slice(0, -1) ///remove '>'
+
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor>#}
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress>#}
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#name>#}
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone>#}
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf>#}
+                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse>#}
+                shape.childLinks.forEach(link => {
+                    if (link.linkType === 1 || link.linkType === 3) {
+                        let constraint = getNodeFromLink(link.target);
+                        query += prefix + constraint.text + '> '
+                    }
+                })
+
+                {#<http://www.department0.university0.edu/UndergraduateStudent9>#}
+                query += '} OPTIONAL {<' + data + '>?p ?o }}'
+
+                console.log('getQueryString')
+                console.log(query)
+                return query
+            }
+
+            {#// remove test btn
+            document.querySelector('#dataGraph').onclick = (e) => {
+                showDataGraph(selectedNode, 'http://www.Department0.University0.edu/GraduateStudent100')
+            }#}
+
+            {#
+            { "head": { "link": [], "vars": ["p", "o"] },
+              "results": { "distinct": false, "ordered": true, "bindings": [
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress" }	, "o": { "type": "literal", "value": "UndergraduateStudent36@Department0.University3.edu" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#name" }	, "o": { "type": "literal", "value": "UndergraduateStudent36" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu/Course34" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu/Course27" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone" }	, "o": { "type": "literal", "value": "xxx-xxx-xxxx" }},
+                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor" }} ] } }
+            #}
+
+            {#
+                returns object with 3 components:
+                main: is the requested data node
+                nodes: list of all other nodes [constraints, data nodes]
+                links: list of all links
+            #}
+
+            function creatDataNetwork(shape, id, json) {
+                {# clear data graph #}
+                let dataGraphNodeList = []
+                let dataGraphLinkList = []
+
+                {# to search for constraints #}
+                let constraintMap = buildConstraintsMap(shape)
+
+                let dataNode = createDataNode(id, shape, true)
+
+                let jsonConstraintsList = json.results.bindings
+                let i = 0
+                jsonConstraintsList.forEach(obj => {
+                    i += 1
+
+                    if (typeof obj.o == 'undefined') {
+                        console.log('creatDataNetwork| Empty: ' + obj.p.value)
+                        return;
+                    }
+
+                    {#let constraintId = obj.p.value#}
+                    let constraintString = obj.p.value.split('#').pop()
+                    {#let constraintType = obj.o.type#}
+                    let constraintValue = obj.o.value
+                    let currentShapeConstraint = constraintMap.get(constraintString)
+
+                    {#if (constraintType == "literal") {#}
+                    if (currentShapeConstraint.isAttribute) {
+                        // create Attribute Node and link it using one link
+                        let attribute = createAttributeNode(i, currentShapeConstraint, dataNode, constraintValue, currentShapeConstraint.min, currentShapeConstraint.max)
+                        let link = createLink(i, constraintString, dataNode, attribute, 1, currentShapeConstraint.min, currentShapeConstraint.max)
+                        dataGraphNodeList.push(attribute)
+                        dataGraphLinkList.push(link)
+                    }
+
+                    {#if (constraintType == "uri") {#}
+                    if (!currentShapeConstraint.isAttribute) {
+                        // create Constraint Node and Data Node then link them with 3 links
+
+                        let n = getNodeFromLink(currentShapeConstraint.childLinks[0].target)
+                        let nextDataNode = createDataNode(constraintValue, n, false)
+
+                        let constraint = createConstraintNode(i, currentShapeConstraint, dataNode, constraintString, currentShapeConstraint.min, currentShapeConstraint.max)
+
+                        let link0 = createLink(i, constraintString, dataNode, nextDataNode, 0, currentShapeConstraint.min, currentShapeConstraint.max)
+                        let link3 = createLink(i, constraintString, dataNode, constraint, 3, currentShapeConstraint.min, currentShapeConstraint.max)
+                        link3.finalTarget = nextDataNode.id
+                        let link4 = createLink(i, constraintString, constraint, nextDataNode, 4, currentShapeConstraint.min, currentShapeConstraint.max)
+                        dataGraphNodeList.push(constraint, nextDataNode)
+                        dataGraphLinkList.push(link0, link3, link4)
+                    }
+                })
+                return {main: dataNode, nodes: dataGraphNodeList, links: dataGraphLinkList}
+            }
+
+            {# create data node "almost as shape node" #}
+
+            function createDataNode(id, shape, retrieved) {
+                let node = nodesById[id]
+                if (node)
+                    return node
+                else {
+                    node = {
+                        id: id,
+                        group: id,
+                        text: id.split('/').pop(),
+                        isClass: true,
+                        expanded: false,
+                        isHidden: false,
+                        highlighted: false,
+                        childLinks: [],
+                        parentLinks: [],
+                        query: shape.query,
+                        prefix: shape.prefix,
+                        valid: -1,
+                        invalid: -1,
+                        columns: [],
+                        data: [],
+                        colorRange: 0 {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
+                    }
+                    node.shape = shape
+                    node.retrieved = retrieved
+                    return node;
+                }
+            }
+
+            function createAttributeNode(incremental, constraint, dataNode, name, min, max) {
+                let node = {
+                    id: incremental + '|' + dataNode.id + ',' + name,
+                    group: dataNode.id,
+                    text: name,
+                    min: min,
+                    max: max,
+                    isClass: false,
+                    expanded: true,
+                    isHidden: false,
+                    highlighted: false,
+                    childLinks: [],
+                    parentLinks: [],
+                    isAttribute: true
+                }
+                node.constraint = constraint
+                return node
+
+            }
+
+            function createConstraintNode(incremental, constraint, dataNode, name, min, max) {
+                let node = {
+                    id: incremental + '|' + dataNode.id + ',' + name,
+                    group: dataNode.id,
+                    text: name,
+                    min: min,
+                    max: max,
+                    isClass: false,
+                    expanded: true,
+                    isHidden: false,
+                    highlighted: false,
+                    childLinks: [],
+                    parentLinks: [],
+                    isAttribute: false
+                }
+                node.constraint = constraint
+                return node
+            }
+
+            {#
+            linkType:
+             0: class to class
+             1: class to attribute
+             2: attribute to same class
+             3: class to constraint
+             4: constraint to other class
+             #}
+
+            function createLink(incremental, text, from, to, type, min, max) {
+
+                let link = {
+                    id: incremental + '|' + type + '|from:' + from.id + ',to:' + to.id,
+                    source: from.id,
+                    target: to.id,
+                    text: text,
+                    min: min,
+                    max: max,
+                    {#isClass2Class: false,#}
+                    {#collapsed: true,#}
+                    isHidden: false,
+                    highlighted: false,
+                    length: getLinkLength(type),
+                    {#isAttribute: true,#}
+                    linkType: type
+                }
+
+                switch (type) {
+                    case 0:
+                        link.isClass2Class = true
+                        link.collapsed = false
+                        link.isAttribute = false
+                        break;
+                    case 1:
+                        link.isClass2Class = false
+                        link.collapsed = true
+                        link.isAttribute = true
+                        break;
+                    case 3:
+                        link.isClass2Class = false
+                        link.collapsed = true
+                        link.isAttribute = false
+                        break;
+                    case 4:
+                        link.isClass2Class = false
+                        link.collapsed = true
+                        link.isAttribute = false
+                        break;
+                    default:
+                        return 1
+                }
+
+                return link;
+            }
+
+            function buildConstraintsMap(shape) {
+                let res = new Map()
+                shape.childLinks.forEach(link => {
+                    if (link.linkType === 1 || link.linkType === 3) {
+                        let constraint = getNodeFromLink(link.target);
+                        res.set(constraint.text, constraint)
+                    }
+                })
+                return res
+            }
+
+            function updateDataGraph(node, callback) {
+                loading(true)
+
+                requestDataNode(node.shape, node.id, function (json) {
+                    // update node in the data graph and add its constraints
+
+                    // create data graph
+                    let graph = creatDataNetwork(node.shape, node.id, json)
+
+                    node.retrieved = true
+                    {#nodes.push(...graph.main)#} {# main already added #}
+                    nodes.push(...graph.nodes)
+                    {# check for each new node if it is already added #}
+                    links.push(...graph.links)
+
+                    resetGraphMaps(true)
+                    resetShapeCheckList()
+                    updateGraph()
+
+                    loading(false)
+
+                    callback()
+                }, function () {
+                    loading(false)
+                })
+            }
+
+            document.querySelector('#closeDataGraph').onclick = (e) => {
+                document.getElementById('rightButtons').style.display = "none"
+                document.getElementById('validationBtn').style.display = "block"
+                openRightNav('validation')
+                showDataTable()
+                showShapeGraph()
+            }
+
+            /** todo
+             *
+             * infoTree combine similar constraints when isShowDataGraph
+             * infoTree text icon for data text
+             *
+             */
+
+            function loading(startLoading) {
+                if (startLoading)
+                    document.querySelector('#loader').classList.add("loader");
+                else
+                    document.querySelector('#loader').removeAttribute("class");
             }
 
             {# remove loader #}

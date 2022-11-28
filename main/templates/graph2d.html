@@ -33,8 +33,12 @@
 
             this.nodeColorDark = '#0af'
             this.nodeColorLight = '#000'
+            this.nodeColorNotRetrievedDark = '#a0f'
+            this.nodeColorNotRetrievedLight = '#000'
             this.nodeBackgroundColorDark = '#000'
             this.nodeBackgroundColorLight = '#0af'
+            this.nodeBackgroundColorNotRetrievedDark = '#000'
+            this.nodeBackgroundColorNotRetrievedLight = '#a0f'
             this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
             this.nodeBorderColor = '#0af'
             this.attributeBorderColor = 'rgb(0,0,0,1)'
@@ -64,11 +68,24 @@
                 const textWidth = ctx.measureText(label).width;
                 const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.5); // some padding
 
-                ctx.fillStyle = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;
+                if (darkMode) {
+                    if (isShowingDataGraph && !node.retrieved) {
+                        ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedDark
+                    } else {
+                        ctx.fillStyle = settings.nodeBackgroundColorDark
+                    }
+                } else {
+                    if (isShowingDataGraph && !node.retrieved) {
+                        ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedLight
+                    } else {
+                        ctx.fillStyle = settings.nodeBackgroundColorLight
+                    }
+                }
+                {#ctx.fillStyle = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;#}
                 ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
 
                 if (node.isClass) {
-                    ctx.strokeStyle = node.expanded ?  settings.nodeBorderColorExpanded : settings.nodeBorderColor;
+                    ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
                 } else if (node.isAttribute) {
                     ctx.strokeStyle = settings.attributeBorderColor;
                 } else {
@@ -87,7 +104,20 @@
 
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = darkMode ? settings.nodeColorDark : settings.nodeColorLight;
+                if (darkMode) {
+                    if (isShowingDataGraph && !node.retrieved) {
+                        ctx.fillStyle = settings.nodeColorNotRetrievedDark
+                    } else {
+                        ctx.fillStyle = settings.nodeColorDark
+                    }
+                } else {
+                    if (isShowingDataGraph && !node.retrieved) {
+                        ctx.fillStyle = settings.nodeColorNotRetrievedLight
+                    } else {
+                        ctx.fillStyle = settings.nodeColorLight
+                    }
+                }
+                {#ctx.fillStyle = darkMode ? settings.nodeColorDark : settings.nodeColorLight;#}
                 ctx.fillText(label, node.x, node.y);
 
                 node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
@@ -122,18 +152,18 @@
             ctx.stroke();
         }
 
-{#        var link = Graph.selectAll(".link")#}
-{#
-        Graph.d3Force("tick", function() {
-            link.attr("x1", function(d) { return d.source.x })
-                .attr("y1", function(d) { return d.source.y })
-                .attr("x2", function(d) { return d.target.x })
-                .attr("y2", function(d) { return d.target.y })
-       })#}
+        {#        var link = Graph.selectAll(".link")#}
+        {#
+                Graph.d3Force("tick", function() {
+                    link.attr("x1", function(d) { return d.source.x })
+                        .attr("y1", function(d) { return d.source.y })
+                        .attr("x2", function(d) { return d.target.x })
+                        .attr("y2", function(d) { return d.target.y })
+               })#}
 
         // call on slider change
         function updateLinkDistance() {
-            linkForce.distance(link => getLinkLength(link));
+            linkForce.distance(link => getLinkLength(link.linkType));
             Graph.d3ReheatSimulation(); // Re-heat simulation
         }
 
@@ -158,5 +188,5 @@
             Graph.zoom(2, 1000);
         }
 
-{#    </script>#}
+        {#    </script>#}
 {% endblock %}
