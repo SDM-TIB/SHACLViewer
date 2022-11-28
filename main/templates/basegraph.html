@@ -2138,7 +2138,7 @@
                         console.log(textStatus)
                         console.log(jqXHR)
 
-                        callback(json)
+                        callbackSuccess(json)
                     },
                     error: function (jqXHR, exception) {
                         console.log("Show Data Graph request error:")
@@ -2169,7 +2169,7 @@
             }
 
             function getQueryString(shape, data) {
-                let query = 'SELECT ?p ?o WHERE { VALUES ?p {'
+                let query = 'SELECT DISTINCT ?p ?o WHERE { VALUES ?p {'
                 let prefix = shape.prefix.slice(0, -1) ///remove '>'
 
                 {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor>#}
