@@ -217,6 +217,7 @@
                     parentLinks: [],
                     query: '{{ node.targetQuery|safe }}',
                     prefix: '{{ node.prefixes['ub']|safe }}',
+                    targetDef: '{{ node.targetDef }}',
                     valid: -1,
                     invalid: -1,
                     columns: [],
@@ -771,7 +772,9 @@
                         + '</p><p>Inter-Constraints: '
                         + node.statistics.constraints
                         + '</p><p>Constraints targeting this shape: '
-                        + node.statistics.partOff + '</p>';
+                        + node.statistics.partOff
+                        + '</p><p>Target: '
+                        + node.targetDef + '</p>';
                 } else {
                     let range = "<p>"
                     if (node.min != "-1") {
@@ -1081,6 +1084,9 @@
                         console.log(data)
                         console.log(textStatus)
                         console.log(jqXHR)
+
+                        //save endpoint to cache
+                        saveToCache(endpointInputBox.id, endpoint)
 
                         {# get current shape node #}
                         let currentNode;
@@ -1977,12 +1983,6 @@
             }#}
 
             {#validation endpoint box#}
-            let endpointList = [
-                "http://host.docker.internal:9000/sparql",
-                "http://127.0.0.1:9000/sparql",
-                "http://shacl_api_testdata:8890/sparql",
-                "http://192.168.111.1:14000/sparql",
-                "https://labs.tib.eu/sdm/clarify-kg-7/sparql"];
 
             // getting all required elements
             const endpointWrapper = document.querySelector("#endpointWrapper");
@@ -1990,6 +1990,14 @@
             const endpointSuggBox = endpointWrapper.querySelector("#endpointSuggBox");
             const endpointIcon = endpointWrapper.querySelector("#endpointIcon");
             let endpointLinkTag = endpointWrapper.querySelector("#endpointLinkTag");
+
+            let endpointList = [
+                "http://host.docker.internal:9000/sparql",
+                "http://127.0.0.1:9000/sparql",
+                "http://shacl_api_testdata:8890/sparql",
+                "http://192.168.111.1:14000/sparql",
+                "https://labs.tib.eu/sdm/clarify-kg-7/sparql"];
+            saveToCacheDefaultValues(endpointInputBox.id, endpointList)
 
             // if user press any key and release
             endpointInputBox.onkeyup = (e) => {
@@ -2006,7 +2014,7 @@
 
             function endpointSuggest(userData) {
                 let emptyArray = [];
-                emptyArray = endpointList.filter((data) => {
+                emptyArray = getFromCache(endpointInputBox.id).filter((data) => {
                     {#console.log("inputBox.onkeyup.userData = " + userData)#}
                     if (userData)
                         //filtering array value and user characters to lowercase and return only those words which are start with user entered chars
@@ -2068,6 +2076,40 @@
                 }
                 endpointSuggBox.innerHTML = listData;
             }
+
+            // save cache list to local storage
+            function saveToCache(id, value) {
+                let json = localStorage.getItem(id)
+                let array
+                if (json != null) {
+                    array = JSON.parse(json)
+                    let set = new Set(array).add(value) //no doubles
+                    array = Array.from(set)
+                } else {
+                    array = [value]
+                }
+                let json2 = JSON.stringify(array)
+                localStorage.setItem(id, json2)
+            }
+
+            function saveToCacheDefaultValues(id, array) {
+                {#localStorage.removeItem(id)#}
+
+                let json = localStorage.getItem(id)
+                if (json == null) {
+                    json = JSON.stringify(array)
+                    localStorage.setItem(id, json)
+                }
+            }
+
+            function getFromCache(id) {
+                let c = localStorage.getItem(id)
+                if (c != null)
+                    return Array.from(JSON.parse(c))
+                else
+                    return []
+            }
+
 
             {# Data viewer #}
 
@@ -2292,6 +2334,7 @@
                         parentLinks: [],
                         query: shape.query,
                         prefix: shape.prefix,
+                        targetDef: shape.targetDef,
                         valid: -1,
                         invalid: -1,
                         columns: [],
