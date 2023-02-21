@@ -95,7 +95,7 @@
         {#<a href="javascript:void(0)" id="dataGraph"><i class='fas fa-compress-arrows-alt option-icon'></i> Data
             Graph</a>#}
     </div>
-    <div id="rightButtons" style="display: none;">
+    <div id="topRightButtons" style="display: none;">
         <button id="closeDataGraph" class="btn btn-block btn-right-nav btn-primary"
                 style="display: block;max-width: 180px;margin-right: 52px;">Back to Data Table
         </button>
@@ -816,44 +816,58 @@
                                 ];
                             } else {
                                 {#if the clicked element is a node#}
-                                const res = [];
-                                const resSelf = [];
                                 const n = nodesById[id];
                                 if (n) {
-                                    if (n.isHidden) {
-                                        n.isHidden = false;
-                                        updateHiddenLinks();
-                                        updateClassState(n);
-                                    } else if (n != selectedNode && !n.expanded) { {# expand the node in graph #}
-                                        n.expanded = true;
-                                        updateClassState(n);
+                                    function sub_callback(n) {
+                                        const res = [];
+                                        const resSelf = [];
+
+                                        if (n.isHidden) {
+                                            n.isHidden = false;
+                                            updateHiddenLinks();
+                                            updateClassState(n);
+                                        } else if (n != selectedNode && !n.expanded && !isShowingDataGraph) { {# expand the node in graph #}
+                                            n.expanded = true;
+                                            updateClassState(n);
+                                        }
+
+                                        {# fill info menu with node connections #}
+                                        if (n.isClass) {
+                                            n.childLinks.forEach(link => {
+                                                if (!link.isClass2Class) { {# if the link goes to a constraint #}
+                                                    if (link.isAttribute) { {# if the link goes to self constaint #}
+                                                        resSelf.push({
+                                                            id: link.id,
+                                                            label: link.text,
+                                                            icon: {classes: ['bi', 'bi-align-middle']},
+                                                            state: 'collapsed'
+                                                        })
+                                                    } else { {# the link goes to another class #}
+                                                        res.push({
+                                                            id: link.id,
+                                                            label: link.text,
+                                                            icon: {classes: ['bi', 'bi-arrow-left-right']},
+                                                            state: 'collapsed'
+                                                        });
+                                                    }
+                                                }
+                                            })
+                                            resSelf.push(...res)
+                                            return resSelf;
+                                        } else { {# the node is a constraint => show attributes #}
+                                            id = n.parentLinks[0].id
+                                        }
                                     }
 
-                                    {# fill info menu with node connections #}
-                                    if (n.isClass) {
-                                        n.childLinks.forEach(link => {
-                                            if (!link.isClass2Class) { {# if the link goes to a constraint #}
-                                                if (link.isAttribute) { {# if the link goes to self constaint #}
-                                                    resSelf.push({
-                                                        id: link.id,
-                                                        label: link.text,
-                                                        icon: {classes: ['bi', 'bi-align-middle']},
-                                                        state: 'collapsed'
-                                                    })
-                                                } else { {# the link goes to another class #}
-                                                    res.push({
-                                                        id: link.id,
-                                                        label: link.text,
-                                                        icon: {classes: ['bi', 'bi-arrow-left-right']},
-                                                        state: 'collapsed'
-                                                    });
-                                                }
-                                            }
+                                    if (isShowingDataGraph && n.isClass && !n.retrieved) {
+                                        {# get the shape data and recall this function #}
+                                        updateDataGraph(n, function () {
+                                            let x = sub_callback(n)
+                                            return x
                                         })
-                                        resSelf.push(...res)
-                                        return resSelf;
-                                    } else { {# the node is a constraint => show attributes #}
-                                        id = n.parentLinks[0].id
+                                    } else {
+                                        let c = sub_callback(n)
+                                        return c
                                     }
                                 }
 
@@ -1797,7 +1811,7 @@
                 isRightNavOpen = true;
                 document.getElementById("myRightSidenav").classList.remove("closeRightNav");
                 document.getElementById("rightTabs").classList.add("tabs-openRightNav");
-                document.getElementById("rightButtons").classList.add("tabs-openRightNav");
+                document.getElementById("topRightButtons").classList.add("tabs-openRightNav");
                 document.getElementById("data-table-container").style.marginRight = "400px";
                 switch (selectedTab) {
                     case 'info':
@@ -1843,7 +1857,7 @@
                 isRightNavOpen = false;
                 document.getElementById("myRightSidenav").classList.add("closeRightNav");
                 document.getElementById("rightTabs").classList.remove("tabs-openRightNav");
-                document.getElementById("rightButtons").classList.remove("tabs-openRightNav");
+                document.getElementById("topRightButtons").classList.remove("tabs-openRightNav");
                 document.getElementById("data-table-container").style.marginRight = "0px";
 
                 document.getElementById('infoBtn').classList.remove('selected')
@@ -2159,9 +2173,11 @@
                     resetShapeCheckList()
                     updateGraph()
 
+                    viewNodeInfo(selectedNode)
+                    highlightNode(selectedNode)
                     openRightNav('info')
                     document.getElementById('validationBtn').style.display = "none"
-                    document.getElementById('rightButtons').style.display = "flex"
+                    document.getElementById('topRightButtons').style.display = "flex"
 
                     loading(false)
                 }, function () {
@@ -2480,7 +2496,7 @@
             }
 
             document.querySelector('#closeDataGraph').onclick = (e) => {
-                document.getElementById('rightButtons').style.display = "none"
+                document.getElementById('topRightButtons').style.display = "none"
                 document.getElementById('validationBtn').style.display = "block"
                 openRightNav('validation')
                 showDataTable()

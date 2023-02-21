@@ -29,7 +29,7 @@
     padding: 1em;
 }
 
-#rightTabs, #rightButtons {
+#rightTabs, #topRightButtons {
     position: absolute;
     z-index: 2;
     right: 0;

@@ -68,6 +68,41 @@
                 const textWidth = ctx.measureText(label).width;
                 const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.5); // some padding
 
+
+                {#   validation coloring   #}
+                {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
+                let color = '#aaa'
+                switch (node.colorRange) {
+                    case 0:
+                        color = "#0af"
+                        break;
+                    case 1:
+                        color = "#0c0"
+                        break;
+                    case 2:
+                        color = "#ff0"
+                        break;
+                    case 3:
+                        color = "#f80"
+                        break;
+                    case 4:
+                        color = "#c00"
+                        break;
+                    case 5:
+                        if (darkMode)
+                            color = "#ccc"
+                        else
+                            color = "#666"
+                        break;
+                }
+                settings.nodeColorDark = color
+                settings.nodeBackgroundColorLight = color
+                settings.nodeBorderColor = color
+                settings.nodeBorderColorExpanded = color
+                settings.attributeBorderColor = color
+                settings.linkNodeBorderColor = color
+
+
                 if (darkMode) {
                     if (isShowingDataGraph && !node.retrieved) {
                         ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedDark
