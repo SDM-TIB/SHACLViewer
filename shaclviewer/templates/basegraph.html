@@ -1113,7 +1113,7 @@
                             currentNode = selectedNode.parentLinks[0];
 
                         Object.keys(data).forEach(shapeId => {
-                            let shape = nodesById[shapeId]
+                            let shape = nodesById[shapeId.replace("<", "&lt;").replace(">", "&gt;")]
                             {# fill valid/invalid count #}
                             shape.valid = data[shapeId].valid
                             shape.invalid = data[shapeId].invalid
@@ -1192,7 +1192,7 @@
                         console.log(jqXHR)
 
                         data['shapes'].forEach(shapeId => {
-                            let shape = nodesById[shapeId]
+                            let shape = nodesById[shapeId.replace("<", "&lt;").replace(">", "&gt;")]
                             if (shape.valid === -1 || shape.invalid === -1) {
                                 requestMap[shapeId] = request_validation
                                 shape.colorRange = 5
