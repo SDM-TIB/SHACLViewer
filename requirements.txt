@@ -1,4 +1,5 @@
 Flask==2.3.3
 Werkzeug==2.3.8
 rdflib==6.2.0
-shaclapi>=0.9.6
+TravSHACL==1.7.0
+shaclapi==0.11.0
