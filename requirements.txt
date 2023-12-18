@@ -1,3 +1,4 @@
-Flask~=2.1.2
-rdflib~=6.1.1
+Flask==2.3.3
+Werkzeug==2.3.8
+rdflib==6.2.0
 shaclapi>=0.9.6
