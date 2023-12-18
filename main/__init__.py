@@ -11,7 +11,7 @@ app = Flask(__name__)
 def graph3d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
-    graph = shape_parser.parse_shapes_from_dir('./main/shacl/example/' + path + '/')
+    graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     shape_parser.prettify_graph(graph)
 
     return render_template('graph3d.html', graph=graph)
@@ -21,7 +21,7 @@ def graph3d():
 def graph2d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
-    graph = shape_parser.parse_shapes_from_dir('./main/shacl/example/' + path + '/')
+    graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     shape_parser.prettify_graph(graph)
 
     return render_template('graph2d.html', graph=graph)
@@ -33,10 +33,10 @@ def home_page():
     path = request.args.get('path')
     if path is None:
         path = "/"
-        full_path = "./main/shacl/example/"
+        full_path = "/shapes/"
     else:
         path = path + "/"
-        full_path = "./main/shacl/example/" + path + "/"
+        full_path = "/shapes/" + path + "/"
 
     folders = sorted(os.listdir(full_path))
     data = []

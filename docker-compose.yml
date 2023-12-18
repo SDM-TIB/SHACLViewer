@@ -5,5 +5,7 @@ services:
     image: sdmtib/shaclviewer:edge
     build: .
     container_name: shaclviewer
+    volumes:
+      - ./shapes:/shapes
     ports:
       - '5001:5001'
