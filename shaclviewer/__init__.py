@@ -3,7 +3,8 @@ import os
 from flask import Flask, render_template, request, jsonify
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
-from main.shacl.core.ShapeParser import ShapeParser
+from shaclviewer.shacl import prettify_graph
+from shaclviewer.shacl.ShapeParser import ShapeParser
 
 app = Flask(__name__)
 
@@ -12,7 +13,7 @@ def graph3d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
-    shape_parser.prettify_graph(graph)
+    prettify_graph(graph)
 
     return render_template('graph3d.html', graph=graph)
 
@@ -22,7 +23,7 @@ def graph2d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
-    shape_parser.prettify_graph(graph)
+    prettify_graph(graph)
 
     return render_template('graph2d.html', graph=graph)
 
