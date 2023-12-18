@@ -1070,8 +1070,8 @@
                     external_endpoint: endpoint,
                     outputDirectory: "./output/",
                     query: "PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>" + node.query,
-                    schemaDir: "./main/shacl/example" + dir,
-                    targetShape: node.id,
+                    schemaDir: "/shapes" + dir,
+                    targetShape: node.id.replace("&lt;", "<").replace("&gt;", ">"),
                     backend: "travshacl",
                     output_format: "test"
                 }
