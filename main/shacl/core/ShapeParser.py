@@ -12,12 +12,12 @@ import rdflib.term
 from rdflib import Graph
 from itertools import islice
 
-from main.shacljson.constraints.Constraint import Constraint
-from main.shacljson.core.Shape import Shape
-from main.shacljson.utils.VariableGenerator import VariableGenerator
-from main.shacljson.constraints.MaxOnlyConstraint import MaxOnlyConstraint
-from main.shacljson.constraints.MinMaxConstraint import MinMaxConstraint
-from main.shacljson.constraints.MinOnlyConstraint import MinOnlyConstraint
+from main.shacl.constraints.Constraint import Constraint
+from main.shacl.core.Shape import Shape
+from main.shacl.utils.VariableGenerator import VariableGenerator
+from main.shacl.constraints.MaxOnlyConstraint import MaxOnlyConstraint
+from main.shacl.constraints.MinMaxConstraint import MinMaxConstraint
+from main.shacl.constraints.MinOnlyConstraint import MinOnlyConstraint
 
 
 class ShapeParser:

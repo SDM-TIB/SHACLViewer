@@ -1,7 +1,7 @@
 __author__ = "Monica Figuera and Philipp D. Rohde"
 
-from main.shacljson.utils.VariableGenerator import VariableType
-from main.shacljson.constraints.Constraint import Constraint
+from main.shacl.utils.VariableGenerator import VariableType
+from main.shacl.constraints.Constraint import Constraint
 
 
 class MinOnlyConstraint(Constraint):

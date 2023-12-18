@@ -1,19 +1,22 @@
-__author__ = "Monica Figuera and Philipp D. Rohde"
+__author__ = "Philipp D. Rohde"
 
-from main.shacljson.utils.VariableGenerator import VariableType
-from main.shacljson.constraints.Constraint import Constraint
+from main.shacl.utils.VariableGenerator import VariableType
+from main.shacl.constraints.Constraint import Constraint
 
 
-class MaxOnlyConstraint(Constraint):
-    """This class represents max constraints, i.e., a constraint for the maximal occurrence of a path."""
+class MinMaxConstraint(Constraint):
+    """
+    This class represents min-max constraints, i.e., a constraint for the minimal and maximal occurrence of a path.
+    """
 
-    def __init__(self, var_generator, id_, path, max_, is_pos, datatype=None, value=None, shape_ref=None, target_def=None):
+    def __init__(self, var_generator, id_, path, min_, max_, is_pos, datatype=None, value=None, shape_ref=None, target_def=None):
         """
-        Creates a new max constraint.
+        Creates a new min-max constraint.
 
         :param var_generator: variable generator instance
         :param id_: name of the constraint
         :param path: the path associated with this constraint, e.g., a predicate
+        :param min_: the minimal occurrence allowed
         :param max_: the maximal occurrence allowed
         :param is_pos: true if it is a positive constraint, false otherwise
         :param datatype: contains the datatype the object must fulfill
@@ -23,12 +26,12 @@ class MaxOnlyConstraint(Constraint):
         """
         super().__init__(id_, is_pos, None, datatype, value, shape_ref, target_def, path)
         self.varGenerator = var_generator
-        self.min = -1
+        self.min = min_
         self.max = max_
         self.variables = self.compute_variables()
-        print("MaxOnlyConstraint" + str({'target': target_def['class'], 'property': path, 'max_cardinality': max_}))
+        print("MinMaxConstraint" + str({'target': target_def['class'], 'property': path, 'min_cardinality': min_, 'max_cardinality': max_}))
 
     def compute_variables(self):
         """Computes variable names for the SPARQL queries of the constraint."""
         atomic_constraint = Constraint()
-        return atomic_constraint.generate_variables(self.varGenerator, VariableType.VALIDATION, self.max + 1)
+        return atomic_constraint.generate_variables(self.varGenerator, VariableType.VALIDATION, self.min)
