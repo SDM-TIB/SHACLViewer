@@ -1,0 +1,9 @@
+version: '2.3'
+
+services:
+  shaclviewer:
+    image: sdmtib/shaclviewer:edge
+    build: .
+    container_name: shaclviewer
+    ports:
+      - '5001:5001'
