@@ -189,10 +189,11 @@
             let selectedNode;
 
             {# used for data graph #}
-            const backupNodes = []
-            const backupLinks = []
-            let bachupSelectedNode;
-            let isShowingDataGraph = false
+            const backupNodes = [],
+                  backupLinks = [];
+            let bachupSelectedNode,
+                isShowingDataGraph = false,
+                node_name;
 
             {#
             linkType:
@@ -205,10 +206,12 @@
 
             {% for node in graph %}
                 {# add class/shape node #}
+                node_name = '{{ node.id }}';
+                if(node_name.includes('&lt;')) { node_name = node_name.substring(4, node_name.length -4)}
                 currentNode = {
                     id: '{{ node.id }}',
                     group: '{{ node.id }}',
-                    text: '{{ node.id }}',
+                    text: node_name,
                     isClass: true,
                     expanded: false,
                     isHidden: false,
@@ -216,7 +219,7 @@
                     childLinks: [],
                     parentLinks: [],
                     query: '{{ node.targetQuery|safe }}',
-                    prefix: '{{ node.prefixes['ub']|safe }}',
+                    prefix: '{{ node.prefixes|safe }}',
                     targetDef: '{{ node.targetDef }}',
                     valid: -1,
                     invalid: -1,
