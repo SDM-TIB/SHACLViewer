@@ -10,7 +10,7 @@ Docker is required for the example to run.
 Assuming the current working directory is the root of this repository, the example can be started with
 
 ```bash
-docker-compose up -d -f example/docker-compose.yml
+docker-compose -f example/docker-compose.yml up -d
 ```
 
 The SHACLViewer is then served at [http://localhost:5001](http://localhost:5001).
