@@ -15,7 +15,7 @@ def graph3d():
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     prettify_graph(graph)
 
-    return render_template('graph3d.html', graph=graph)
+    return render_template('graph_3d.jinja2', graph=graph)
 
 
 @app.route("/graph2d")
@@ -25,7 +25,7 @@ def graph2d():
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     prettify_graph(graph)
 
-    return render_template('graph2d.html', graph=graph)
+    return render_template('graph_2d.jinja2', graph=graph)
 
 
 # to-do check for folders within folders (folder explorer)
@@ -53,7 +53,7 @@ def home_page():
             "filecount": len(os.listdir(full_path + name))
         })
 
-    return render_template('home.html', data=data)
+    return render_template('home.jinja2', data=data)
 
 
 @app.route('/validation', methods=['POST'])
