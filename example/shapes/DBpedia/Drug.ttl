@@ -1,0 +1,24 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:DrugShape a sh:NodeShape ;
+    sh:targetClass dbo:Drug ;
+    sh:property [
+        sh:path dbp:drugName ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbp:chemicalFormula ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path <http://dbpedia.org/ontology/drugs.com> ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
+        sh:minCount 1
+    ] .

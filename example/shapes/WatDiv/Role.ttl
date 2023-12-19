@@ -1,0 +1,109 @@
+@prefix ub: <http://db.uwaterloo.ca/~galuc/wsdbm/> .
+@prefix sorg: <http://schema.org/> .
+@prefix foaf: <http://xmlns.com/foaf/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:RoleShape a sh:NodeShape ;
+    sh:targetClass ub:Role ;
+    sh:property [
+        sh:path ub:follows ;
+        sh:qualifiedValueShape [
+            sh:node :RoleShape
+        ] ;
+        sh:qualifiedMinCount 2
+    ] ;
+    sh:property [
+        sh:path ub:follows ;
+        sh:maxCount 100
+    ] ;
+    sh:property [
+        sh:path ub:friendOf ;
+        sh:qualifiedValueShape [
+            sh:node :RoleShape
+        ] ;
+        sh:qualifiedMinCount 3
+    ] ;
+    sh:property [
+        sh:path ub:friendOf ;
+        sh:maxCount 164
+    ] ;
+    sh:property [
+        sh:path ub:gender ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path ub:likes ;
+        sh:qualifiedValueShape [
+            sh:node :ProductShape
+        ] ;
+        sh:qualifiedMinCount 3
+    ] ;
+    sh:property [
+        sh:path ub:likes ;
+        sh:maxCount 18
+    ] ;
+    sh:property [
+        sh:path ub:makesPurchase ;
+        sh:minCount 3 ;
+        sh:maxCount 15
+    ] ;
+    sh:property [
+        sh:path ub:subscribes ;
+        sh:minCount 2 ;
+        sh:maxCount 12
+    ] ;
+    sh:property [
+        sh:path ub:userId ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path <http://purl.org/dc/terms/Location> ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:birthDate ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:email ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:jobTitle ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:nationality ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:telephone ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path foaf:age ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path foaf:familyName ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path foaf:givenName ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path foaf:homepage ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] .

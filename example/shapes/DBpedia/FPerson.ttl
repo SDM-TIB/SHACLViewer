@@ -1,0 +1,13 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:FPersonShape a sh:NodeShape ;
+    sh:targetClass <http://xmlns.com/foaf/0.1/Person><http://xmlns.com/foaf/0.1/Person> ;
+    sh:property [
+        sh:path <http://xmlns.com/foaf/0.1/name> ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path <http://xmlns.com/foaf/0.1/givenName> ;
+        sh:minCount 1
+    ] .

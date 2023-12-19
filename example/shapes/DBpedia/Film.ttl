@@ -1,0 +1,50 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:FilmShape a sh:NodeShape ;
+    sh:targetClass dbo:Film ;
+    sh:property [
+        sh:path dbo:producer ;
+        sh:qualifiedValueShape [
+            sh:node :PersonShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:director ;
+        sh:qualifiedValueShape [
+            sh:node :PersonShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:writer ;
+        sh:qualifiedValueShape [
+            sh:node :PersonShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:country ;
+        sh:qualifiedValueShape [
+            sh:node :CountryShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:recorded ;
+        sh:qualifiedValueShape [
+            sh:node :CountryShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:genre ;
+        sh:qualifiedValueShape [
+            sh:node :GenreShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] .

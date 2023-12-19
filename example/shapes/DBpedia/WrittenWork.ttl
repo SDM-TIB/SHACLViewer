@@ -1,0 +1,19 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:WrittenWorkShape a sh:NodeShape ;
+    sh:targetClass dbo:WrittenWork ;
+    sh:property [
+        sh:path dbo:releaseDate ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path dbo:author ;
+        sh:qualifiedValueShape [
+            sh:node :PersonShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] .

@@ -4,6 +4,17 @@
 
 SHACLViewer is a Web application for interactive visualizations of SHACL shape schemas.
 
+## Example
+Example data and SHACL shapes are provided in the `example` directory.
+Docker is required for the example to run.
+Assuming the current working directory is the root of this repository, the example can be started with
+
+```bash
+docker-compose up -d -f example/docker-compose.yml
+```
+
+The SHACLViewer is then served at [http://localhost:5001](http://localhost:5001).
+
 ## Publications
 The underlying work is reported in:
 

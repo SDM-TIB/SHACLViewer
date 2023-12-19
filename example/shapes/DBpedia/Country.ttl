@@ -1,0 +1,24 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:CountryShape a sh:NodeShape ;
+    sh:targetClass dbo:Country ;
+    sh:property [
+        sh:path dbo:countryCode ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbp:name ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:capital ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbp:flag ;
+        sh:minCount 1
+    ] .

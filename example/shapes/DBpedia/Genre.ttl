@@ -1,0 +1,20 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:GenreShape a sh:NodeShape ;
+    sh:targetClass dbo:name ;
+    sh:property [
+        sh:path dbp:countryCode ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbp:stylisticOrigins ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbp:culturalOrigins ;
+        sh:minCount 1
+    ] .

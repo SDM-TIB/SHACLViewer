@@ -1,0 +1,10 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:GenreShape a sh:NodeShape ;
+    sh:targetClass <http://db.uwaterloo.ca/~galuc/wsdbm/Genre> ;
+    sh:property [
+        sh:path <http://ogp.me/ns#tag> ;
+        sh:minCount 1 ;
+        sh:maxCount 6
+    ] .

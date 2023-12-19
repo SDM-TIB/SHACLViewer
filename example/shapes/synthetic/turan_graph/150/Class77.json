@@ -1,0 +1,513 @@
+{
+    "name": "Class77",
+    "targetDef": {
+        "class": "http://example.com/Class77",
+        "query": "SELECT ?x WHERE { ?x a <http://example.com/Class77> }"
+    },
+    "constraintDef": {
+        "conjunctions": [
+            [
+                {
+                    "path": "<http://example.com/edge77-0>",
+                    "min": 1,
+                    "shape": "Class0"
+                },
+                {
+                    "path": "<http://example.com/edge77-1>",
+                    "min": 1,
+                    "shape": "Class1"
+                },
+                {
+                    "path": "<http://example.com/edge77-2>",
+                    "min": 1,
+                    "shape": "Class2"
+                },
+                {
+                    "path": "<http://example.com/edge77-3>",
+                    "min": 1,
+                    "shape": "Class3"
+                },
+                {
+                    "path": "<http://example.com/edge77-4>",
+                    "min": 1,
+                    "shape": "Class4"
+                },
+                {
+                    "path": "<http://example.com/edge77-5>",
+                    "min": 1,
+                    "shape": "Class5"
+                },
+                {
+                    "path": "<http://example.com/edge77-6>",
+                    "min": 1,
+                    "shape": "Class6"
+                },
+                {
+                    "path": "<http://example.com/edge77-7>",
+                    "min": 1,
+                    "shape": "Class7"
+                },
+                {
+                    "path": "<http://example.com/edge77-8>",
+                    "min": 1,
+                    "shape": "Class8"
+                },
+                {
+                    "path": "<http://example.com/edge77-9>",
+                    "min": 1,
+                    "shape": "Class9"
+                },
+                {
+                    "path": "<http://example.com/edge77-10>",
+                    "min": 1,
+                    "shape": "Class10"
+                },
+                {
+                    "path": "<http://example.com/edge77-11>",
+                    "min": 1,
+                    "shape": "Class11"
+                },
+                {
+                    "path": "<http://example.com/edge77-12>",
+                    "min": 1,
+                    "shape": "Class12"
+                },
+                {
+                    "path": "<http://example.com/edge77-13>",
+                    "min": 1,
+                    "shape": "Class13"
+                },
+                {
+                    "path": "<http://example.com/edge77-14>",
+                    "min": 1,
+                    "shape": "Class14"
+                },
+                {
+                    "path": "<http://example.com/edge77-15>",
+                    "min": 1,
+                    "shape": "Class15"
+                },
+                {
+                    "path": "<http://example.com/edge77-16>",
+                    "min": 1,
+                    "shape": "Class16"
+                },
+                {
+                    "path": "<http://example.com/edge77-17>",
+                    "min": 1,
+                    "shape": "Class17"
+                },
+                {
+                    "path": "<http://example.com/edge77-18>",
+                    "min": 1,
+                    "shape": "Class18"
+                },
+                {
+                    "path": "<http://example.com/edge77-19>",
+                    "min": 1,
+                    "shape": "Class19"
+                },
+                {
+                    "path": "<http://example.com/edge77-20>",
+                    "min": 1,
+                    "shape": "Class20"
+                },
+                {
+                    "path": "<http://example.com/edge77-21>",
+                    "min": 1,
+                    "shape": "Class21"
+                },
+                {
+                    "path": "<http://example.com/edge77-22>",
+                    "min": 1,
+                    "shape": "Class22"
+                },
+                {
+                    "path": "<http://example.com/edge77-23>",
+                    "min": 1,
+                    "shape": "Class23"
+                },
+                {
+                    "path": "<http://example.com/edge77-24>",
+                    "min": 1,
+                    "shape": "Class24"
+                },
+                {
+                    "path": "<http://example.com/edge77-25>",
+                    "min": 1,
+                    "shape": "Class25"
+                },
+                {
+                    "path": "<http://example.com/edge77-26>",
+                    "min": 1,
+                    "shape": "Class26"
+                },
+                {
+                    "path": "<http://example.com/edge77-27>",
+                    "min": 1,
+                    "shape": "Class27"
+                },
+                {
+                    "path": "<http://example.com/edge77-28>",
+                    "min": 1,
+                    "shape": "Class28"
+                },
+                {
+                    "path": "<http://example.com/edge77-29>",
+                    "min": 1,
+                    "shape": "Class29"
+                },
+                {
+                    "path": "<http://example.com/edge77-30>",
+                    "min": 1,
+                    "shape": "Class30"
+                },
+                {
+                    "path": "<http://example.com/edge77-31>",
+                    "min": 1,
+                    "shape": "Class31"
+                },
+                {
+                    "path": "<http://example.com/edge77-32>",
+                    "min": 1,
+                    "shape": "Class32"
+                },
+                {
+                    "path": "<http://example.com/edge77-33>",
+                    "min": 1,
+                    "shape": "Class33"
+                },
+                {
+                    "path": "<http://example.com/edge77-34>",
+                    "min": 1,
+                    "shape": "Class34"
+                },
+                {
+                    "path": "<http://example.com/edge77-35>",
+                    "min": 1,
+                    "shape": "Class35"
+                },
+                {
+                    "path": "<http://example.com/edge77-36>",
+                    "min": 1,
+                    "shape": "Class36"
+                },
+                {
+                    "path": "<http://example.com/edge77-37>",
+                    "min": 1,
+                    "shape": "Class37"
+                },
+                {
+                    "path": "<http://example.com/edge77-38>",
+                    "min": 1,
+                    "shape": "Class38"
+                },
+                {
+                    "path": "<http://example.com/edge77-39>",
+                    "min": 1,
+                    "shape": "Class39"
+                },
+                {
+                    "path": "<http://example.com/edge77-40>",
+                    "min": 1,
+                    "shape": "Class40"
+                },
+                {
+                    "path": "<http://example.com/edge77-41>",
+                    "min": 1,
+                    "shape": "Class41"
+                },
+                {
+                    "path": "<http://example.com/edge77-42>",
+                    "min": 1,
+                    "shape": "Class42"
+                },
+                {
+                    "path": "<http://example.com/edge77-43>",
+                    "min": 1,
+                    "shape": "Class43"
+                },
+                {
+                    "path": "<http://example.com/edge77-44>",
+                    "min": 1,
+                    "shape": "Class44"
+                },
+                {
+                    "path": "<http://example.com/edge77-45>",
+                    "min": 1,
+                    "shape": "Class45"
+                },
+                {
+                    "path": "<http://example.com/edge77-46>",
+                    "min": 1,
+                    "shape": "Class46"
+                },
+                {
+                    "path": "<http://example.com/edge77-47>",
+                    "min": 1,
+                    "shape": "Class47"
+                },
+                {
+                    "path": "<http://example.com/edge77-48>",
+                    "min": 1,
+                    "shape": "Class48"
+                },
+                {
+                    "path": "<http://example.com/edge77-49>",
+                    "min": 1,
+                    "shape": "Class49"
+                },
+                {
+                    "path": "<http://example.com/edge77-100>",
+                    "min": 1,
+                    "shape": "Class100"
+                },
+                {
+                    "path": "<http://example.com/edge77-101>",
+                    "min": 1,
+                    "shape": "Class101"
+                },
+                {
+                    "path": "<http://example.com/edge77-102>",
+                    "min": 1,
+                    "shape": "Class102"
+                },
+                {
+                    "path": "<http://example.com/edge77-103>",
+                    "min": 1,
+                    "shape": "Class103"
+                },
+                {
+                    "path": "<http://example.com/edge77-104>",
+                    "min": 1,
+                    "shape": "Class104"
+                },
+                {
+                    "path": "<http://example.com/edge77-105>",
+                    "min": 1,
+                    "shape": "Class105"
+                },
+                {
+                    "path": "<http://example.com/edge77-106>",
+                    "min": 1,
+                    "shape": "Class106"
+                },
+                {
+                    "path": "<http://example.com/edge77-107>",
+                    "min": 1,
+                    "shape": "Class107"
+                },
+                {
+                    "path": "<http://example.com/edge77-108>",
+                    "min": 1,
+                    "shape": "Class108"
+                },
+                {
+                    "path": "<http://example.com/edge77-109>",
+                    "min": 1,
+                    "shape": "Class109"
+                },
+                {
+                    "path": "<http://example.com/edge77-110>",
+                    "min": 1,
+                    "shape": "Class110"
+                },
+                {
+                    "path": "<http://example.com/edge77-111>",
+                    "min": 1,
+                    "shape": "Class111"
+                },
+                {
+                    "path": "<http://example.com/edge77-112>",
+                    "min": 1,
+                    "shape": "Class112"
+                },
+                {
+                    "path": "<http://example.com/edge77-113>",
+                    "min": 1,
+                    "shape": "Class113"
+                },
+                {
+                    "path": "<http://example.com/edge77-114>",
+                    "min": 1,
+                    "shape": "Class114"
+                },
+                {
+                    "path": "<http://example.com/edge77-115>",
+                    "min": 1,
+                    "shape": "Class115"
+                },
+                {
+                    "path": "<http://example.com/edge77-116>",
+                    "min": 1,
+                    "shape": "Class116"
+                },
+                {
+                    "path": "<http://example.com/edge77-117>",
+                    "min": 1,
+                    "shape": "Class117"
+                },
+                {
+                    "path": "<http://example.com/edge77-118>",
+                    "min": 1,
+                    "shape": "Class118"
+                },
+                {
+                    "path": "<http://example.com/edge77-119>",
+                    "min": 1,
+                    "shape": "Class119"
+                },
+                {
+                    "path": "<http://example.com/edge77-120>",
+                    "min": 1,
+                    "shape": "Class120"
+                },
+                {
+                    "path": "<http://example.com/edge77-121>",
+                    "min": 1,
+                    "shape": "Class121"
+                },
+                {
+                    "path": "<http://example.com/edge77-122>",
+                    "min": 1,
+                    "shape": "Class122"
+                },
+                {
+                    "path": "<http://example.com/edge77-123>",
+                    "min": 1,
+                    "shape": "Class123"
+                },
+                {
+                    "path": "<http://example.com/edge77-124>",
+                    "min": 1,
+                    "shape": "Class124"
+                },
+                {
+                    "path": "<http://example.com/edge77-125>",
+                    "min": 1,
+                    "shape": "Class125"
+                },
+                {
+                    "path": "<http://example.com/edge77-126>",
+                    "min": 1,
+                    "shape": "Class126"
+                },
+                {
+                    "path": "<http://example.com/edge77-127>",
+                    "min": 1,
+                    "shape": "Class127"
+                },
+                {
+                    "path": "<http://example.com/edge77-128>",
+                    "min": 1,
+                    "shape": "Class128"
+                },
+                {
+                    "path": "<http://example.com/edge77-129>",
+                    "min": 1,
+                    "shape": "Class129"
+                },
+                {
+                    "path": "<http://example.com/edge77-130>",
+                    "min": 1,
+                    "shape": "Class130"
+                },
+                {
+                    "path": "<http://example.com/edge77-131>",
+                    "min": 1,
+                    "shape": "Class131"
+                },
+                {
+                    "path": "<http://example.com/edge77-132>",
+                    "min": 1,
+                    "shape": "Class132"
+                },
+                {
+                    "path": "<http://example.com/edge77-133>",
+                    "min": 1,
+                    "shape": "Class133"
+                },
+                {
+                    "path": "<http://example.com/edge77-134>",
+                    "min": 1,
+                    "shape": "Class134"
+                },
+                {
+                    "path": "<http://example.com/edge77-135>",
+                    "min": 1,
+                    "shape": "Class135"
+                },
+                {
+                    "path": "<http://example.com/edge77-136>",
+                    "min": 1,
+                    "shape": "Class136"
+                },
+                {
+                    "path": "<http://example.com/edge77-137>",
+                    "min": 1,
+                    "shape": "Class137"
+                },
+                {
+                    "path": "<http://example.com/edge77-138>",
+                    "min": 1,
+                    "shape": "Class138"
+                },
+                {
+                    "path": "<http://example.com/edge77-139>",
+                    "min": 1,
+                    "shape": "Class139"
+                },
+                {
+                    "path": "<http://example.com/edge77-140>",
+                    "min": 1,
+                    "shape": "Class140"
+                },
+                {
+                    "path": "<http://example.com/edge77-141>",
+                    "min": 1,
+                    "shape": "Class141"
+                },
+                {
+                    "path": "<http://example.com/edge77-142>",
+                    "min": 1,
+                    "shape": "Class142"
+                },
+                {
+                    "path": "<http://example.com/edge77-143>",
+                    "min": 1,
+                    "shape": "Class143"
+                },
+                {
+                    "path": "<http://example.com/edge77-144>",
+                    "min": 1,
+                    "shape": "Class144"
+                },
+                {
+                    "path": "<http://example.com/edge77-145>",
+                    "min": 1,
+                    "shape": "Class145"
+                },
+                {
+                    "path": "<http://example.com/edge77-146>",
+                    "min": 1,
+                    "shape": "Class146"
+                },
+                {
+                    "path": "<http://example.com/edge77-147>",
+                    "min": 1,
+                    "shape": "Class147"
+                },
+                {
+                    "path": "<http://example.com/edge77-148>",
+                    "min": 1,
+                    "shape": "Class148"
+                },
+                {
+                    "path": "<http://example.com/edge77-149>",
+                    "min": 1,
+                    "shape": "Class149"
+                }
+            ]
+        ]
+    }
+}

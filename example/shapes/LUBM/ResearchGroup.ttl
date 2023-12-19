@@ -1,0 +1,14 @@
+@prefix ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:ResearchGroupShape a sh:NodeShape ;
+    sh:targetClass ub:ResearchGroup ;
+    sh:property [
+        sh:path ub:subOrganizationOf ;
+        sh:qualifiedValueShape [
+            sh:node :DepartmentShape
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:qualifiedMaxCount 1
+    ] .

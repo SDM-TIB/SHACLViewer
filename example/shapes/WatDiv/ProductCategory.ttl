@@ -1,0 +1,70 @@
+@prefix ub: <http://db.uwaterloo.ca/~galuc/wsdbm/> .
+@prefix sorg: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:ProductShape a sh:NodeShape ;
+    sh:targetClass ub:ProductCategory ;
+    sh:property [
+        sh:path ub:hasGenre ;
+        sh:qualifiedValueShape [
+            sh:node :GenreShape
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:qualifiedMaxCount 4
+    ] ;
+    sh:property [
+        sh:path <http://ogp.me/ns#tag> ;
+        sh:minCount 2 ;
+        sh:maxCount 16
+    ] ;
+    sh:property [
+        sh:path <http://ogp.me/ns#title> ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path <http://purl.org/stuff/rev#hasReview> ;
+        sh:minCount 3 ;
+        sh:maxCount 50
+    ] ;
+    sh:property [
+        sh:path sorg:caption ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:contentRating ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:contentSize ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:description ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:expires ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:keywords ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path sorg:text ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] ;
+    sh:property [
+        sh:path <http://xmlns.com/foaf/homepage> ;
+        sh:minCount 1 ;
+        sh:maxCount 1
+    ] .

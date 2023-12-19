@@ -1,0 +1,19 @@
+version: '2.3'
+
+services:
+  lubm:
+    image: prohde/virtuoso-opensource-7:7.2.11
+    container_name: lubm
+    volumes:
+      - ./data:/database/toLoad
+    ports:
+      - '17000:8890'
+
+  shaclviewer:
+    image: sdmtib/shaclviewer:edge
+    build: ..
+    container_name: shaclviewer
+    volumes:
+      - ./shapes:/shapes
+    ports:
+      - '5001:5001'

@@ -1,0 +1,19 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
+
+:DiseaseShape a sh:NodeShape ;
+    sh:targetClass dbo:Disease ;
+    sh:property [
+        sh:path dbp:name ;
+        sh:minCount 1
+    ] ;
+    sh:property [
+        sh:path dbo:treatment ;
+        sh:qualifiedValueShape [
+            sh:node :DrugShape
+        ] ;
+        sh:qualifiedMinCount 1
+    ] .
