@@ -1,227 +1,187 @@
 {% extends 'base_graph.jinja2' %}
 
 {% block head %}
-    {#    <script src="//unpkg.com/force-graph"></script>#}
-    {#    <script type="text/javascript" src="static/js/2d/force-graph.js"></script>#}
     <script type="text/javascript" src="static/js/2d/force-graph.min.js"></script>
 {% endblock %}
 
-{#{% block title %}#}
-{#    2D Graph#}
-{#{% endblock %}#}
-
-{#{% block optionMenu %}#}
-{##}
-{#{% endblock %}#}
-
-{#{% block infoMenu %}#}
-{#    #}
-{#{% endblock %}#}
-
 {% block graph_implementation %}
-{#    <script type="module">#}
-        document.querySelector('#navigationBar').innerHTML = '<li class="nav-item active"><a class="nav-link" href="{{ url_for("graph3d") }}?path={{ request.args.get("path") }}">3D <span class="sr-only">(current)</span></a></li>';
+    document.querySelector('#navigationBar').innerHTML = '<li class="nav-item active"><a class="nav-link" href="{{ url_for("graph3d") }}?path={{ request.args.get("path") }}">3D <span class="sr-only">(current)</span></a></li>';
 
-        {# to avoid "temporal dead zone" when using Graph for node update #}
-        let isGraphInit = false;
+    let isGraphInit = false;
 
-        let settings = new function () {
-            this.linkLengthClass2Class = 100;
-            this.linkLengthAttribute = 25;
-            this.linkLengthToConstraint = 25;
-            this.linkLengthFromConstraint = 50;
+    let settings = new function () {
+        this.linkLengthClass2Class = 100;
+        this.linkLengthAttribute = 25;
+        this.linkLengthToConstraint = 25;
+        this.linkLengthFromConstraint = 50;
 
-            this.nodeColorDark = '#0af'
-            this.nodeColorLight = '#000'
-            this.nodeColorNotRetrievedDark = '#a0f'
-            this.nodeColorNotRetrievedLight = '#000'
-            this.nodeBackgroundColorDark = '#000'
-            this.nodeBackgroundColorLight = '#0af'
-            this.nodeBackgroundColorNotRetrievedDark = '#000'
-            this.nodeBackgroundColorNotRetrievedLight = '#a0f'
-            this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
-            this.nodeBorderColor = '#0af'
-            this.attributeBorderColor = 'rgb(0,0,0,1)'
-            this.linkNodeBorderColor = 'rgb(255,64,0)'
-        }
+        this.nodeColorDark = '#0af'
+        this.nodeColorLight = '#000'
+        this.nodeColorNotRetrievedDark = '#a0f'
+        this.nodeColorNotRetrievedLight = '#000'
+        this.nodeBackgroundColorDark = '#000'
+        this.nodeBackgroundColorLight = '#0af'
+        this.nodeBackgroundColorNotRetrievedDark = '#000'
+        this.nodeBackgroundColorNotRetrievedLight = '#a0f'
+        this.nodeBorderColorExpanded = 'rgb(0,255,0,1)'
+        this.nodeBorderColor = '#0af'
+        this.attributeBorderColor = 'rgb(0,0,0,1)'
+        this.linkNodeBorderColor = 'rgb(255,64,0)'
+    }
 
-        const elem = document.getElementById('3d-graph');
-        const Graph = ForceGraph({
-            extraRenderers: [new THREE.CSS2DRenderer()]
-        })
-        (elem)
-            .graphData(getVisibleLists())
-            .linkCurvature('curvature')
-            {#.linkCurveRotation('rotation')#}
-            {#.nodeAutoColorBy('group')#}
-            {#.linkOpacity(0.5)#}
-            .backgroundColor('#212121')
-            .linkColor((link) => link.highlighted ? 'rgb(255,64,0)' : '#909090')
-            .linkWidth((link) => link.highlighted ? 2 : 0)
-            .linkDirectionalParticles('particles')
-            .linkDirectionalParticleSpeed(d => d.particles * 0.002)
-            .linkDirectionalParticleWidth(link => link.highlighted ? 4 : 2)
-            .nodeCanvasObject((node, ctx, globalScale) => {
-                const label = node.text;
-                const fontSize = 18 / globalScale;
-                ctx.font = `${fontSize}px Sans-Serif`;
-                const textWidth = ctx.measureText(label).width;
-                const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.5); // some padding
+    const elem = document.getElementById('3d-graph');
+    const Graph = ForceGraph({
+        extraRenderers: [new THREE.CSS2DRenderer()]
+    })
+    (elem)
+        .graphData(getVisibleLists())
+        .linkCurvature('curvature')
+        .backgroundColor('#212121')
+        .linkColor((link) => link.highlighted ? 'rgb(255,64,0)' : '#909090')
+        .linkWidth((link) => link.highlighted ? 2 : 0)
+        .linkDirectionalParticles('particles')
+        .linkDirectionalParticleSpeed(d => d.particles * 0.002)
+        .linkDirectionalParticleWidth(link => link.highlighted ? 4 : 2)
+        .nodeCanvasObject((node, ctx, globalScale) => {
+            const label = node.text;
+            const fontSize = 18 / globalScale;
+            ctx.font = `${fontSize}px Sans-Serif`;
+            const textWidth = ctx.measureText(label).width;
+            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.5); // some padding
 
+            {#    validation coloring    #}
+            {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
+            let color = '#aaa'
+            switch (node.colorRange) {
+                case 0:
+                    color = "#0af"
+                    break;
+                case 1:
+                    color = "#0c0"
+                    break;
+                case 2:
+                    color = "#ff0"
+                    break;
+                case 3:
+                    color = "#f80"
+                    break;
+                case 4:
+                    color = "#c00"
+                    break;
+                case 5:
+                    if (darkMode)
+                        color = "#ccc"
+                    else
+                        color = "#666"
+                    break;
+            }
+            settings.nodeColorDark = color
+            settings.nodeBackgroundColorLight = color
+            settings.nodeBorderColor = color
+            settings.nodeBorderColorExpanded = color
+            settings.attributeBorderColor = color
+            settings.linkNodeBorderColor = color
 
-                {#   validation coloring   #}
-                {# 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high, 5:validating #}
-                let color = '#aaa'
-                switch (node.colorRange) {
-                    case 0:
-                        color = "#0af"
-                        break;
-                    case 1:
-                        color = "#0c0"
-                        break;
-                    case 2:
-                        color = "#ff0"
-                        break;
-                    case 3:
-                        color = "#f80"
-                        break;
-                    case 4:
-                        color = "#c00"
-                        break;
-                    case 5:
-                        if (darkMode)
-                            color = "#ccc"
-                        else
-                            color = "#666"
-                        break;
-                }
-                settings.nodeColorDark = color
-                settings.nodeBackgroundColorLight = color
-                settings.nodeBorderColor = color
-                settings.nodeBorderColorExpanded = color
-                settings.attributeBorderColor = color
-                settings.linkNodeBorderColor = color
-
-
-                if (darkMode) {
-                    if (isShowingDataGraph && !node.retrieved) {
-                        ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedDark
-                    } else {
-                        ctx.fillStyle = settings.nodeBackgroundColorDark
-                    }
+            if (darkMode) {
+                if (isShowingDataGraph && !node.retrieved) {
+                    ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedDark
                 } else {
-                    if (isShowingDataGraph && !node.retrieved) {
-                        ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedLight
-                    } else {
-                        ctx.fillStyle = settings.nodeBackgroundColorLight
-                    }
+                    ctx.fillStyle = settings.nodeBackgroundColorDark
                 }
-                {#ctx.fillStyle = darkMode ? settings.nodeBackgroundColorDark : settings.nodeBackgroundColorLight;#}
+            } else {
+                if (isShowingDataGraph && !node.retrieved) {
+                    ctx.fillStyle = settings.nodeBackgroundColorNotRetrievedLight
+                } else {
+                    ctx.fillStyle = settings.nodeBackgroundColorLight
+                }
+            }
+            ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
+
+            if (node.isClass) {
                 ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
+            } else if (node.isAttribute) {
+                ctx.strokeStyle = settings.attributeBorderColor;
+            } else {
+                ctx.strokeStyle = settings.linkNodeBorderColor;
+            }
 
-                if (node.isClass) {
-                    ctx.strokeStyle = node.expanded ? settings.nodeBorderColorExpanded : settings.nodeBorderColor;
-                } else if (node.isAttribute) {
-                    ctx.strokeStyle = settings.attributeBorderColor;
+            let borderThickness = 4;
+            roundRect(ctx, node.x - bckgDimensions[0] / 2,
+                node.y - bckgDimensions[1] / 2,
+                (textWidth + borderThickness) * 1.01 + 2,
+                fontSize * 1.1 + borderThickness,
+                2)
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            if (darkMode) {
+                if (isShowingDataGraph && !node.retrieved) {
+                    ctx.fillStyle = settings.nodeColorNotRetrievedDark
                 } else {
-                    ctx.strokeStyle = settings.linkNodeBorderColor;
+                    ctx.fillStyle = settings.nodeColorDark
                 }
-
-                let borderThickness = 4;
-                roundRect(ctx, node.x - bckgDimensions[0] / 2,
-                    node.y - bckgDimensions[1] / 2,
-                    (textWidth + borderThickness) * 1.01 + 2,
-                    fontSize * 1.1 + borderThickness,
-                    2)
-
-                {#ctx.fillStyle = 'rgba(0, 0, 0, 1)';#}
-                {#ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);#}
-
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                if (darkMode) {
-                    if (isShowingDataGraph && !node.retrieved) {
-                        ctx.fillStyle = settings.nodeColorNotRetrievedDark
-                    } else {
-                        ctx.fillStyle = settings.nodeColorDark
-                    }
+            } else {
+                if (isShowingDataGraph && !node.retrieved) {
+                    ctx.fillStyle = settings.nodeColorNotRetrievedLight
                 } else {
-                    if (isShowingDataGraph && !node.retrieved) {
-                        ctx.fillStyle = settings.nodeColorNotRetrievedLight
-                    } else {
-                        ctx.fillStyle = settings.nodeColorLight
-                    }
+                    ctx.fillStyle = settings.nodeColorLight
                 }
-                {#ctx.fillStyle = darkMode ? settings.nodeColorDark : settings.nodeColorLight;#}
-                ctx.fillText(label, node.x, node.y);
+            }
+            ctx.fillText(label, node.x, node.y);
 
-                node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
-            })
-            .nodePointerAreaPaint((node, color, ctx) => {
-                ctx.fillStyle = color;
-                const bckgDimensions = node.__bckgDimensions;
-                bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
-            })
-            .onNodeHover(node => elem.style.cursor = node && node.isClass ? 'pointer' : 'unset')
-            .onNodeClick(node => {
-                onNodeClicked(node);
-            })
-            .onLinkClick(link => {
-                {#debug#}
-                console.log(debugLink(link))
-            });
+            node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+        })
+        .nodePointerAreaPaint((node, color, ctx) => {
+            ctx.fillStyle = color;
+            const bckgDimensions = node.__bckgDimensions;
+            bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+        })
+        .onNodeHover(node => elem.style.cursor = node && node.isClass ? 'pointer' : 'unset')
+        .onNodeClick(node => {
+            onNodeClicked(node);
+        })
+        .onLinkClick(link => {
+            {#debug#}
+            console.log(debugLink(link))
+        });
 
-        function roundRect(ctx, x, y, w, h, r) {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + w - r, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-            ctx.lineTo(x + w, y + h - r);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-            ctx.lineTo(x + r, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-            ctx.lineTo(x, y + r);
-            ctx.quadraticCurveTo(x, y, x + r, y);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
 
-        {#        var link = Graph.selectAll(".link")#}
-        {#
-                Graph.d3Force("tick", function() {
-                    link.attr("x1", function(d) { return d.source.x })
-                        .attr("y1", function(d) { return d.source.y })
-                        .attr("x2", function(d) { return d.target.x })
-                        .attr("y2", function(d) { return d.target.y })
-               })#}
+    // call on slider change
+    function updateLinkDistance() {
+        linkForce.distance(link => getLinkLength(link.linkType));
+        Graph.d3ReheatSimulation(); // Re-heat simulation
+    }
 
-        // call on slider change
-        function updateLinkDistance() {
-            linkForce.distance(link => getLinkLength(link.linkType));
-            Graph.d3ReheatSimulation(); // Re-heat simulation
-        }
+    // Spread nodes a little wider
+    Graph.d3Force('charge').strength(-520);
+    isGraphInit = true;
 
-        // Spread nodes a little wider
-        Graph.d3Force('charge').strength(-520);
+    function updateNode3d() {
+        if (isGraphInit)
+            Graph
+                .nodeCanvasObject(Graph.nodeCanvasObject())
+                .linkWidth(Graph.linkWidth())
+                .linkDirectionalParticleWidth(Graph.linkDirectionalParticleWidth())
+    }
 
-        isGraphInit = true;
-
-        function updateNode3d() {
-            {# get node 3d object and update based of it is expanded #}
-            {#node.__threeObj.borderColor = node.expanded ? 'rgb(0,255,0,0.5)' : 'rgb(255,255,0,0.5)';#}
-            if (isGraphInit)
-                Graph
-                    .nodeCanvasObject(Graph.nodeCanvasObject())
-                    .linkWidth(Graph.linkWidth())
-                    .linkDirectionalParticleWidth(Graph.linkDirectionalParticleWidth())
-        }
-
-        function focusNode(node) {
-            // Center/zoom on node
-            Graph.centerAt(node.x, node.y, 1000);
-            Graph.zoom(2, 1000);
-        }
-
-        {#    </script>#}
+    function focusNode(node) {
+        // Center/zoom on node
+        Graph.centerAt(node.x, node.y, 1000);
+        Graph.zoom(2, 1000);
+    }
 {% endblock %}

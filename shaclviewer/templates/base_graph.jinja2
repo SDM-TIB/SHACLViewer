@@ -1,36 +1,26 @@
 {% include 'base.jinja2' %}
 {% block headbase %}
 
-    <link rel="stylesheet" href="./static/css/basegraph.css">
-    <link rel="stylesheet" href="./static/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
 
     <style> body {
         margin: 0;
     } </style>
 
-    {#    <script src="//unpkg.com/three"></script>#}
-    {#    <script src="//unpkg.com/three/examples/js/renderers/CSS2DRenderer.js"></script>#}
-    {#    <script src="//unpkg.com/three-spritetext"></script>#}
-    <script src="./static/js/three/three.js"></script>
-    <script src="./static/js/three/CSS2DRenderer.js"></script>
-    <script src="./static/js/sprite/three-spritetext.js"></script>
-    <script src="./static/js/dataTable/jquery.dataTables.min.js"></script>
-
-    {#    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">#}
-    {#    <script type="text/javascript" charset="utf8"#}
-    {#            src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>#}
-
+    <script src="{{ url_for('static', filename='js/three/three.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/three/CSS2DRenderer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sprite/three-spritetext.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTable/jquery.dataTables.min.js') }}"></script>
 
     {% block head %}{% endblock %}
-
 {% endblock %}
 
-{#{% block title %}#}
-<title>{{ request.args.get("path") }} Graph</title>
-{#{% endblock %}#}
+{% block title %}
+    <title>{{ request.args.get("path") }} Graph</title>
+{% endblock %}
 
 {% block body %}
-
     <span id="optionBtn" class="option-btn">&#9776; Options</span>
     <div id="mySidenav" class="sidenav leftnav closeLeftNav">
         <div class="wrapper">
@@ -54,15 +44,11 @@
                 <span class="slider round"></span>
             </label>
         </a>
-        <a href="javascript:void(0)" id="focusNode"><i class="fas fa-crosshairs option-icon"></i> Focus Selected
-            Shape</a>
+        <a href="javascript:void(0)" id="focusNode"><i class="fas fa-crosshairs option-icon"></i> Focus Selected Shape</a>
         <a href="javascript:void(0)" id="centerGraph"><i class="fas fa-expand option-icon"></i> Center Graph</a>
-        <a href="javascript:void(0)" id="expandAll"><i class="fa fa-expand-arrows-alt option-icon"
-                                                       aria-hidden="true"></i>
-            Expand All</a>
-        <a href="javascript:void(0)" id="collapseAll"><i class='fas fa-compress-arrows-alt option-icon'></i> Collapse
-            All</a>
-        <a href="javascript:void(0)" id="hideAttributes"><i class=''></i>Hide Intra-Constraints
+        <a href="javascript:void(0)" id="expandAll"><i class="fa fa-expand-arrows-alt option-icon" aria-hidden="true"></i> Expand All</a>
+        <a href="javascript:void(0)" id="collapseAll"><i class='fas fa-compress-arrows-alt option-icon'></i> Collapse All</a>
+        <a href="javascript:void(0)" id="hideAttributes"><i class=''></i> Hide Intra-Constraints
             <label class="switch">
                 <input type="checkbox" disabled="disabled">
                 <span class="slider round"></span>
@@ -92,8 +78,6 @@
             <input type="range" class="range-style" id="HighValidationPercentage" min="0" max="100">
             <output>90</output>
         </div>
-        {#<a href="javascript:void(0)" id="dataGraph"><i class='fas fa-compress-arrows-alt option-icon'></i> Data
-            Graph</a>#}
     </div>
     <div id="topRightButtons" style="display: none;">
         <button id="closeDataGraph" class="btn btn-block btn-right-nav btn-primary"
@@ -133,17 +117,6 @@
                     </div>
                 </div>
             </div>
-            {#<div class="slider-container panel">
-                <select id="validationEndpointDropdown">
-                    <option selected="selected" value="http://192.168.111.1:14000/sparql">
-                        http://192.168.111.1:14000/sparql
-                    </option>
-                    <option value="https://labs.tib.eu/sdm/clarify-kg-7/sparql">
-                        https://labs.tib.eu/sdm/clarify-kg-7/sparql
-                    </option>
-                </select>
-                <input id="validationEndpointTextBox"/>
-            </div>#}
             <button class="accordion active">Total Validation Data</button>
             <div class="slider-container panel">
                 <div id="totalValidationData"></div>
@@ -162,9 +135,6 @@
                 </button>
             </div>
         </div>
-        {#        {% block infoMenu %}#}
-        {#        #}
-        {#        {% endblock %}#}
     </div>
     <div id="main">
         <div id="3d-graph" style="position: absolute;top: 0;"></div>
@@ -177,33 +147,25 @@
         </div>
         <div id="loader" class="loader"></div>
         <script type="module">
-            {#$('#flash').append(flashMessage('graph size => {{ graph|length }}', 'info'));#}
-            {#console.log({{ graph }})#}
-
-            const nodes = [];
-            const GROUPS = 1;
-            const links = [];
-            const none = 'None'
-            {#let local_links_count = 0;#}
-            let currentNode;
-            let selectedNode;
-
-            {# used for data graph #}
-            const backupNodes = [],
+            const nodes = [],
+                  GROUPS = 1,
+                  links = [],
+                  none = 'None',
+                  backupNodes = [],
                   backupLinks = [];
-            let bachupSelectedNode,
+            let currentNode,
+                selectedNode,
+                bachupSelectedNode,
                 isShowingDataGraph = false,
                 node_name;
 
-            {#
-            linkType:
-             0: class to class
-             1: class to attribute
-             2: attribute to same class
-             3: class to constraint
-             4: constraint to other class
+            {# linkType:
+               0: class to class
+               1: class to attribute
+               2: attribute to same class
+               3: class to constraint
+               4: constraint to other class
              #}
-
             {% for node in graph %}
                 {# add class/shape node #}
                 node_name = '{{ node.id }}';
@@ -235,25 +197,13 @@
                 {% set curv = namespace(value=0) %}
                 {% set rot = namespace(value=0) %}
                 {% for link in node.get_constraints() %}
-
-
                     {% set link_node_name = link.path %}
-                    {# set constraint node name with min and max to fix unlinked nodes#}
-                    {#                {% if none != link.min %}#}
-                    {#                    {% set link_node_name = link_node_name ~ ' > ' ~ link.min %}#}
-                    {#                {% endif %}#}
-                    {#                {% if none != link.max %}#}
-                    {#                    {% set link_node_name = link_node_name ~ ' < ' ~ link.max %}#}
-                    {#                {% endif %}#}
-
-
                     {% set link_count.value = link_count.value + 1 %}
 
                     {% if none == link.shapeRef %}
                         {# link goes to the same node #}
                         {% set same_curv.value = same_curv.value + 2 %}
                         {% set same_rot.value = same_rot.value + 2 %}
-                        {#local_links_count++; {# debug #}
                         {# add constraint as node #}
                         nodes.push({
                             id: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
@@ -280,29 +230,10 @@
                             collapsed: true,
                             isHidden: false,
                             highlighted: false,
-                            {#particles: 2,#}
-                            {#curvature: {{ same_curv.value/100 }},#}
-                            {#rotation:{{ same_rot.value/10 }},#}
                             length: 25,
                             isAttribute: true,
                             linkType: 1
                         });
-                        {#links.push({
-                            id:'linkBackFromConstraint,{{ node.id }},{{ link_count.value }}-{{ link.path }}',
-                            source: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
-                            target: '{{ node.id }}',
-                            text: '{{ link_node_name }}',
-                            isClass2Class: false,
-                            collapsed: true,
-                            isHidden: false,
-                            highlighted: false,
-                            particles: 2,
-                            curvature: {{ same_curv.value/100 }},
-                            rotation:{{ same_rot.value/10 }},
-                            length: 25,
-                            isAttribute: true,
-                            linkType:2
-                        })#}
                     {% else %}
                         {# link goes to another node #}
                         links.push({
@@ -317,11 +248,9 @@
                             isHidden: false,
                             highlighted: false,
                             particles: 0,
-                            {#curvature: {{ curv.value/10 }},#}
                             curvature: 0.2,
                             rotation:{{ rot.value/10 }},
                             length: 100,
-                            {#rotation:0#}
                             isAttribute: false,
                             linkType: 0
                         })
@@ -354,11 +283,7 @@
                             isHidden: false,
                             highlighted: false,
                             particles: 2,
-                            {#curvature: {{ curv.value/10 }},#}
-                            {#curvature: 0.2,#}
-                            {#rotation:{{ rot.value/10 }},#}
                             length: 25,
-                            {#rotation:0#}
                             isAttribute: false,
                             linkType: 3
                         })
@@ -374,35 +299,13 @@
                             isHidden: false,
                             highlighted: false,
                             particles: 2,
-                            {#curvature: {{ curv.value/10 }},#}
-                            {#curvature: 0.2,#}
-                            {#rotation:{{ rot.value/10 }},#}
                             length: 50,
-                            {#rotation:0#}
                             isAttribute: false,
                             linkType: 4
                         })
                         {% set curv.value = curv.value + 1 %}
                         {% set rot.value = rot.value + 12 %}
                     {% endif %}
-
-                    {#   shapeRef = '{{ link.shapeRef }}'
-                       #}{#console.log(`link.shapeRef= ${shapeRef}`)#}{#
-                       if (shapeRef.localeCompare('None') != 0) {
-                           #}{#console.log(`True`)#}{#
-                           links.push({
-                               source: '{{ node.id }}',
-                               target: shapeRef
-                           })
-                       } else
-                           local_links_count++;
-                       links.push({
-                           source: '{{ node.id }}',
-                           target: '{{ node.id }}'
-                       })
-                       #}{#console.log(`false`)#}{#
-                       #}
-
                 {% endfor %}
             {% endfor %}
 
@@ -410,13 +313,11 @@
                 attributes = 0;
                 constraints = 0;
                 partOff = 0;
-
-                constructor() {
-                }
+                constructor(){}
             }
 
-            const nodesById = {}
-            const linksById = {}
+            const nodesById = {},
+                  linksById = {};
             resetGraphMaps()
 
             function resetGraphMaps(removeDuplicates) {
@@ -428,18 +329,17 @@
                 Object.assign(linksById, Object.fromEntries(links.map(link => [link.id, link])));
 
                 if (removeDuplicates) {
-                    nodes.length = 0
-                    nodes.push(...Object.values(nodesById))
+                    nodes.length = 0;
+                    nodes.push(...Object.values(nodesById));
                 }
 
                 {# clear node lists #}
                 nodes.forEach(n => {
-                    n.childLinks = []
-                    n.parentLinks = []
+                    n.childLinks = [];
+                    n.parentLinks = [];
                 })
                 {# fill nodes' lists #}
                 links.forEach(link => {
-                    let source = nodesById[link.source]
                     getNodeFromLink(link.source).childLinks.push(link);
                     getNodeFromLink(link.target).parentLinks.push(link);
                 });
@@ -460,27 +360,19 @@
             }
 
             function updateClassState(node) {
-                {#updateNode3d(node)#}
-
                 {# foreach link to this node show/hide the links to classes and hide/show links to constraint and their links #}
                 node.childLinks.forEach(link => {
-                    {#link.isHidden = false; {# by default show all links that's been hidden by other functions #}
-
                     if (link.isClass2Class) {
                         {# if node not expanded => show link to other classes #}
                         link.collapsed = node.expanded;
-
-                        if (hideUnrelatedClasses) {
-                            link.isHidden = false;
-                        }
+                        if (hideUnrelatedClasses) { link.isHidden = false; }
                     } else {  {# links to constraint #}
                         link.collapsed = !node.expanded;
                         let constraint = getNodeFromLink(link.target);
                         constraint.expanded = !node.expanded;
-                        if (!constraint.isClass){# so when clicking on constraint it wont highlight all links of the target node #}
+                        if (!constraint.isClass) {# so when clicking on constraint it wont highlight all links of the target node #}
                             constraint.childLinks.forEach(l => {
                                 l.collapsed = !node.expanded
-
                                 if (hideUnrelatedClasses) { {# show links and constraints of clicked nodes because now they are related #}
                                     l.isHidden = false;
                                     let target = getNodeFromLink(l.target);
@@ -503,16 +395,10 @@
                             link.isHidden = false;
                             constraint.isHidden = false;
                         }
-
-                        {#if (hideAttributes && link.isAttribute) {
-                            link.isHidden = true;
-                            constraint.isHidden = true;
-                        }#}
                     }
                 })
-
                 updateGraph();
-            };
+            }
 
             function getNodeFromLink(linkTarget) {
                 {# before drawing for the first time the link.target is just a string, after that it will be an object #}
@@ -550,24 +436,21 @@
                         node.childLinks.forEach(link => link.highlighted = true);
                         node.parentLinks.forEach(link => link.highlighted = true);
                     }
-
                     updateNode3d()
                 }
             }
 
             let hideAttributes = false;
 
-            function updateGraph() {
-                Graph.graphData(getVisibleLists())
-            }
+            function updateGraph() { Graph.graphData(getVisibleLists()) }
 
             function getVisibleLists() {
-                const visibleNodes = [];
-                const visibleLinks = [];
+                const visibleNodes = [],
+                      visibleLinks = [];
 
                 let enableUpdate = false;
 
-                if (document.getElementById('nodeChecklist').getElementsByTagName('ul')[0].innerHTML != "")
+                if (document.getElementById('nodeChecklist').getElementsByTagName('ul')[0].innerHTML !== "")
                     enableUpdate = true;
 
                 nodes.forEach(node => {
@@ -598,95 +481,17 @@
             function debugNode(node) {
                 console.log('debugNode|')
                 console.log(node)
-                {#console.log(JSON.stringify(node.id))#}
-                {#console.log(links.filter(link => link.source.id === node.id || link.target.id === node.id));#}
             }
 
             function debugLink(link) {
-                {#return nodes.filter(node => node.id === link.source.id || node.id === link.target.id);#}
                 console.log('debugLink|')
                 console.log(link)
-                {#console.log('source: ' + link.source)#}
-                {#console.log('target: ' + link.target)#}
             }
 
-            {#        function getNodeShape(node, parameters) {
-                        if (parameters === undefined) parameters = {};
-                        var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
-                        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 58;
-                        var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
-                        var borderColor = parameters.hasOwnProperty("borderColor") ? parameters["borderColor"] : {
-                            r: 255,
-                            g: 0,
-                            b: 0,
-                            a: 1.0
-                        };
-                        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ? parameters["backgroundColor"] : {
-                            r: 255,
-                            g: 255,
-                            b: 255,
-                            a: 1.0
-                        };
-                        var textColor = parameters.hasOwnProperty("textColor") ? parameters["textColor"] : {
-                            r: 0,
-                            g: 0,
-                            b: 0,
-                            a: 1.0
-                        };
-
-                        var canvas = document.createElement('canvas');
-                        var context = canvas.getContext('2d');
-                        context.font = "Bold " + fontsize + "px " + fontface;
-                        var metrics = context.measureText(node.text);
-                        var textWidth = metrics.width;
-
-                        context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-                        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
-
-                        context.lineWidth = borderThickness;
-                        roundRect(context, borderThickness / 2, borderThickness / 2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
-
-                        context.fillStyle = "rgba(" + textColor.r + ", " + textColor.g + ", " + textColor.b + ", 1.0)";
-                        context.fillText(node.text, borderThickness, fontsize + borderThickness);
-
-                        var texture = new THREE.Texture(canvas)
-                        texture.needsUpdate = true;
-
-                        var spriteMaterial = new THREE.SpriteMaterial({map: texture, useScreenCoordinates: false});
-                        var sprite = new THREE.Sprite(spriteMaterial);
-                        sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
-                        return sprite;
-                    }
-
-                    function roundRect(ctx, x, y, w, h, r) {
-                        ctx.beginPath();
-                        ctx.moveTo(x + r, y);
-                        ctx.lineTo(x + w - r, y);
-                        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-                        ctx.lineTo(x + w, y + h - r);
-                        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                        ctx.lineTo(x + r, y + h);
-                        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-                        ctx.lineTo(x, y + r);
-                        ctx.quadraticCurveTo(x, y, x + r, y);
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
-                    }#}
-
-            {# debug #}
-            {#$('#flash').append(flashMessage(`Shapes= {{ graph|length }} | Nodes= ${nodes.length} | Links= ${links.length}`, 'info'));#}
-            {#console.log(JSON.stringify(nodes))#}
-            {#console.log(JSON.stringify(links))#}
-
-
-            {% block graph_implementation %}
-
-            {% endblock %}
+            {% block graph_implementation %}{% endblock %}
 
             // link length
-            const linkForce =
-                Graph.d3Force('link').distance(link => getLinkLength(link.linkType));
+            const linkForce = Graph.d3Force('link').distance(link => getLinkLength(link.linkType));
 
             function getLinkLength(linkType) {
                 switch (linkType) {
@@ -703,19 +508,13 @@
                 }
             }
 
-            let isRightNavOpenedBefore = false
+            let isRightNavOpenedBefore = false;
 
             function onNodeClicked(node) {
-                {#debug#}
-                {#console.log('onNodeClick|')#}
-                {#debugNode(node)#}
-
-                {# if shoding data grapn and the node is not retrieved #}
+                {# if showing data graph and the node is not retrieved #}
                 if (isShowingDataGraph && node.isClass && !node.retrieved) {
                     {# get the shape data and recall this function #}
-                    updateDataGraph(node, function () {
-                        onNodeClicked(node)
-                    })
+                    updateDataGraph(node, function() { onNodeClicked(node) })
                     return
                 }
 
@@ -743,8 +542,7 @@
                         }
                     })
                     updateHiddenLinks();
-                    {# to show links between the new shown classes #}
-                    updateGraph();
+                    updateGraph(); {# to show links between the new shown classes #}
                 }
 
                 // open info panel for the first time
@@ -753,20 +551,15 @@
                     isRightNavOpenedBefore = true;
                 }
 
-                viewNodeInfo(node)
-                fillValidationData()
-                highlightNode(node)
+                viewNodeInfo(node);
+                fillValidationData();
+                highlightNode(node);
             }
 
-            // Info navigation
-            {#import {BootstrapTreeView} from 'https://unpkg.com/simple-treeview/dist/treeview.bootstrap.js';#}
-
-            import {BootstrapTreeView} from './static/js/treeview/treeview.bootstrap.js';
+            import {BootstrapTreeView} from '{{ url_for('static', filename='js/treeview/treeview.bootstrap.js') }}';
 
             {# fill info menu #}
-
             function viewNodeInfo(node) {
-
                 // fill statistics
                 let stat = document.getElementById('infoStatistic')
                 if (node.isClass) {
@@ -795,15 +588,9 @@
                     stat.innerHTML = range + '</p>';
                 }
 
-
                 // fill constraints
                 document.getElementById('infoTree').innerHTML = "";
-
-                // show info menu and hide node check list
-                {#document.getElementById('infoMenu').classList.remove('disable')#}
-                {#document.getElementById('nodeChecklist').classList.add('disable')#}
-
-                let tree = new BootstrapTreeView(document.getElementById('infoTree'), {
+                new BootstrapTreeView(document.getElementById('infoTree'), {
                     provider: {
                         async getChildren(id) {
                             console.log('Info navigation| id: ' + id)
@@ -864,14 +651,8 @@
 
                                     if (isShowingDataGraph && n.isClass && !n.retrieved) {
                                         {# get the shape data and recall this function #}
-                                        updateDataGraph(n, function () {
-                                            let x = sub_callback(n)
-                                            return x
-                                        })
-                                    } else {
-                                        let c = sub_callback(n)
-                                        return c
-                                    }
+                                        updateDataGraph(n, function () { return sub_callback(n) })
+                                    } else { return sub_callback(n) }
                                 }
 
                                 {#if the clicked element is a link#}
@@ -904,7 +685,7 @@
 
                                     if (l.finalTarget) { {# if the link goes to constraint #}
                                         const ft = nodesById[l.finalTarget];
-                                        {# to-do check ft undefinde when clicking on constraint: id: ft.id, #}
+                                        {# TODO check it undefined when clicking on constraint: id: ft.id, #}
                                         return_list.push({
                                             id: ft.id,
                                             label: ft.text,
@@ -919,17 +700,10 @@
                                                 icon: {classes: ['fa-regular', 'fa-file-lines']}
                                             })
                                     }
-
-
                                     return return_list;
                                 }
-
-                                {#if not found#}
-                                return [];
-
+                                return []; {# if not found #}
                             }
-
-
                         }
                     }
                 });
@@ -941,13 +715,7 @@
 
             function resetShapeCheckList() {
                 const checklist = document.getElementById('nodeChecklist').getElementsByTagName('ul');
-
                 checklist[0].innerHTML = "";
-
-                // show node check list and hide info menu
-                {#document.getElementById('nodeChecklist').classList.remove('disable')#}
-                {#document.getElementById('infoMenu').classList.add('disable')#}
-
 
                 // Add a "checked" symbol on click
                 checklist[0].addEventListener('click', function (ev) {
@@ -958,10 +726,8 @@
                             let node = nodesById[ev.target.getAttribute('nodeId')]
 
                             node.isHidden = false;
-                            {#updateClassState(node)#}
                         } else {
                             let node = nodesById[ev.target.getAttribute('nodeId')]
-
                             node.isHidden = true;
                             node.childLinks.forEach(link => {
                                 link.isHidden = true;
@@ -978,7 +744,6 @@
                                         break;
                                 }
                             })
-                            {#updateGraph();#}
                         }
                         updateHiddenLinks();
                         updateGraph();
@@ -991,16 +756,10 @@
                         li.setAttribute('nodeId', node.id);
                         li.appendChild(document.createTextNode(node.text));
                         checklist[0].appendChild(li);
-
-                        if (!node.isHidden) {
-                            li.classList.add('checked')
-                        }
-
+                        if (!node.isHidden) { li.classList.add('checked') }
                         shapeCheckList[node.id] = li;
                     }
                 });
-
-                {#console.log(shapeCheckList);#}
             }
 
             function updateHiddenLinks() {
@@ -1012,9 +771,7 @@
                             let constraint = getNodeFromLink(link.target)
                             let finalTarget = getNodeFromLink(link.finalTarget)
                             if (source.isHidden || finalTarget.isHidden) {
-                                {#source.isHidden = true;#}
                                 constraint.isHidden = true;
-                                {#finalTarget.isHidden = true;#}
                                 constraint.parentLinks.forEach(l => l.isHidden = true)
                                 constraint.childLinks.forEach(l => l.isHidden = true)
                             } else {
@@ -1024,13 +781,6 @@
                             }
                             break;
                         case 1: {# do nothing to attributes #}
-                        {#if (!hideAttributes) {
-                            link.isHidden = false;
-                            getNodeFromLink(link.target).isHidden = false;
-                        } else {
-                            link.isHidden = true;
-                            getNodeFromLink(link.target).isHidden = true;
-                        }#}
                             if (getNodeFromLink(link.source).isHidden) {
                                 link.isHidden = true;
                                 getNodeFromLink(link.target).isHidden = true;
@@ -1040,23 +790,15 @@
                             }
                             break;
                         default:
-                            if (getNodeFromLink(link.source).isHidden || getNodeFromLink(link.target).isHidden) {
-                                link.isHidden = true;
-                            } else {
-                                link.isHidden = false
-                            }
+                            link.isHidden = (getNodeFromLink(link.source).isHidden || getNodeFromLink(link.target).isHidden);
                             break;
                     }
-
                 });
             }
 
             {# validation #}
-
             function requestValidationData(node) {
                 console.log("requestValidationData")
-
-                //get endpoint
                 let endpoint = endpointInputBox.value
                 if (endpoint === "") {
                     $('#flash').append(flashMessage("Select the validation endpoint", 'warning'));
@@ -1080,18 +822,6 @@
                 console.log("node.query:" + node.query)
                 console.log("targetShape:" + config.targetShape)
 
-                {#
-                    JSON structure:
-                    {shape1:
-                        {valid: #valid instances,
-                        invalid: #invalid instances,
-                        columns: [column name 1, column name 2, ...],
-                        results: [[instance 1 data 1,instance 1 data 2, ...], [instance 2 data 1,instance 2 data 2, ...], ...]
-                        }
-                    shape2: {...}
-                    ...
-                    }
-                #}
                 let request_validation = $.ajax({
                     url: "/validation",
                     type: "POST",
@@ -1117,7 +847,7 @@
                             {# fill valid/invalid count #}
                             shape.valid = data[shapeId].valid
                             shape.invalid = data[shapeId].invalid
-                            {# cacluate validation percent #}
+                            {# calculate validation percent #}
                             if (shape.valid === 0 && shape.invalid === 0)
                                 shape.validPercent = 100
                             else
@@ -1132,9 +862,8 @@
                             delete requestMap[shapeId];
 
                             {# update validation tab #}
-                            if (shapeId === currentNode.id) {
+                            if (shapeId.replace("<", "&lt;").replace(">", "&gt;") === currentNode.id) {
                                 fillValidationData()
-                                requestBtnClicked(false)
                             } else
                                 {# only update total validation data in the validation tab #}
                                 updateTotalValidation()
@@ -1147,7 +876,7 @@
                         console.log(exception)
                         let msg = '';
                         if (jqXHR.status === 0) {
-                            msg = ': Cannot connect to ShaclAPI';
+                            msg = ': Cannot connect to shaclAPI';
                         } else if (jqXHR.status === 404) {
                             msg = ': Requested page not found. [404]';
                         } else if (jqXHR.status === 500) {
@@ -1172,9 +901,7 @@
                         else
                             currentNode = selectedNode.parentLinks[0];
 
-                        if (node.id === currentNode.id) {
-                            requestBtnClicked(false)
-                        }
+                        if (node.id.replace("<", "&lt;").replace(">", "&gt;") === currentNode.id) { requestBtnClicked(false) }
                     }
                 });
 
@@ -1206,7 +933,7 @@
                         console.log(exception)
                         let msg = '';
                         if (jqXHR.status === 0) {
-                            msg = ': Cannot connect to ShaclAPI';
+                            msg = ': Cannot connect to shaclAPI';
                         } else if (jqXHR.status === 404) {
                             msg = ': Requested page not found. [404]';
                         } else if (jqXHR.status === 500) {
@@ -1231,9 +958,7 @@
                         else
                             currentNode = selectedNode.parentLinks[0];
 
-                        if (node.id === currentNode.id) {
-                            requestBtnClicked(false)
-                        }
+                        if (node.id.replace("<", "&lt;").replace(">", "&gt;") === currentNode.id) { requestBtnClicked(false) }
                     }
                 });
 
@@ -1241,7 +966,6 @@
             }
 
             let validationData = {
-
                 settings: {
                     highValidPercent: 10,
                     lowValidPercent: 40
@@ -1311,7 +1035,7 @@
                 }
             }
 
-            let requestMap = {}
+            let requestMap = {};
 
             function fillValidationData() {
                 console.log("fillValidationData")
@@ -1320,13 +1044,11 @@
                 updateTotalValidation()
 
                 {# fill selected validation #}
-
                 let shapeNode;
                 if (selectedNode.isClass)
                     shapeNode = selectedNode;
                 else
                     shapeNode = getNodeFromLink(selectedNode.parentLinks[0].source);
-
 
                 console.log("selectedNode: " + selectedNode.text)
                 console.log("selectedNode.isClass: " + selectedNode.isClass)
@@ -1339,13 +1061,9 @@
                     document.getElementById('ViewDataBtn').style.display = "none"
 
                     {# check if already requested or not #}
-                    if (requestMap[shapeNode.id]) {
-                        requestBtnClicked(true)
-                    } else {
-                        requestBtnClicked(false)
-                    }
-                    {# clear validation data #}
-                    statNode.innerHTML = ''
+                    if (requestMap[shapeNode.id]) { requestBtnClicked(true) }
+                    else { requestBtnClicked(false) }
+                    statNode.innerHTML = '' {# clear validation data #}
                 } else {
                     {# hide request button #}
                     document.getElementById('requestValidationBtn').style.display = "none"
@@ -1404,18 +1122,17 @@
             function requestBtnClicked(clicked) {
                 let btn = document.getElementById('requestValidationBtn');
                 if (clicked) {
-                    btn.classList.add("sending", "btn-secondary")
-                    btn.classList.remove("btn-primary")
-                    btn.textContent = "Validating, click to cancel"
-                    btn.blur()
+                    btn.classList.add("sending", "btn-secondary");
+                    btn.classList.remove("btn-primary");
+                    btn.textContent = "Validating, click to cancel";
+                    btn.blur();
                 } else {
-                    btn.classList.remove("sending", "btn-secondary")
-                    btn.classList.add("btn-primary")
-                    btn.textContent = "Request Validation"
-                    btn.blur()
+                    btn.classList.remove("sending", "btn-secondary");
+                    btn.classList.add("btn-primary");
+                    btn.textContent = "Request Validation";
+                    btn.blur();
                 }
             }
-
 
             // HTML calls
             document.querySelector("#collapseAll").onclick = () => {
@@ -1426,34 +1143,25 @@
 
             document.querySelector("#expandAll").onclick = () => {
                 nodes.forEach(node => node.isClass ? node.expanded = true : node.expanded = false);
-                {#nodes.forEach(node => node.expanded = true);#}
                 links.forEach(link => link.isClass2Class ? link.collapsed = true : link.collapsed = false);
                 updateGraph();
             }
 
-            document.querySelector("#centerGraph").onclick = () => {
-                Graph.zoomToFit(400);
-            }
+            document.querySelector("#centerGraph").onclick = () => { Graph.zoomToFit(400); }
 
-            document.querySelector("#focusNode").onclick = () => {
-                {# check selected node #}
-                if (null == selectedNode) {
-                    $('#flash').append(flashMessage(`Select a Shape first`, 'warning'));
-                } else {
-                    focusNode(selectedNode);
-                }
-
+            document.querySelector("#focusNode").onclick = () => { {# check selected node #}
+                if (null == selectedNode) { $('#flash').append(flashMessage(`Select a Shape first`, 'warning')); }
+                else { focusNode(selectedNode); }
             }
 
             let hideUnrelatedClasses = false;
             document.querySelector('#hideUnrelatedClasses').onclick = () => {
-
                 const checkbox = $("#hideUnrelatedClasses").find('input:checkbox:first');
                 console.log('hideUnrelatedClasses| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 {# check selected node #}
                 if (null == selectedNode) {
-                    $('#flash').append(flashMessage(`Select a Shape first`, 'warning'));
+                    $('#flash').append(flashMessage(`Select a shape first`, 'warning'));
                     return;
                 }
 
@@ -1464,67 +1172,33 @@
                     nodes.forEach(node => node.isHidden = false)
                     links.forEach(link => link.isHidden = false)
 
-                    {#updateClassState(selectedNode)#}
                     updateGraph();
                 } else {
                     checkbox.prop('checked', true);
                     hideUnrelatedClasses = true;
-
                     hideAllButSelectedNode();
                 }
 
-                // open node checklist and fill it
-                openRightNav('shape');
-
-                // center graph without changing the zoom
-                {#setTimeout(() => Graph.zoomToFit(400),500)#}
-
+                openRightNav('shape');  // open node checklist and fill it
             }
 
             function hideAllButSelectedNode() {
                 {# hide all nodes and links #}
                 nodes.forEach(node => node.isHidden = true)
-                {#links.forEach(link => link.isHidden = true)#}{# debricated #}
 
                 selectedNode.isHidden = false;
                 {# get class to class links and show classes #}
-                {# debricated #}
-                {#selectedNode.childLinks.forEach(link => {
-
-                    if (link.isClass2Class) { #}{# show all links not class to class #}{#
-                        #}{#console.log("selectedNode| id: " + selectedNode.id + " .expanded: " + selectedNode.expanded)#}{#
-
-                        #}{#if (!selectedNode.expanded) #}{# alwasy show, .expanded will take care of it#}{#
-                        link.isHidden = false;
-
-                    } else { #}{# show constraints classes #}{#
-                        link.isHidden = false;
-
-                        let constraintNode = getNodeFromLink(link.target);
-                        constraintNode.isHidden = false;
-                        if (!constraintNode.isClass)#}{# meaning the selected node is not a constraint #}{#
-                            constraintNode.childLinks.forEach(l => {
-                                l.isHidden = false
-                            });
-
-                        if (link.finalTarget) {
-                            getNodeFromLink(link.finalTarget).isHidden = false;
-                        }
-                    }
-                });#}
                 selectedNode.childLinks.forEach(link => {
                     if (link.isClass2Class) {
                         getNodeFromLink(link.target).isHidden = false;
                     }
                 });
                 updateHiddenLinks();
-
                 updateGraph();
             }
 
             let highlightSelectedNode = true;
             document.querySelector('#highlightSelectedNode').onclick = () => {
-
                 const checkbox = $("#highlightSelectedNode").find('input:checkbox:first');
                 console.log('highlightSelectedNode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
@@ -1538,28 +1212,23 @@
                 } else {
                     checkbox.prop('checked', true);
                     highlightSelectedNode = true;
-
                     highlightNode(selectedNode)
                 }
-
             }
 
             {#Search box#}
             let suggestions = [];
             nodes.forEach(node => node.isClass ? suggestions.push(node.text) : null);
-            {#console.log(suggestions)#}
 
             // getting all required elements
-            const searchWrapper = document.querySelector("#search-wrapper");
-            const inputBox = searchWrapper.querySelector("#search-input");
-            const suggBox = searchWrapper.querySelector("#search-sugg");
-            const icon = searchWrapper.querySelector("#search-icon");
+            const searchWrapper = document.querySelector("#search-wrapper"),
+                  inputBox = searchWrapper.querySelector("#search-input"),
+                  suggBox = searchWrapper.querySelector("#search-sugg"),
+                  icon = searchWrapper.querySelector("#search-icon");
             let linkTag = searchWrapper.querySelector("#search-linkTag");
 
             // if user press any key and release
-            inputBox.onkeyup = (e) => {
-                suggest(e);
-            }
+            inputBox.onkeyup = (e) => { suggest(e); }
             inputBox.onfocus = (e) => {
                 inputBox.value = '';
                 suggest(e);
@@ -1568,21 +1237,17 @@
             function suggest(e) {
                 let userData = e.target.value; //user entered data
                 let emptyArray = [];
-                {#if (userData) {#}
-                icon.onclick = () => {
-
-                }
+                icon.onclick = () => { }  // TODO: can this be removed?
                 emptyArray = suggestions.filter((data) => {
-                    {#console.log("inputBox.onkeyup.userData = " + userData)#}
                     if (userData)
-                        //filtering array value and user characters to lowercase and return only those words which are start with user entered chars
+                        // filtering array value and user characters to lowercase and return only those words which are start with user entered chars
                         return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
                     else
                         return data;
                 });
                 emptyArray = emptyArray.map((data) => {
                     // passing return data inside li tag
-                    return data = `<li>${data}</li>`;
+                    return `<li>${data}</li>`;
                 });
                 searchWrapper.classList.add("active"); //show autocomplete box
                 showSuggestions(emptyArray.sort());
@@ -1590,7 +1255,7 @@
                 let clicked = false;
                 {# fix on mouse out will hide the highlight after clicking #}
                 for (let i = 0; i < allList.length; i++) {
-                    //adding onclick attribute in all li tag
+                    // adding onclick attribute in all li tag
                     allList[i].onclick = () => {
                         clicked = true;
                         select(allList[i])
@@ -1608,9 +1273,7 @@
                             updateClassState(nodesById[allList[i].textContent])
                         }
                     };
-                    allList[i].onmouseover = () => {
-                        highlightSelectedNode ? highlightNode(nodesById[allList[i].textContent]) : null
-                    }
+                    allList[i].onmouseover = () => { highlightSelectedNode ? highlightNode(nodesById[allList[i].textContent]) : null }
                 }
                 suggBox.onmouseout = () => {
                     if (highlightSelectedNode) {
@@ -1618,35 +1281,25 @@
                             clicked = false;
                             return;
                         }
-
                         nodes.forEach(node => node.highlighted = false)
                         links.forEach(link => link.highlighted = false)
                         updateNode3d();
                     }
                 }
-                {# } else {
-                     searchWrapper.classList.remove("active"); //hide autocomplete box
-                 }#}
             }
 
-            var mouse_is_inside = false;
-            searchWrapper.onmouseover = () => {
-                mouse_is_inside = true;
-            }
-            searchWrapper.onmouseout = () => {
-                mouse_is_inside = false;
-            }
+            let mouse_is_inside = false;
+            searchWrapper.onmouseover = () => { mouse_is_inside = true; }
+            searchWrapper.onmouseout = () => { mouse_is_inside = false; }
 
             document.querySelector("body").onmouseup = () => {
-                {#console.log("body.onmouseup.mouse_is_inside = " + mouse_is_inside)#}
-                if (!mouse_is_inside) searchWrapper.classList.remove("active"); //hide autocomplete box
+                if (!mouse_is_inside) searchWrapper.classList.remove("active"); // hide autocomplete box
             }
 
             function select(element) {
                 let selectData = element.textContent;
                 inputBox.value = selectData;
                 icon.onclick = () => {
-                    {#highlightNode(nodesById[selectData])#}
                     updateClassState(nodesById[selectData])
                     viewNodeInfo(nodesById[selectData])
                 }
@@ -1660,32 +1313,21 @@
                     listData = `<li>${userValue}</li>`;
                 } else {
                     listData = list.join('');
-
-                    {#listData = `<li>${suggestions}</li>`;#}
                 }
                 suggBox.innerHTML = listData;
             }
 
             document.querySelector('#hideAttributes').onclick = () => {
-
                 const checkbox = $("#hideAttributes").find('input:checkbox:first');
                 console.log('hideAttributes| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 if (hideAttributes) {
                     checkbox.prop('checked', false);
                     hideAttributes = false;
-
-                    {#nodes.forEach(node => node.isAttribute ? node.isHidden = false : null)#}
-                    {#links.forEach(link => link.isAttribute ? link.isHidden = false : null)#}
-
                     updateGraph();
                 } else {
                     checkbox.prop('checked', true);
                     hideAttributes = true;
-
-                    {#nodes.forEach(node => node.isAttribute ? node.isHidden = true : null)#}
-                    {#links.forEach(link => link.isAttribute ? link.isHidden = true : null)#}
-
                     updateGraph();
                 }
             }
@@ -1749,19 +1391,12 @@
                 acc[i].addEventListener("click", function () {
                     this.classList.toggle("active");
                     toggleAccordion(this);
-                    {#let panel = this.nextElementSibling;
-                    if (panel.style.maxHeight) {
-                        panel.style.maxHeight = null;
-                    } else {
-                        panel.style.maxHeight = panel.scrollHeight + "px";
-                    }#}
                 });
             }
 
             function toggleAccordion(accordionBtn) {
                 let panel = accordionBtn.nextElementSibling;
                 if (accordionBtn.classList.contains("active")) {
-                    {#panel.style.maxHeight = panel.scrollHeight + "px";#}
                     panel.style.maxHeight = "fit-content";
                     if (panel.style.overflow)
                         panel.style.overflow = "visible";
@@ -1780,8 +1415,7 @@
             }
 
             {# navigation panels #}
-            // Sidenav Push Content
-            let isNavOpen = false;
+            let isNavOpen = false; // Sidenav Push Content
 
             /* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
             function openNav() {
@@ -1797,13 +1431,7 @@
                 document.getElementById("data-table-container").style.marginLeft = "0";
             }
 
-            document.querySelector('#optionBtn').onclick = () => {
-                if (isNavOpen) {
-                    closeNav()
-                } else {
-                    openNav()
-                }
-            }
+            document.querySelector('#optionBtn').onclick = () => { isNavOpen ? closeNav() : openNav(); }
 
             let isRightNavOpen = false;
 
@@ -1826,10 +1454,7 @@
                         document.getElementById('infoMenu').classList.remove('disable')
                         document.getElementById('nodeChecklist').classList.add('disable')
                         document.getElementById('validationMenu').classList.add('disable')
-
-                    {#if (node) viewNodeInfo(node)#}
                         break;
-
                     case 'shape':
                         document.getElementById('infoBtn').classList.remove('selected')
                         document.getElementById('shapeBtn').classList.add('selected')
@@ -1839,9 +1464,7 @@
                         document.getElementById('infoMenu').classList.add('disable')
                         document.getElementById('nodeChecklist').classList.remove('disable')
                         document.getElementById('validationMenu').classList.add('disable')
-
                         break;
-
                     case 'validation':
                         document.getElementById('infoBtn').classList.remove('selected')
                         document.getElementById('shapeBtn').classList.remove('selected')
@@ -1851,7 +1474,6 @@
                         document.getElementById('infoMenu').classList.add('disable')
                         document.getElementById('nodeChecklist').classList.add('disable')
                         document.getElementById('validationMenu').classList.remove('disable')
-
                         break;
                 }
             }
@@ -1869,49 +1491,33 @@
             }
 
             document.querySelector('#infoBtn').onclick = () => {
-                if (isRightNavOpen && !document.getElementById("infoBtn").classList.contains("selected")) {
-                    openRightNav('info')
-                } else if (isRightNavOpen && document.getElementById("infoBtn").classList.contains("selected")) {
-                    closeRightNav()
-                } else { //it is closed
-                    openRightNav('info')
-                }
+                if (isRightNavOpen && !document.getElementById("infoBtn").classList.contains("selected")) { openRightNav('info') }
+                else if (isRightNavOpen && document.getElementById("infoBtn").classList.contains("selected")) { closeRightNav() }
+                else {  openRightNav('info') } // it is closed
             }
             document.querySelector('#shapeBtn').onclick = () => {
-                if (isRightNavOpen && !document.getElementById("shapeBtn").classList.contains("selected")) {
-                    openRightNav('shape')
-                } else if (isRightNavOpen && document.getElementById("shapeBtn").classList.contains("selected")) {
-                    closeRightNav()
-                } else { //it is closed
-                    openRightNav('shape')
-                }
+                if (isRightNavOpen && !document.getElementById("shapeBtn").classList.contains("selected")) { openRightNav('shape') }
+                else if (isRightNavOpen && document.getElementById("shapeBtn").classList.contains("selected")) { closeRightNav() }
+                else { openRightNav('shape') } // it is closed
             }
             document.querySelector('#validationBtn').onclick = () => {
-                if (isRightNavOpen && !document.getElementById("validationBtn").classList.contains("selected")) {
-                    openRightNav('validation')
-                } else if (isRightNavOpen && document.getElementById("validationBtn").classList.contains("selected")) {
-                    closeRightNav()
-                } else { //it is closed
-                    openRightNav('validation')
-                }
+                if (isRightNavOpen && !document.getElementById("validationBtn").classList.contains("selected")) { openRightNav('validation') }
+                else if (isRightNavOpen && document.getElementById("validationBtn").classList.contains("selected")) { closeRightNav() }
+                else { openRightNav('validation') } // it is closed
             }
 
             let darkMode = true;
             document.querySelector('#darkMode').onclick = () => {
-
                 const checkbox = $("#darkMode").find('input:checkbox:first');
                 console.log('darkMode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 if (darkMode) {
                     checkbox.prop('checked', false);
                     darkMode = false;
-
                     document.documentElement.setAttribute('data-theme', 'light');
-
                 } else {
                     checkbox.prop('checked', true);
                     darkMode = true;
-
                     document.documentElement.setAttribute('data-theme', 'dark');
                 }
 
@@ -1922,54 +1528,42 @@
 
             document.querySelector('#requestValidationBtn').onclick = (e) => {
                 let shapeNode;
-                if (selectedNode.isClass)
-                    shapeNode = selectedNode;
-                else
-                    shapeNode = getNodeFromLink(selectedNode.parentLinks[0].source);
+                if (selectedNode.isClass) { shapeNode = selectedNode }
+                else { shapeNode = getNodeFromLink(selectedNode.parentLinks[0].source) }
 
                 {# check if the request is sent and abort it#}
                 if (requestMap[shapeNode.id]) {
-                    {#requestMap[shapeNode.id].abort();#}
                     delete requestMap[shapeNode.id];
-                    {# change style #}
                     requestBtnClicked(false)
                 } else {
                     if (requestValidationData(shapeNode))
-                        {# change style #}
                         requestBtnClicked(true)
                 }
             }
 
             document.querySelector('#ViewDataBtn').onclick = (e) => {
                 {# view selected node data#}
-                let html = '<table id="myTable" class="display"><thead><tr>'
-                let dataIndex = selectedNode.columns.indexOf('Data')
+                let html = '<table id="myTable" class="display"><thead><tr>',
+                    dataIndex = selectedNode.columns.indexOf('Data');
 
-                selectedNode.columns.forEach(col => {
-                    html += '<th>' + col + '</th>'
-                })
-
-                html += '<th>View Data</th></tr></thead><tbody>'
+                selectedNode.columns.forEach(col => { html += '<th>' + col + '</th>' });
+                html += '<th>View Data</th></tr></thead><tbody>';
 
                 selectedNode.data.forEach(row => {
-                    html += '<tr>'
-
-                    row.forEach(cell => {
-                        html += '<td>' + cell + '</td>'
-                    })
-
-                    html += '<td><button query-data="' + row[dataIndex] + '" class="btn btn-primary view-data-graph" style="display: block;">View</button></td>'
-                    html += '</tr>'
+                    html += '<tr>';
+                    row.forEach(cell => { html += '<td>' + cell + '</td>' });
+                    html += '<td><button query-data="' + row[dataIndex] + '" class="btn btn-primary view-data-graph" style="display: block;">View</button></td>';
+                    html += '</tr>';
                 })
 
-                html += '</tbody></table>'
+                html += '</tbody></table>';
 
-                document.getElementById('data-table').innerHTML = html
+                document.getElementById('data-table').innerHTML = html;
                 $('#myTable').DataTable();
 
                 // button click showDataGraph
-                $('#myTable').on('click', '.view-data-graph', function () {
-                    showDataGraph(selectedNode, $(this).attr("query-data"))
+                $('#myTable').on('click', '.view-data-graph', function() {
+                    showDataGraph(selectedNode, $(this).attr("query-data"));
                     closeDataTable()
                 });
 
@@ -1977,9 +1571,7 @@
                 showDataTable()
             }
 
-            document.querySelector('#close-table-btn').onclick = (e) => {
-                closeDataTable()
-            }
+            document.querySelector('#close-table-btn').onclick = () => { closeDataTable() }
 
             function showDataTable() {
                 elem.style.display = "none";
@@ -1993,14 +1585,7 @@
                 Graph.resumeAnimation()
             }
 
-            {#document.querySelector('#validationEndpointDropdown').onchange = () => {
-                let dropdown = $("#validationEndpointDropdown")[0];
-                let val = dropdown.options[dropdown.selectedIndex].value;
-                $("#validationEndpointTextBox").val(val);
-            }#}
-
             {#validation endpoint box#}
-
             // getting all required elements
             const endpointWrapper = document.querySelector("#endpointWrapper");
             const endpointInputBox = endpointWrapper.querySelector("#endpointInputBox");
@@ -2011,45 +1596,33 @@
             let endpointList = [
                 "http://host.docker.internal:9000/sparql",
                 "http://127.0.0.1:9000/sparql",
-                "http://shacl_api_testdata:8890/sparql",
-                "http://192.168.111.1:14000/sparql",
-                "https://labs.tib.eu/sdm/clarify-kg-7/sparql"];
+                "http://192.168.111.1:14000/sparql"];
             saveToCacheDefaultValues(endpointInputBox.id, endpointList)
 
-            // if user press any key and release
-            endpointInputBox.onkeyup = (e) => {
-                endpointSuggest(e.target.value);
-            }
-            endpointInputBox.onfocus = (e) => {
-                {#endpointInputBox.value = '';#}
-                endpointSuggest(e.target.value);
-            }
-
-            endpointIcon.onclick = () => {
-                endpointSuggest()
-            }
+            endpointInputBox.onkeyup = (e) => { endpointSuggest(e.target.value); } // if user presses and releases any key
+            endpointInputBox.onfocus = (e) => { endpointSuggest(e.target.value); }
+            endpointIcon.onclick = () => { endpointSuggest() }
 
             function endpointSuggest(userData) {
                 let emptyArray = [];
                 emptyArray = getFromCache(endpointInputBox.id).filter((data) => {
-                    {#console.log("inputBox.onkeyup.userData = " + userData)#}
                     if (userData)
-                        //filtering array value and user characters to lowercase and return only those words which are start with user entered chars
+                        // filtering array value and user characters to lowercase and return only those words which are start with user entered chars
                         return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
                     else
                         return data;
                 });
                 emptyArray = emptyArray.map((data) => {
                     // passing return data inside li tag
-                    return data = `<li>${data}</li>`;
+                    return `<li>${data}</li>`;
                 });
                 endpointWrapper.classList.add("active"); //show autocomplete box
                 showEndpointSuggestions(emptyArray.sort());
-                let allList = endpointSuggBox.querySelectorAll("li");
-                let clicked = false;
+                let allList = endpointSuggBox.querySelectorAll("li"),
+                    clicked = false;
                 {# fix on mouse out will hide the highlight after clicking #}
                 for (let i = 0; i < allList.length; i++) {
-                    //adding onclick attribute in all li tag
+                    // adding onclick attribute in all li tag
                     allList[i].onclick = () => {
                         clicked = true;
                         selectEndpoint(allList[i])
@@ -2057,27 +1630,16 @@
                 }
             }
 
-            var mouse_is_inside_endpoint = false;
-            endpointWrapper.onmouseover = () => {
-                mouse_is_inside_endpoint = true;
-            }
-            endpointWrapper.onmouseout = () => {
-                mouse_is_inside_endpoint = false;
-            }
+            let mouse_is_inside_endpoint = false;
+            endpointWrapper.onmouseover = () => { mouse_is_inside_endpoint = true; }
+            endpointWrapper.onmouseout = () => { mouse_is_inside_endpoint = false; }
 
             document.querySelector("body").onmouseup = () => {
-                {#console.log("body.onmouseup.mouse_is_inside = " + mouse_is_inside)#}
-                if (!mouse_is_inside_endpoint) endpointWrapper.classList.remove("active"); //hide autocomplete box
+                if (!mouse_is_inside_endpoint) endpointWrapper.classList.remove("active"); // hide autocomplete box
             }
 
             function selectEndpoint(element) {
-                let selectData = element.textContent;
-                endpointInputBox.value = selectData;
-                {#endpointIcon.onclick = () => {
-                    #}{#highlightNode(nodesById[selectData])#}{#
-                    #}{#updateClassState(nodesById[selectData])
-                    viewNodeInfo(nodesById[selectData])#}{#
-                }#}
+                endpointInputBox.value = element.textContent;
                 endpointWrapper.classList.remove("active");
             }
 
@@ -2088,109 +1650,99 @@
                     listData = `<li>${userValue}</li>`;
                 } else {
                     listData = list.join('');
-
-                    {#listData = `<li>${suggestions}</li>`;#}
                 }
                 endpointSuggBox.innerHTML = listData;
             }
 
             // save cache list to local storage
             function saveToCache(id, value) {
-                let json = localStorage.getItem(id)
-                let array
+                let json = localStorage.getItem(id),
+                    array;
                 if (json != null) {
-                    array = JSON.parse(json)
-                    let set = new Set(array).add(value) //no doubles
+                    array = JSON.parse(json);
+                    let set = new Set(array).add(value); // no duplicates
                     array = Array.from(set)
                 } else {
                     array = [value]
                 }
-                let json2 = JSON.stringify(array)
+                let json2 = JSON.stringify(array);
                 localStorage.setItem(id, json2)
             }
 
             function saveToCacheDefaultValues(id, array) {
-                {#localStorage.removeItem(id)#}
-
-                let json = localStorage.getItem(id)
+                let json = localStorage.getItem(id);
                 if (json == null) {
-                    json = JSON.stringify(array)
+                    json = JSON.stringify(array);
                     localStorage.setItem(id, json)
                 }
             }
 
             function getFromCache(id) {
-                let c = localStorage.getItem(id)
+                let c = localStorage.getItem(id);
                 if (c != null)
                     return Array.from(JSON.parse(c))
                 else
                     return []
             }
 
-
             {# Data viewer #}
-
             function showShapeGraph() {
                 {# restore #}
-                nodes.length = 0
-                links.length = 0
-                nodes.push(...backupNodes)
-                links.push(...backupLinks)
-                selectedNode = bachupSelectedNode
+                nodes.length = 0;
+                links.length = 0;
+                nodes.push(...backupNodes);
+                links.push(...backupLinks);
+                selectedNode = bachupSelectedNode;
                 {# empty backup data #}
-                backupNodes.length = 0
-                backupLinks.length = 0
-                bachupSelectedNode = null
+                backupNodes.length = 0;
+                backupLinks.length = 0;
+                bachupSelectedNode = null;
 
-                isShowingDataGraph = false
-                resetGraphMaps()
-                resetShapeCheckList()
-                updateGraph()
-                viewNodeInfo(selectedNode)
-                fillValidationData()
+                isShowingDataGraph = false;
+                resetGraphMaps();
+                resetShapeCheckList();
+                updateGraph();
+                viewNodeInfo(selectedNode);
+                fillValidationData();
             }
 
             function showDataGraph(shape, id) {
-                loading(true)
-
+                loading(true);
                 requestDataNode(shape, id, function (json) {
-
                     // show data graph
-                    let graph = creatDataNetwork(shape, id, json)
+                    let graph = creatDataNetwork(shape, id, json);
                     {# backup #}
-                    backupNodes.length = 0
-                    backupLinks.length = 0
-                    backupNodes.push(...nodes)
-                    backupLinks.push(...links)
-                    bachupSelectedNode = selectedNode
+                    backupNodes.length = 0;
+                    backupLinks.length = 0;
+                    backupNodes.push(...nodes);
+                    backupLinks.push(...links);
+                    bachupSelectedNode = selectedNode;
                     {# show #}
-                    nodes.length = 0
-                    links.length = 0
-                    nodes.push(graph.main)
-                    nodes.push(...graph.nodes)
-                    links.push(...graph.links)
-                    selectedNode = graph.main
+                    nodes.length = 0;
+                    links.length = 0;
+                    nodes.push(graph.main);
+                    nodes.push(...graph.nodes);
+                    links.push(...graph.links);
+                    selectedNode = graph.main;
 
-                    isShowingDataGraph = true
-                    resetGraphMaps(true)
-                    resetShapeCheckList()
-                    updateGraph()
+                    isShowingDataGraph = true;
+                    resetGraphMaps(true);
+                    resetShapeCheckList();
+                    updateGraph();
 
-                    viewNodeInfo(selectedNode)
-                    highlightNode(selectedNode)
-                    openRightNav('info')
-                    document.getElementById('validationBtn').style.display = "none"
-                    document.getElementById('topRightButtons').style.display = "flex"
+                    viewNodeInfo(selectedNode);
+                    highlightNode(selectedNode);
+                    openRightNav('info');
+                    document.getElementById('validationBtn').style.display = "none";
+                    document.getElementById('topRightButtons').style.display = "flex";
 
-                    loading(false)
-                }, function () {
-                    loading(false)
-                })
+                    loading(false);
+                }, function () { loading(false) })
             }
 
             function requestDataNode(shape, id, callbackSuccess, callbackFail) {
-                let endpoint = endpointInputBox.value
-                let query = getQueryString(shape, id)
+                let endpoint = endpointInputBox.value,
+                    query = getQueryString(shape, id);
                 $.ajax({
                     dataType: "jsonp",
                     url: endpoint + "?query=" + encodeURIComponent(query) + "&format=json",
@@ -2199,7 +1751,6 @@
                         console.log(json)
                         console.log(textStatus)
                         console.log(jqXHR)
-
                         callbackSuccess(json)
                     },
                     error: function (jqXHR, exception) {
@@ -2208,7 +1759,7 @@
                         console.log(exception)
                         let msg = '';
                         if (jqXHR.status === 0) {
-                            msg = ': Cannot connect to ShaclAPI';
+                            msg = ': Cannot connect to shaclAPI';
                         } else if (jqXHR.status === 404) {
                             msg = ': Requested page not found. [404]';
                         } else if (jqXHR.status === 500) {
@@ -2223,23 +1774,15 @@
                             msg = ': Uncaught Error.\n' + jqXHR.responseText;
                         }
                         $('#flash').append(flashMessage(msg, 'warning'));
-
-                        callbackFail()
-
+                        callbackFail();
                     }
                 });
             }
 
             function getQueryString(shape, data) {
-                let query = 'SELECT DISTINCT ?p ?o WHERE { VALUES ?p {'
-                let prefix = shape.prefix.slice(0, -1) ///remove '>'
+                let query = 'SELECT DISTINCT ?p ?o WHERE { VALUES ?p {',
+                    prefix = shape.prefix.slice(0, -1); ///remove '>'
 
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor>#}
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress>#}
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#name>#}
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone>#}
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf>#}
-                {#<http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse>#}
                 shape.childLinks.forEach(link => {
                     if (link.linkType === 1 || link.linkType === 3) {
                         let constraint = getNodeFromLink(link.target);
@@ -2247,7 +1790,6 @@
                     }
                 })
 
-                {#<http://www.department0.university0.edu/UndergraduateStudent9>#}
                 query += '} OPTIONAL {<' + data + '>?p ?o }}'
 
                 console.log('getQueryString')
@@ -2255,42 +1797,14 @@
                 return query
             }
 
-            {#// remove test btn
-            document.querySelector('#dataGraph').onclick = (e) => {
-                showDataGraph(selectedNode, 'http://www.Department0.University0.edu/GraduateStudent100')
-            }#}
-
-            {#
-            { "head": { "link": [], "vars": ["p", "o"] },
-              "results": { "distinct": false, "ordered": true, "bindings": [
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress" }	, "o": { "type": "literal", "value": "UndergraduateStudent36@Department0.University3.edu" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#memberOf" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#name" }	, "o": { "type": "literal", "value": "UndergraduateStudent36" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu/Course34" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#takesCourse" }	, "o": { "type": "uri", "value": "http://www.Department0.University3.edu/Course27" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone" }	, "o": { "type": "literal", "value": "xxx-xxx-xxxx" }},
-                { "p": { "type": "uri", "value": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#advisor" }} ] } }
-            #}
-
-            {#
-                returns object with 3 components:
-                main: is the requested data node
-                nodes: list of all other nodes [constraints, data nodes]
-                links: list of all links
-            #}
-
             function creatDataNetwork(shape, id, json) {
                 {# clear data graph #}
-                let dataGraphNodeList = []
-                let dataGraphLinkList = []
-
-                {# to search for constraints #}
-                let constraintMap = buildConstraintsMap(shape)
-
-                let dataNode = createDataNode(id, shape, true)
-
-                let jsonConstraintsList = json.results.bindings
-                let i = 0
+                let dataGraphNodeList = [],
+                    dataGraphLinkList = [],
+                    constraintMap = buildConstraintsMap(shape), {# to search for constraints #}
+                    dataNode = createDataNode(id, shape, true),
+                    jsonConstraintsList = json.results.bindings,
+                    i = 0;
                 jsonConstraintsList.forEach(obj => {
                     i += 1
 
@@ -2299,35 +1813,28 @@
                         return;
                     }
 
-                    {#let constraintId = obj.p.value#}
-                    let constraintString = obj.p.value.split('#').pop()
-                    {#let constraintType = obj.o.type#}
-                    let constraintValue = obj.o.value
-                    let currentShapeConstraint = constraintMap.get(constraintString)
+                    let constraintString = obj.p.value.split('#').pop(),
+                        constraintValue = obj.o.value,
+                        currentShapeConstraint = constraintMap.get(constraintString);
 
-                    {#if (constraintType == "literal") {#}
                     if (currentShapeConstraint.isAttribute) {
                         // create Attribute Node and link it using one link
-                        let attribute = createAttributeNode(i, currentShapeConstraint, dataNode, constraintValue, currentShapeConstraint.min, currentShapeConstraint.max)
-                        let link = createLink(i, constraintString, dataNode, attribute, 1, currentShapeConstraint.min, currentShapeConstraint.max)
-                        dataGraphNodeList.push(attribute)
+                        let attribute = createAttributeNode(i, currentShapeConstraint, dataNode, constraintValue, currentShapeConstraint.min, currentShapeConstraint.max),
+                            link = createLink(i, constraintString, dataNode, attribute, 1, currentShapeConstraint.min, currentShapeConstraint.max);
+                        dataGraphNodeList.push(attribute);
                         dataGraphLinkList.push(link)
                     }
 
-                    {#if (constraintType == "uri") {#}
                     if (!currentShapeConstraint.isAttribute) {
                         // create Constraint Node and Data Node then link them with 3 links
-
-                        let n = getNodeFromLink(currentShapeConstraint.childLinks[0].target)
-                        let nextDataNode = createDataNode(constraintValue, n, false)
-
-                        let constraint = createConstraintNode(i, currentShapeConstraint, dataNode, constraintString, currentShapeConstraint.min, currentShapeConstraint.max)
-
-                        let link0 = createLink(i, constraintString, dataNode, nextDataNode, 0, currentShapeConstraint.min, currentShapeConstraint.max)
-                        let link3 = createLink(i, constraintString, dataNode, constraint, 3, currentShapeConstraint.min, currentShapeConstraint.max)
-                        link3.finalTarget = nextDataNode.id
-                        let link4 = createLink(i, constraintString, constraint, nextDataNode, 4, currentShapeConstraint.min, currentShapeConstraint.max)
-                        dataGraphNodeList.push(constraint, nextDataNode)
+                        let n = getNodeFromLink(currentShapeConstraint.childLinks[0].target),
+                            nextDataNode = createDataNode(constraintValue, n, false),
+                            constraint = createConstraintNode(i, currentShapeConstraint, dataNode, constraintString, currentShapeConstraint.min, currentShapeConstraint.max),
+                            link0 = createLink(i, constraintString, dataNode, nextDataNode, 0, currentShapeConstraint.min, currentShapeConstraint.max),
+                            link3 = createLink(i, constraintString, dataNode, constraint, 3, currentShapeConstraint.min, currentShapeConstraint.max),
+                            link4 = createLink(i, constraintString, constraint, nextDataNode, 4, currentShapeConstraint.min, currentShapeConstraint.max);
+                        link3.finalTarget = nextDataNode.id;
+                        dataGraphNodeList.push(constraint, nextDataNode);
                         dataGraphLinkList.push(link0, link3, link4)
                     }
                 })
@@ -2335,7 +1842,6 @@
             }
 
             {# create data node "almost as shape node" #}
-
             function createDataNode(id, shape, retrieved) {
                 let node = nodesById[id]
                 if (node)
@@ -2383,7 +1889,6 @@
                 }
                 node.constraint = constraint
                 return node
-
             }
 
             function createConstraintNode(incremental, constraint, dataNode, name, min, max) {
@@ -2405,15 +1910,13 @@
                 return node
             }
 
-            {#
-            linkType:
-             0: class to class
-             1: class to attribute
-             2: attribute to same class
-             3: class to constraint
-             4: constraint to other class
+            {# linkType:
+               0: class to class
+               1: class to attribute
+               2: attribute to same class
+               3: class to constraint
+               4: constraint to other class
              #}
-
             function createLink(incremental, text, from, to, type, min, max) {
 
                 let link = {
@@ -2423,12 +1926,9 @@
                     text: text,
                     min: min,
                     max: max,
-                    {#isClass2Class: false,#}
-                    {#collapsed: true,#}
                     isHidden: false,
                     highlighted: false,
                     length: getLinkLength(type),
-                    {#isAttribute: true,#}
                     linkType: type
                 }
 
@@ -2456,7 +1956,6 @@
                     default:
                         return 1
                 }
-
                 return link;
             }
 
@@ -2472,18 +1971,13 @@
             }
 
             function updateDataGraph(node, callback) {
-                loading(true)
-
-                requestDataNode(node.shape, node.id, function (json) {
-                    // update node in the data graph and add its constraints
-
+                loading(true);
+                requestDataNode(node.shape, node.id, function (json) { // update node in the data graph and add its constraints
                     // create data graph
                     let graph = creatDataNetwork(node.shape, node.id, json)
 
                     node.retrieved = true
-                    {#nodes.push(...graph.main)#} {# main already added #}
                     nodes.push(...graph.nodes)
-                    {# check for each new node if it is already added #}
                     links.push(...graph.links)
 
                     resetGraphMaps(true)
@@ -2498,7 +1992,7 @@
                 })
             }
 
-            document.querySelector('#closeDataGraph').onclick = (e) => {
+            document.querySelector('#closeDataGraph').onclick = () => {
                 document.getElementById('topRightButtons').style.display = "none"
                 document.getElementById('validationBtn').style.display = "block"
                 openRightNav('validation')
@@ -2506,13 +2000,12 @@
                 showShapeGraph()
             }
 
-            /** todo
+            /** TODO
              *
              * infoTree combine similar constraints when isShowDataGraph
              * infoTree text icon for data text
              *
              */
-
             function loading(startLoading) {
                 if (startLoading)
                     document.querySelector('#loader').classList.add("loader");
@@ -2522,9 +2015,6 @@
 
             {# remove loader #}
             document.querySelector('#loader').removeAttribute("class");
-
         </script>
-
     </div>
-
 {% endblock %}
