@@ -1,3 +1,5 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 # SHACLViewer
 
 SHACLViewer is a Web application for interactive visualizations of SHACL shape schemas.
