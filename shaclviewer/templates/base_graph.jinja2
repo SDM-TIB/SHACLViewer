@@ -8,10 +8,10 @@
         margin: 0;
     } </style>
 
-    <script src="{{ url_for('static', filename='js/three/three.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/three/CSS2DRenderer.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sprite/three-spritetext.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dataTable/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/libs/three.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/CSS2DRenderer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/libs/three-spritetext.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/libs/jquery.dataTables.min.js') }}"></script>
 
     {% block head %}{% endblock %}
 {% endblock %}
@@ -556,7 +556,7 @@
                 highlightNode(node);
             }
 
-            import {BootstrapTreeView} from '{{ url_for('static', filename='js/treeview/treeview.bootstrap.js') }}';
+            import {BootstrapTreeView} from '{{ url_for('static', filename='js/libs/simple-treeview.bootstrap.min.js') }}';
 
             {# fill info menu #}
             function viewNodeInfo(node) {

@@ -68,7 +68,7 @@
         {% for item in data %}
             {% if item.isNetwork %}
                 <div class="card">
-                    <a href="/graph3d?path={{ item.dir }}">
+                    <a href="{{ url_for("graph3d") }}?path={{ item.dir }}">
                         <div class="container">
                             <h4><i class="fas fa-project-diagram icon"></i><b>{{ item.name }}</b></h4>
                             <p>Number of shapes: {{ item.filecount }}</p>

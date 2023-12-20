@@ -1,7 +1,7 @@
 {% extends 'base_graph.jinja2' %}
 
 {% block head %}
-    <script type="text/javascript" src="static/js/3d/3d-force-graph.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/libs/3d-force-graph.min.js') }}"></script>
 {% endblock %}
 
 {% block graph_implementation %}
