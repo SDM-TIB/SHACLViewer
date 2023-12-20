@@ -3,3 +3,9 @@ Dockerfile
 venv
 .idea
 example
+node_modules
+Makefile
+package.json
+package-lock.json
+requirements-dev.txt
+bundle-assets.py
