@@ -15,6 +15,13 @@ docker-compose -f example/docker-compose.yml up -d
 
 The SHACLViewer is then served at [http://localhost:5001](http://localhost:5001).
 
+Alternatively, the example can be started or stopped with their respective commands as follows:
+
+```bash
+make example-run
+make example-stop
+```
+
 ## Publications
 The underlying work is reported in:
 
