@@ -838,7 +838,7 @@
                             currentNode = selectedNode.parentLinks[0];
 
                         Object.keys(data).forEach(shapeId => {
-                            let shape = nodesById[shapeId.replace("<", "&lt;").replace(">", "&gt;")]
+                            let shape = nodesById[shapeId]
                             {# fill valid/invalid count #}
                             shape.valid = data[shapeId].valid
                             shape.invalid = data[shapeId].invalid
