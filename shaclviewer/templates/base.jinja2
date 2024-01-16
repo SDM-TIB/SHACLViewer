@@ -5,6 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "{{ url_for('static', filename='js/libs/three.mjs') }}",
+          "CSS2DRenderer": "{{ url_for('static', filename='js/libs/three-CSS2DRenderer.mjs') }}",
+          "SpriteText": "{{ url_for('static', filename='js/libs/three-spritetext.mjs') }}"
+        }
+      }
+    </script>
+
     <!-- JQuery -->
     <script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
 

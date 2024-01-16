@@ -99,16 +99,23 @@ Bundle(
 
 # three
 Bundle(
-    NPM_PATH + 'three/build/three.min.js',
+    NPM_PATH + 'three/build/three.module.js',
     filters='rjsmin',
-    output=JS_PATH + 'three.min.js'
+    output=JS_PATH + 'three.mjs'
+).build()
+
+# three-CSS2DRenderer
+Bundle(
+    NPM_PATH + 'three/examples/jsm/renderers/CSS2DRenderer.js',
+    filters='rjsmin',
+    output=JS_PATH + 'three-CSS2DRenderer.mjs'
 ).build()
 
 # three-spritetext
 Bundle(
-    NPM_PATH + 'three-spritetext/dist/three-spritetext.min.js',
+    NPM_PATH + 'three-spritetext/dist/three-spritetext.mjs',
     filters='rjsmin',
-    output=JS_PATH + 'three-spritetext.min.js'
+    output=JS_PATH + 'three-spritetext.mjs'
 ).build()
 
 # simple-treeview

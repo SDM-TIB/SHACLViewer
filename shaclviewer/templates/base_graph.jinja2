@@ -8,9 +8,6 @@
         margin: 0;
     } </style>
 
-    <script src="{{ url_for('static', filename='js/libs/three.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/CSS2DRenderer.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/libs/three-spritetext.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/libs/jquery.dataTables.min.js') }}"></script>
 
     {% block head %}{% endblock %}
@@ -142,6 +139,9 @@
         </div>
         <div id="loader" class="loader"></div>
         <script type="module">
+            import { CSS2DRenderer } from 'CSS2DRenderer';
+            import SpriteText from 'SpriteText';
+
             const nodes = [],
                   GROUPS = 1,
                   links = [],

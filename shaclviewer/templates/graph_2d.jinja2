@@ -31,7 +31,7 @@
 
     const elem = document.getElementById('3d-graph');
     const Graph = ForceGraph({
-        extraRenderers: [new THREE.CSS2DRenderer()]
+        extraRenderers: [new CSS2DRenderer()]
     })
     (elem)
         .graphData(getVisibleLists())
