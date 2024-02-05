@@ -28,7 +28,6 @@ def graph2d():
     return render_template('graph_2d.jinja2', graph=graph)
 
 
-# to-do check for folders within folders (folder explorer)
 @app.route("/")
 def home_page():
     path = request.args.get('path')
@@ -42,12 +41,12 @@ def home_page():
     folders = sorted(os.listdir(full_path))
     data = []
     for name in folders:
-        isNetwork = True
-        dir = os.listdir(full_path + name)[0]
-        if os.path.isdir(full_path + name + "/" + dir):
-            isNetwork = False
+        is_network = True
+        directory = os.listdir(full_path + name)[0]
+        if os.path.isdir(full_path + name + "/" + directory):
+            is_network = False
         data.append({
-            "isNetwork": isNetwork,
+            "isNetwork": is_network,
             "name": name,
             "dir": path + name,
             "filecount": len(os.listdir(full_path + name))
