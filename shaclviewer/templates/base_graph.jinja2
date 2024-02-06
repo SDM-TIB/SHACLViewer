@@ -37,7 +37,7 @@
         </a>
         <a href="javascript:void(0)" id="highlightSelectedNode"><i class=''></i>Highlight Selected
             <label class="switch">
-                <input type="checkbox" disabled="disabled" checked="true">
+                <input type="checkbox" disabled="disabled" checked>
                 <span class="slider round"></span>
             </label>
         </a>
@@ -53,25 +53,25 @@
         </a>
         <button class="accordion">Links Length</button>
         <div class="slider-container panel">
-            <p>Shape to Shape link</p>
+            <label for="class2classLinkSlider">Shape to Shape link</label>
             <input type="range" class="range-style" id="class2classLinkSlider" min="0" max="200">
             <output>150</output>
-            <p>Shape to Intra-Constraint link</p>
+            <label for="attributeLinkSlider">Shape to Intra-Constraint link</label>
             <input type="range" class="range-style" id="attributeLinkSlider" min="0" max="200">
             <output>150</output>
-            <p>Shape to Inter-Constraint link</p>
+            <label for="toConstraintLinkSlider">Shape to Inter-Constraint link</label>
             <input type="range" class="range-style" id="toConstraintLinkSlider" min="0" max="200">
             <output>150</output>
-            <p>Inter-Constraint to Shape link</p>
+            <label for="fromConstraintLinkSlider">Inter-Constraint to Shape link</label>
             <input type="range" class="range-style" id="fromConstraintLinkSlider" min="0" max="200">
             <output>150</output>
         </div>
         <button class="accordion">Validation Intensity Categorization</button>
         <div class="slider-container panel">
-            <p>Low Invalid Percentage</p>
+            <label for="lowValidationPercentage">Low Invalid Percentage</label>
             <input type="range" class="range-style" id="lowValidationPercentage" min="0" max="100">
             <output>60</output>
-            <p>High Invalid Percentage</p>
+            <label for="HighValidationPercentage">High Invalid Percentage</label>
             <input type="range" class="range-style" id="HighValidationPercentage" min="0" max="100">
             <output>90</output>
         </div>
@@ -107,7 +107,7 @@
                 <div style="padding: 10px 0px;">
                     <div id="endpointWrapper" class="search-input">
                         <a id="endpointLinkTag" href="" target="_blank" hidden></a>
-                        <input id="endpointInputBox" type="text" placeholder="Endpoint Address..">
+                        <input id="endpointInputBox" type="text" placeholder="Endpoint Address...">
                         <div id="endpointSuggBox" class="autocom-box">
                         </div>
                         <div id="endpointIcon" class="icon"><i class="fas fa-angle-down"></i></div>
