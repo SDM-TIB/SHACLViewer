@@ -1,10 +1,10 @@
-
-FROM python:3.8-slim-buster
+FROM python:3.12.1-slim-bookworm
 
 WORKDIR /SHACLViewer
 
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN python -m pip install --upgrade pip==24.0.* &&\
+    python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
