@@ -1,4 +1,4 @@
-Flask==3.0.2
+Flask==3.0.3
 Werkzeug==3.0.4
 rdflib==6.2.0
 TravSHACL==1.7.1
