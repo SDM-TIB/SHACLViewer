@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   lubm:
-    image: prohde/virtuoso-opensource-7:7.2.11
+    image: prohde/virtuoso-opensource-7:7.2.13
     container_name: lubm
     volumes:
       - ./data:/database/toLoad
