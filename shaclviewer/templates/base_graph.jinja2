@@ -974,7 +974,6 @@
                 low: 0,
                 med: 0,
                 high: 0,
-                allValid: 0,
                 add: function (node) { {# colorRange[ 0:unvalidated, 1:allValid, 2:low, 3:medium, 4:high ] #}
                     if (!this.validatedNodes.includes(node)) {
                         switch (true) {
@@ -991,7 +990,7 @@
                                 node.colorRange = 2;
                                 break;
                             case (node.validPercent === 100):
-                                this.allValid++;
+                                this.low++;
                                 node.colorRange = 1;
                                 break;
                         }
@@ -1019,7 +1018,7 @@
                                 node.colorRange = 2;
                                 break;
                             case (node.validPercent === 100):
-                                this.allValid++;
+                                this.low++;
                                 node.colorRange = 1;
                                 break;
                         }
@@ -1069,7 +1068,7 @@
                     {# fill validation data #}
                     statNode.innerHTML =
                         '<p>Valid Percentage:</p>'
-                        + "<p style=\'background: linear-gradient(90deg, rgb(0 90 255) 0%, rgb(0 90 255) " + shapeNode.validPercent + "%, rgb(192 0 0) " + shapeNode.validPercent + "%, rgb(192 0 0) 100%);\'"
+                        + "<p style=\'background: linear-gradient(90deg, rgb(0 192 0) 0%, rgb(0 192 0) " + shapeNode.validPercent + "%, rgb(192 0 0) " + shapeNode.validPercent + "%, rgb(192 0 0) 100%);\'"
                         + " class=\'powerbar\'>"
                         + shapeNode.validPercent + "%</p>"
                         + "<table><tr><td>Valid: " + shapeNode.valid + "</td><td>"
@@ -1107,7 +1106,7 @@
                     + "Medium: " + validationData.med + "</td><td>"
                     + "High: " + validationData.high + "</td></tr></table>"
                     + '<p>Validation Data:</p>'
-                    + "<p style=\'background: linear-gradient(90deg, rgb(13 110 253) 0%, rgb(13 110 253) " + validDataPercent
+                    + "<p style=\'background: linear-gradient(90deg, rgb(0 192 0) 0%, rgb(0 192 0) " + validDataPercent
                     + "%, rgb(192 0 0) " + validDataPercent
                     + "%, rgb(192 0 0) 100%);\'"
                     + " class=\'powerbar\'>"
