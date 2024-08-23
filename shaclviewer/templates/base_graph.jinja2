@@ -163,7 +163,7 @@
              #}
             {% for node in graph %}
                 {# add class/shape node #}
-                node_name = '{{ node.id }}';
+                node_name = '{{ node.id }}'.replace("<", "&lt;").replace(">", "&gt;");
                 if(node_name.includes('&lt;')) { node_name = node_name.substring(4, node_name.length -4)}
                 currentNode = {
                     id: '{{ node.id }}',
@@ -567,7 +567,7 @@
                         + '</p><p>Constraints targeting this shape: '
                         + node.statistics.partOff
                         + '</p><p>Target: '
-                        + node.targetDef + '</p>';
+                        + node.targetDef.replace("<", "&lt;").replace(">", "&gt;") + '</p>';
                 } else {
                     let range = "<p>"
                     if (node.min != "-1") {
