@@ -1,5 +1,6 @@
 import os
 
+from SPARQLWrapper import SPARQLWrapper, JSON
 from flask import Flask, render_template, request, jsonify
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
@@ -64,3 +65,16 @@ def validation_shacl_api():
 def reduce_shacl_api():
     node_order = only_reduce_shape_schema(request.form)
     return jsonify({'shapes': node_order})
+
+
+@app.route('/dataNode', methods=['POST'])
+def get_data_node():
+    query = request.form.get('query')
+    endpoint = request.form.get('endpoint')
+    if query is None or endpoint is None:
+        return jsonify({})
+    sparql = SPARQLWrapper(endpoint)
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    results = sparql.queryAndConvert()
+    return jsonify(results)

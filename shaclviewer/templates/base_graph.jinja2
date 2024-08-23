@@ -1740,40 +1740,25 @@
             function requestDataNode(shape, id, callbackSuccess, callbackFail) {
                 let endpoint = endpointInputBox.value,
                     query = getQueryString(shape, id);
-                $.ajax({
-                    dataType: "jsonp",
-                    url: endpoint + "?query=" + encodeURIComponent(query) + "&format=json",
-                    success: function (json, textStatus, jqXHR) {
-                        console.log("Show Data Graph request success")
-                        console.log(json)
-                        console.log(textStatus)
-                        console.log(jqXHR)
-                        callbackSuccess(json)
-                    },
-                    error: function (jqXHR, exception) {
-                        console.log("Show Data Graph request error:")
-                        console.log(jqXHR.status)
-                        console.log(exception)
-                        let msg = '';
-                        if (jqXHR.status === 0) {
-                            msg = ': Cannot connect to shaclAPI';
-                        } else if (jqXHR.status === 404) {
-                            msg = ': Requested page not found. [404]';
-                        } else if (jqXHR.status === 500) {
-                            msg = ': Internal Server Error [500].';
-                        } else if (exception === 'parsererror') {
-                            msg = ': Requested JSON parse failed.';
-                        } else if (exception === 'timeout') {
-                            msg = ': Time out error.';
-                        } else if (exception === 'abort') {
-                            msg = ': Ajax request aborted.';
-                        } else {
-                            msg = ': Uncaught Error.\n' + jqXHR.responseText;
-                        }
+
+                let data = new FormData();
+                data.append('query', query);
+                data.append('endpoint', endpoint)
+
+                const request = new Request('/dataNode', {
+                    method: 'POST',
+                    body: data,
+                });
+
+                fetch(request)
+                    .then(res => res.json())
+                    .then(res => { console.log('FetchAPI'); console.log(res); callbackSuccess(res)})
+                    .catch(err => {
+                        console.error(err);
+                        let msg = 'There has been an error, please, check the logs.';
                         $('#flash').append(flashMessage(msg, 'warning'));
                         callbackFail();
-                    }
-                });
+                    });
             }
 
             function getQueryString(shape, data) {
