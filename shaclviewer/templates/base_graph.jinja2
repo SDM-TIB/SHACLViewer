@@ -204,6 +204,7 @@
                             id: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
                             group: '{{ node.id }}',
                             text: '{{ link_node_name }}',
+                            predicate: '{{ link.pathURL }}',
                             min: '{{ link.min }}',
                             max: '{{ link.max }}',
                             isClass: false,
@@ -255,6 +256,7 @@
                             id: '{{ node.id }},{{ link_count.value }}-{{ link.path }}',
                             group: '{{ node.id }}',
                             text: '{{ link_node_name }}',
+                            predicate: '{{ link.pathURL }}',
                             min: '{{ link.min }}',
                             max: '{{ link.max }}',
                             isClass: false,
@@ -1775,20 +1777,17 @@
             }
 
             function getQueryString(shape, data) {
-                let query = 'SELECT DISTINCT ?p ?o WHERE { VALUES ?p {',
-                    prefix = shape.prefix.slice(0, -1); ///remove '>'
+                let query = 'SELECT DISTINCT ?p ?o WHERE { VALUES ?p { ';
 
                 shape.childLinks.forEach(link => {
                     if (link.linkType === 1 || link.linkType === 3) {
                         let constraint = getNodeFromLink(link.target);
-                        query += prefix + constraint.text + '> '
+                        query += constraint.predicate + ' '
                     }
                 })
 
-                query += '} OPTIONAL {<' + data + '>?p ?o }}'
-
-                console.log('getQueryString')
-                console.log(query)
+                query += '} OPTIONAL { <' + data + '> ?p ?o }}';
+                console.log('[getQueryString] Query: ' + query);
                 return query
             }
 

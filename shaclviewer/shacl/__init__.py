@@ -24,6 +24,7 @@ def prettify_graph(graph):
 
         # if it starts with "<http" it is a URL
         for constraint in node.constraints:
+            constraint.pathURL = constraint.path
             if constraint.path.startswith('<http'):
                 if '#' in constraint.path:
                     constraint.path = constraint.path.split('#')[-1][:-1]
