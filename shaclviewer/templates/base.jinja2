@@ -28,7 +28,7 @@
     <!-- custom script -->
     <script>
         const flashMessage = function (data, category) {
-            return '<div class="alert alert-' + category + '"><button type="button" class="m1-2 mb-1 close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&#x2715</span></button>' + data + '</div>';
+            return '<div class="alert alert-' + category + ' alert-dismissible" role="alert"><div>' + data + '</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></div>';
         };
     </script>
 
