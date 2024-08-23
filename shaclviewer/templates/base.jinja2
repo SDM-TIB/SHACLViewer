@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-bs-theme="dark">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -89,9 +89,11 @@
         if (checkbox.prop('checked')) {
             checkbox.prop('checked', false);
             document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.setAttribute('data-bs-theme', 'light');
         } else {
             checkbox.prop('checked', true);
             document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
         }
     }
 </script>

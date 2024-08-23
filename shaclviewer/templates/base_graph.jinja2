@@ -1512,10 +1512,12 @@
                     checkbox.prop('checked', false);
                     darkMode = false;
                     document.documentElement.setAttribute('data-theme', 'light');
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
                 } else {
                     checkbox.prop('checked', true);
                     darkMode = true;
                     document.documentElement.setAttribute('data-theme', 'dark');
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
                 }
 
                 // update graph
