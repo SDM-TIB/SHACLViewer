@@ -5,7 +5,7 @@
     "datatables.net-dt": "2.1.5",
     "force-graph": "1.43.5",
     "3d-force-graph": "1.73.3",
-    "three": "0.167.1",
+    "three": "0.168.0",
     "three-spritetext": "1.8.2",
     "simple-treeview": "0.0.9",
     "bootstrap": "5.3.3",
