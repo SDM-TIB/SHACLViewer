@@ -78,7 +78,7 @@ shutil.copytree(os.path.join(NPM_PATH, 'bootstrap-icons/font/fonts'), WEBFONTS_B
 Bundle(
     NPM_PATH + 'datatables.net/js/dataTables.min.js',
     filters='rjsmin',
-    output=JS_PATH + 'jquery.dataTables.min.js',
+    output=JS_PATH + 'dataTables.min.js',
     name='DataTables JS'
 ).build()
 
