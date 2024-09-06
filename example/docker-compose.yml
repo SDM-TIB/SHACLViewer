@@ -11,7 +11,9 @@ services:
 
   shaclviewer:
     image: sdmtib/shaclviewer:edge
-    build: ..
+    build:
+      context: ../
+      dockerfile: Dockerfile-alpine
     container_name: shaclviewer
     volumes:
       - ./shapes:/shapes
