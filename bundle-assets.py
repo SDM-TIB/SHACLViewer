@@ -86,7 +86,7 @@ Bundle(
 Bundle(
     NPM_PATH + 'datatables.net-dt/css/dataTables.dataTables.min.css',
     filters='cssmin',
-    output=CSS_PATH + 'jquery.dataTables.min.css',
+    output=CSS_PATH + 'dataTables.min.css',
     name='DataTables CSS'
 ).build()
 
