@@ -3,7 +3,7 @@ FROM python:3.12.8-slim-bookworm
 WORKDIR /SHACLViewer
 
 COPY requirements.txt requirements.txt
-RUN python -m pip install --upgrade pip==24.2.* &&\
+RUN python -m pip install --upgrade pip==25.0.* &&\
     python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
