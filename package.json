@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "jquery": "3.7.1",
-    "datatables.net": "2.2.1",
-    "datatables.net-dt": "2.2.1",
+    "datatables.net": "2.2.2",
+    "datatables.net-dt": "2.2.2",
     "force-graph": "1.49.0",
     "3d-force-graph": "1.76.0",
     "three": "0.173.0",
