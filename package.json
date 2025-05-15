@@ -3,7 +3,7 @@
     "jquery": "3.7.1",
     "datatables.net": "2.3.0",
     "datatables.net-dt": "2.3.0",
-    "force-graph": "1.49.5",
+    "force-graph": "1.49.6",
     "3d-force-graph": "1.77.0",
     "three": "0.176.0",
     "three-spritetext": "1.9.6",
