@@ -15,6 +15,13 @@ docker-compose -f example/docker-compose.yml up -d
 
 The SHACLViewer is then served at [http://localhost:5001](http://localhost:5001).
 
+> [!NOTE]
+> If you receive a message from Docker saying `shaclviewer Warning pull access denied for sdmtib/shaclviewer, repository does not exist or may require 'docker login'`, this is caused by us not puhsing any image of the SHACLViewer yet.
+> You can fix it by building the image yourself by running:
+> ```bash
+> docker-compose -f example/docker-compose.yml up -d --build
+> ```
+
 Alternatively, the example can be started or stopped with their respective commands as follows:
 
 ```bash
