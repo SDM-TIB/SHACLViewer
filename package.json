@@ -10,6 +10,6 @@
     "simple-treeview": "0.0.9",
     "bootstrap": "5.3.8",
     "bootstrap-icons": "1.13.1",
-    "@fortawesome/fontawesome-free": "7.0.0"
+    "@fortawesome/fontawesome-free": "7.0.1"
   }
 }
