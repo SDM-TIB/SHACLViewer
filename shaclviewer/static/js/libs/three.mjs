@@ -106,7 +106,7 @@ return texture;}
 function onTextureDispose(event){const texture=event.target;texture.removeEventListener('dispose',onTextureDispose);const cubemap=cubemaps.get(texture);if(cubemap!==undefined){cubemaps.delete(texture);cubemap.dispose();}}
 function dispose(){cubemaps=new WeakMap();}
 return{get:get,dispose:dispose};}
-const LOD_MIN=4;const EXTRA_LOD_SIGMA=[0.125,0.215,0.35,0.446,0.526,0.582];const MAX_SAMPLES=20;const GGX_SAMPLES=512;const _flatCamera=new OrthographicCamera();const _clearColor=new Color();let _oldTarget=null;let _oldActiveCubeFace=0;let _oldActiveMipmapLevel=0;let _oldXrEnabled=false;const _origin=new Vector3();class PMREMGenerator{constructor(renderer){this._renderer=renderer;this._pingPongRenderTarget=null;this._lodMax=0;this._cubeSize=0;this._sizeLods=[];this._sigmas=[];this._lodMeshes=[];this._backgroundBox=null;this._cubemapMaterial=null;this._equirectMaterial=null;this._blurMaterial=null;this._ggxMaterial=null;}
+const LOD_MIN=4;const EXTRA_LOD_SIGMA=[0.125,0.215,0.35,0.446,0.526,0.582];const MAX_SAMPLES=20;const GGX_SAMPLES=256;const _flatCamera=new OrthographicCamera();const _clearColor=new Color();let _oldTarget=null;let _oldActiveCubeFace=0;let _oldActiveMipmapLevel=0;let _oldXrEnabled=false;const _origin=new Vector3();class PMREMGenerator{constructor(renderer){this._renderer=renderer;this._pingPongRenderTarget=null;this._lodMax=0;this._cubeSize=0;this._sizeLods=[];this._sigmas=[];this._lodMeshes=[];this._backgroundBox=null;this._cubemapMaterial=null;this._equirectMaterial=null;this._blurMaterial=null;this._ggxMaterial=null;}
 fromScene(scene,sigma=0,near=0.1,far=100,options={}){const{size=256,position=_origin,}=options;_oldTarget=this._renderer.getRenderTarget();_oldActiveCubeFace=this._renderer.getActiveCubeFace();_oldActiveMipmapLevel=this._renderer.getActiveMipmapLevel();_oldXrEnabled=this._renderer.xr.enabled;this._renderer.xr.enabled=false;this._setSize(size);const cubeUVRenderTarget=this._allocateTargets();cubeUVRenderTarget.depthBuffer=true;this._sceneToCubeUV(scene,near,far,cubeUVRenderTarget,position);if(sigma>0){this._blur(cubeUVRenderTarget,0,0,sigma);}
 this._applyPMREM(cubeUVRenderTarget);this._cleanup(cubeUVRenderTarget);return cubeUVRenderTarget;}
 fromEquirectangular(equirectangular,renderTarget=null){return this._fromTexture(equirectangular,renderTarget);}
@@ -154,8 +154,8 @@ function _createRenderTarget(width,height,params){const cubeUVRenderTarget=new W
 function _setViewport(target,x,y,width,height){target.viewport.set(x,y,width,height);target.scissor.set(x,y,width,height);}
 function _getGGXShader(lodMax,width,height){const shaderMaterial=new ShaderMaterial({name:'PMREMGGXConvolution',defines:{'GGX_SAMPLES':GGX_SAMPLES,'CUBEUV_TEXEL_WIDTH':1.0/width,'CUBEUV_TEXEL_HEIGHT':1.0/height,'CUBEUV_MAX_MIP':`${lodMax}.0`,},uniforms:{'envMap':{value:null},'roughness':{value:0.0},'mipInt':{value:0}},vertexShader:_getCommonVertexShader(),fragmentShader:`
 
-			precision mediump float;
-			precision mediump int;
+			precision highp float;
+			precision highp int;
 
 			varying vec3 vOutputDirection;
 
