@@ -114,6 +114,13 @@ Bundle(
     name='Three'
 ).build()
 
+Bundle(
+    NPM_PATH + 'three/build/three.core.js',
+    filters='rjsmin',
+    output=JS_PATH + 'three.core.js',
+    name='ThreeCore'
+).build()
+
 # three-CSS2DRenderer
 Bundle(
     NPM_PATH + 'three/examples/jsm/renderers/CSS2DRenderer.js',
