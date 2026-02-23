@@ -1152,7 +1152,7 @@
 
             let hideUnrelatedClasses = false;
             document.querySelector('#hideUnrelatedClasses').onclick = () => {
-                const checkbox = $("#hideUnrelatedClasses").find('input:checkbox:first');
+                const checkbox = $("#hideUnrelatedClasses").find('input[type="checkbox"]').first();
                 console.log('hideUnrelatedClasses| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 {# check selected node #}
@@ -1195,7 +1195,7 @@
 
             let highlightSelectedNode = true;
             document.querySelector('#highlightSelectedNode').onclick = () => {
-                const checkbox = $("#highlightSelectedNode").find('input:checkbox:first');
+                const checkbox = $("#highlightSelectedNode").find('input[type="checkbox"]').first();
                 console.log('highlightSelectedNode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 if (highlightSelectedNode) {
@@ -1314,7 +1314,7 @@
             }
 
             document.querySelector('#hideAttributes').onclick = () => {
-                const checkbox = $("#hideAttributes").find('input:checkbox:first');
+                const checkbox = $("#hideAttributes").find('input[type="checkbox"]').first();
                 console.log('hideAttributes| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 if (hideAttributes) {
@@ -1504,7 +1504,7 @@
 
             let darkMode = true;
             document.querySelector('#darkMode').onclick = () => {
-                const checkbox = $("#darkMode").find('input:checkbox:first');
+                const checkbox = $("#darkMode").find('input[type="checkbox"]').first();
                 console.log('darkMode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
 
                 if (darkMode) {

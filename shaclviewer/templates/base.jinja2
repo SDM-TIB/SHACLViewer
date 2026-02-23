@@ -84,7 +84,7 @@
 
 <script>
     document.querySelector('#darkMode').onclick = () => {
-        const checkbox = $("#darkMode").find('input:checkbox:first');
+        const checkbox = $("#darkMode").find('input[type="checkbox"]').first();
         console.log('darkMode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
         if (checkbox.prop('checked')) {
             checkbox.prop('checked', false);
