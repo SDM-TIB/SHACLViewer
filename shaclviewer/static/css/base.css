@@ -131,3 +131,8 @@ input:checked + .slider:before {
 .mr-auto {
     margin-right: auto !important;
 }
+
+body {
+    background-color: var(--main-background);
+    color: var(--search-input);
+}

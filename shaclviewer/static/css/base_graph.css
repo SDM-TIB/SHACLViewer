@@ -3,6 +3,10 @@
     position: absolute;
 }
 
+body {
+    margin: 0;
+}
+
 .alert {
     z-index: 1;
     margin-left: 50vw;

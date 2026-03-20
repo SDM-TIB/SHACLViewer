@@ -1,61 +1,7 @@
 {% extends 'base.jinja2' %}
 
 {% block headbase %}
-    <style>
-        .main {
-            padding: 10px;
-        }
-    </style>
-    <style>
-        .card {
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-            width: 23%;
-            background: var(--sidenav-background-inactive);
-            display: inline-flex;
-            margin: 1% 1% 1% 0%;
-        }
-
-        .card [data-theme="light"] {
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-            width: 23%;
-            background: var(--accordion-btn);
-            display: inline-flex;
-            margin: 1% 1% 1% 0%;
-        }
-
-        .card.folder {
-            width: 23%;
-        }
-
-        .card a {
-            text-decoration: none;
-        }
-
-        .card:hover {
-            box-shadow: 0 8px 16px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .card:hover [data-theme="light"] {
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .container {
-            padding: 20px 16px 2px 16px;
-            color: var(--sidenav-text);
-            text-decoration: none;
-            display: block;
-        }
-
-        .container > p {
-            padding-left: 35px;
-        }
-
-        .icon {
-            padding-right: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
 
 {% block title %}

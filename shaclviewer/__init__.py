@@ -9,6 +9,39 @@ from shaclviewer.shacl.ShapeParser import ShapeParser
 
 app = Flask(__name__)
 
+
+def _graph_to_json(graph):
+    """Serialize a parsed SHACL graph to a JSON-safe list of dicts.
+
+    This replaces the Jinja2 loop-based data-injection that previously built
+    JS arrays inline in the templates.  The result is embedded as a JSON data
+    island (<script type="application/json">) that graph_2d.js / graph_3d.js
+    read with JSON.parse() — keeping all data-wrangling out of the templates.
+    """
+    return [
+        {
+            "id":          node.id,
+            "targetQuery": node.targetQuery,
+            "prefixes":    node.prefixes,
+            "targetDef":   node.targetDef,
+            "constraints": [
+                {
+                    "path":     c.path,
+                    "pathURL":  c.pathURL,
+                    "min":      str(c.min),
+                    "max":      str(c.max),
+                    # Python None / the string "None" both become JSON null so
+                    # the JS side can do  `constraint.shapeRef === null`
+                    "shapeRef": None if (c.shapeRef is None or str(c.shapeRef) == "None")
+                                     else c.shapeRef,
+                }
+                for c in node.constraints
+            ],
+        }
+        for node in graph
+    ]
+
+
 @app.route("/graph3d")
 def graph3d():
     path = request.args.get('path')
@@ -16,7 +49,10 @@ def graph3d():
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     prettify_graph(graph)
 
-    return render_template('graph_3d.jinja2', graph=graph)
+    return render_template(
+        'graph_3d.jinja2',
+        graph_json=_graph_to_json(graph),
+    )
 
 
 @app.route("/graph2d")
@@ -26,7 +62,10 @@ def graph2d():
     graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
     prettify_graph(graph)
 
-    return render_template('graph_2d.jinja2', graph=graph)
+    return render_template(
+        'graph_2d.jinja2',
+        graph_json=_graph_to_json(graph),
+    )
 
 
 @app.route("/")

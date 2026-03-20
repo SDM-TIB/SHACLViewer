@@ -8,9 +8,11 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "{{ url_for('static', filename='js/libs/three.mjs') }}",
-          "CSS2DRenderer": "{{ url_for('static', filename='js/libs/three-CSS2DRenderer.mjs') }}",
-          "SpriteText": "{{ url_for('static', filename='js/libs/three-spritetext.mjs') }}"
+          "three":          "{{ url_for('static', filename='js/libs/three.mjs') }}",
+          "CSS2DRenderer":  "{{ url_for('static', filename='js/libs/three-CSS2DRenderer.mjs') }}",
+          "SpriteText":     "{{ url_for('static', filename='js/libs/three-spritetext.mjs') }}",
+          "simple-treeview":"{{ url_for('static', filename='js/libs/simple-treeview.bootstrap.min.js') }}",
+          "graph_shared":   "{{ url_for('static', filename='js/graph_shared.js') }}"
         }
       }
     </script>
@@ -18,21 +20,16 @@
     <!-- JQuery -->
     <script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
 
-    <!-- font icon -->
+    <!-- Font icons -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
 
-    <!-- bootstrap -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
 
-    <!-- custom script -->
-    <script>
-        const flashMessage = function (data, category) {
-            return '<div class="alert alert-' + category + ' alert-dismissible" role="alert"><div>' + data + '</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></div>';
-        };
-    </script>
-
+    <!-- Base styles and utilities (flashMessage helper, dark-mode toggle) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <script defer src="{{ url_for('static', filename='js/base.js') }}"></script>
 
     {% block headbase %}{% endblock %}
     {% block title %}<title>SHACLViewer</title>{% endblock %}
@@ -75,26 +72,4 @@
 {% block body %}{% endblock %}
 
 </body>
-<style>
-    body {
-        background-color: var(--main-background);
-        color: var(--search-input);
-    }
-</style>
-
-<script>
-    document.querySelector('#darkMode').onclick = () => {
-        const checkbox = $("#darkMode").find('input[type="checkbox"]').first();
-        console.log('darkMode| checkbox.prop(\'checked\')| ' + checkbox.prop('checked'));
-        if (checkbox.prop('checked')) {
-            checkbox.prop('checked', false);
-            document.documentElement.setAttribute('data-theme', 'light');
-            document.documentElement.setAttribute('data-bs-theme', 'light');
-        } else {
-            checkbox.prop('checked', true);
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-        }
-    }
-</script>
 </html>
