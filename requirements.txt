@@ -3,4 +3,4 @@ Werkzeug==3.1.7
 rdflib==6.3.2
 TravSHACL==1.9.0
 shaclapi==0.12.0
-requests==2.32.5
+requests==2.33.0
