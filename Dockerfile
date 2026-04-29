@@ -3,7 +3,7 @@ FROM python:3.12.13-slim-trixie
 WORKDIR /SHACLViewer
 
 COPY requirements.txt requirements.txt
-RUN python -m pip install --upgrade pip==26.0.* &&\
+RUN python -m pip install --upgrade pip==26.1.* &&\
     python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
