@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block title %}
-    <title>{{ request.args.get("path") }} Graph</title>
+    <title>{{ request.args.get("path") | escape }} Graph</title>
 {% endblock %}
 
 {% block body %}
