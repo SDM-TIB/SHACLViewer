@@ -1,13 +1,24 @@
 import os
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, abort
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
 from shaclviewer.shacl import prettify_graph
 from shaclviewer.shacl.ShapeParser import ShapeParser
 
 app = Flask(__name__)
+
+SHAPES_DIR = os.path.realpath('/shapes')
+
+
+def _resolve_shapes_path(path):
+    """Resolve a user-supplied sub-path under SHAPES_DIR, rejecting any
+    attempt (e.g. via '../') to escape outside of the shapes directory."""
+    candidate = os.path.realpath(os.path.join(SHAPES_DIR, (path or '').strip('/')))
+    if candidate != SHAPES_DIR and not candidate.startswith(SHAPES_DIR + os.sep):
+        abort(400)
+    return candidate
 
 
 def _graph_to_json(graph):
@@ -46,7 +57,7 @@ def _graph_to_json(graph):
 def graph3d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
-    graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
+    graph = shape_parser.parse_shapes_from_dir(_resolve_shapes_path(path) + '/')
     prettify_graph(graph)
 
     return render_template(
@@ -59,7 +70,7 @@ def graph3d():
 def graph2d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
-    graph = shape_parser.parse_shapes_from_dir('/shapes/' + path + '/')
+    graph = shape_parser.parse_shapes_from_dir(_resolve_shapes_path(path) + '/')
     prettify_graph(graph)
 
     return render_template(
@@ -73,10 +84,9 @@ def home_page():
     path = request.args.get('path')
     if path is None:
         path = "/"
-        full_path = "/shapes/"
     else:
         path = path + "/"
-        full_path = "/shapes/" + path + "/"
+    full_path = _resolve_shapes_path(path) + "/"
 
     folders = sorted(os.listdir(full_path))
     data = []
