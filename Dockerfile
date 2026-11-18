@@ -1,4 +1,4 @@
-FROM python:3.12.13-slim-trixie
+FROM python:3.12.16-slim-trixie
 
 WORKDIR /SHACLViewer
 
