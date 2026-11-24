@@ -1,7 +1,8 @@
 import os
+import tempfile
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from flask import Blueprint, Flask, render_template, request, jsonify, abort
+from flask import Blueprint, Flask, abort, current_app, jsonify, render_template, request
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
 from shaclviewer.shacl import prettify_graph
@@ -14,16 +15,48 @@ bp = Blueprint(
     static_url_path='/static',  # served below the blueprint's url_prefix
 )
 
-SHAPES_DIR = os.path.realpath('/shapes')
+DEFAULT_SHAPES_DIR = '/shapes'
+DEFAULT_OUTPUT_DIR = os.path.join(tempfile.gettempdir(), 'shaclviewer-output')
+
+# Parameters of the shaclAPI that must never be taken from the client:
+# the schema location (and the config file, which can point anywhere on the
+# file system) as well as the output location are decided by the server.
+_SERVER_CONTROLLED_PARAMS = (
+    'config',
+    'schemaDir', 'schema_directory',
+    'outputDirectory', 'output_directory',
+)
+
+
+def _shapes_dir():
+    return os.path.realpath(current_app.config['SHACLVIEWER_SHAPES_DIR'])
 
 
 def _resolve_shapes_path(path):
-    """Resolve a user-supplied sub-path under SHAPES_DIR, rejecting any
-    attempt (e.g. via '../') to escape outside of the shapes directory."""
-    candidate = os.path.realpath(os.path.join(SHAPES_DIR, (path or '').strip('/')))
-    if candidate != SHAPES_DIR and not candidate.startswith(SHAPES_DIR + os.sep):
+    """Resolve a user-supplied sub-path under the shapes directory, rejecting
+    any attempt (e.g. via '../') to escape outside of it."""
+    shapes_dir = _shapes_dir()
+    candidate = os.path.realpath(os.path.join(shapes_dir, (path or '').strip('/')))
+    if candidate != shapes_dir and not candidate.startswith(shapes_dir + os.sep):
         abort(400)
     return candidate
+
+
+def _shaclapi_params():
+    """Build the parameters for the shaclAPI from the request.
+
+    The client only names the shape schema by its path relative to the shapes
+    directory (parameter `path`). The absolute locations are set here.
+    """
+    params = request.form.to_dict()
+    path = params.pop('path', None)
+    if path is None:
+        abort(400)
+    for key in _SERVER_CONTROLLED_PARAMS:
+        params.pop(key, None)
+    params['schemaDir'] = _resolve_shapes_path(path)
+    params['outputDirectory'] = current_app.config['SHACLVIEWER_OUTPUT_DIR']
+    return params
 
 
 def _graph_to_json(graph):
@@ -112,12 +145,12 @@ def home_page():
 
 @bp.route('/validation', methods=['POST'])
 def validation_shacl_api():
-    return validation_and_statistics(request.form)
+    return validation_and_statistics(_shaclapi_params())
 
 
 @bp.route('/reduce', methods=['POST'])
 def reduce_shacl_api():
-    node_order = only_reduce_shape_schema(request.form)
+    node_order = only_reduce_shape_schema(_shaclapi_params())
     return jsonify({'shapes': node_order})
 
 
@@ -134,19 +167,38 @@ def get_data_node():
     return jsonify(results)
 
 
-def init_app(app, url_prefix='/shaclviewer'):
+def init_app(app, url_prefix='/shaclviewer', shapes_dir=None, output_dir=None):
     """Mount the SHACLViewer into an existing Flask application.
 
     :param app: the Flask application to register the viewer with
     :param url_prefix: the URL below which the viewer is served; use '/' to
                        serve it at the root of the application
+    :param shapes_dir: directory containing the SHACL shape schemas to
+                       visualize; defaults to the environment variable
+                       SHACLVIEWER_SHAPES_DIR or, if unset, '/shapes'
+    :param output_dir: directory the shaclAPI may write its output to;
+                       defaults to the environment variable
+                       SHACLVIEWER_OUTPUT_DIR or, if unset, a directory in
+                       the system's temporary directory
     """
+    # explicit argument > value already in app.config > environment > default
+    for key, value, env, default in (
+            ('SHACLVIEWER_SHAPES_DIR', shapes_dir, 'SHACLVIEWER_SHAPES_DIR', DEFAULT_SHAPES_DIR),
+            ('SHACLVIEWER_OUTPUT_DIR', output_dir, 'SHACLVIEWER_OUTPUT_DIR', DEFAULT_OUTPUT_DIR),
+    ):
+        if value is not None:
+            app.config[key] = value
+        else:
+            app.config.setdefault(key, os.environ.get(env, default))
     app.register_blueprint(bp, url_prefix=url_prefix)
 
 
-def create_app():
-    """Create a standalone Flask application serving only the SHACLViewer."""
+def create_app(**config):
+    """Create a standalone Flask application serving only the SHACLViewer.
+
+    Keyword arguments (`shapes_dir`, `output_dir`) are passed to `init_app`.
+    """
     # The blueprint ships its own static files, so the app needs none.
     app = Flask(__name__, static_folder=None)
-    init_app(app, url_prefix='/')
+    init_app(app, url_prefix='/', **config)
     return app

@@ -632,9 +632,8 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
 
         const requestConfig = {
             external_endpoint: endpoint,
-            outputDirectory:   './output/',
             query:             `PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>${node.query}`,
-            schemaDir:         '/shapes' + config.path,
+            path:              config.path,
             targetShape:       node.id.replace('&lt;', '<').replace('&gt;', '>'),
             backend:           'travshacl',
             output_format:     'test'
