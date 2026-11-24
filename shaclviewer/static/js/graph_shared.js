@@ -662,7 +662,7 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
         };
 
         const request_validation = $.ajax({
-            url:  '/validation',
+            url:  config.urls.validation,
             type: 'POST',
             data: requestConfig,
             success(data) {
@@ -694,7 +694,7 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
         node.colorRange = 5;
 
         $.ajax({
-            url:  '/reduce',
+            url:  config.urls.reduce,
             type: 'POST',
             data: requestConfig,
             success(data) {
@@ -1131,7 +1131,7 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
         const formData = new FormData();
         formData.append('query',    getQueryString(shape, id));
         formData.append('endpoint', endpoint);
-        fetch(new Request('/dataNode', { method: 'POST', body: formData }))
+        fetch(new Request(config.urls.dataNode, { method: 'POST', body: formData }))
             .then(res  => res.json())
             .then(res  => callbackSuccess(res))
             .catch(err => {
