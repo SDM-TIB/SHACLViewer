@@ -1,13 +1,18 @@
 import os
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from flask import Flask, render_template, request, jsonify, abort
+from flask import Blueprint, Flask, render_template, request, jsonify, abort
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
 from shaclviewer.shacl import prettify_graph
 from shaclviewer.shacl.ShapeParser import ShapeParser
 
-app = Flask(__name__)
+bp = Blueprint(
+    'shaclviewer', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/static',  # served below the blueprint's url_prefix
+)
 
 SHAPES_DIR = os.path.realpath('/shapes')
 
@@ -53,7 +58,7 @@ def _graph_to_json(graph):
     ]
 
 
-@app.route("/graph3d")
+@bp.route("/graph3d")
 def graph3d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
@@ -66,7 +71,7 @@ def graph3d():
     )
 
 
-@app.route("/graph2d")
+@bp.route("/graph2d")
 def graph2d():
     path = request.args.get('path')
     shape_parser = ShapeParser()
@@ -79,7 +84,7 @@ def graph2d():
     )
 
 
-@app.route("/")
+@bp.route("/")
 def home_page():
     path = request.args.get('path')
     if path is None:
@@ -105,18 +110,18 @@ def home_page():
     return render_template('home.jinja2', data=data)
 
 
-@app.route('/validation', methods=['POST'])
+@bp.route('/validation', methods=['POST'])
 def validation_shacl_api():
     return validation_and_statistics(request.form)
 
 
-@app.route('/reduce', methods=['POST'])
+@bp.route('/reduce', methods=['POST'])
 def reduce_shacl_api():
     node_order = only_reduce_shape_schema(request.form)
     return jsonify({'shapes': node_order})
 
 
-@app.route('/dataNode', methods=['POST'])
+@bp.route('/dataNode', methods=['POST'])
 def get_data_node():
     query = request.form.get('query')
     endpoint = request.form.get('endpoint')
@@ -127,3 +132,21 @@ def get_data_node():
     sparql.setReturnFormat(JSON)
     results = sparql.queryAndConvert()
     return jsonify(results)
+
+
+def init_app(app, url_prefix='/shaclviewer'):
+    """Mount the SHACLViewer into an existing Flask application.
+
+    :param app: the Flask application to register the viewer with
+    :param url_prefix: the URL below which the viewer is served; use '/' to
+                       serve it at the root of the application
+    """
+    app.register_blueprint(bp, url_prefix=url_prefix)
+
+
+def create_app():
+    """Create a standalone Flask application serving only the SHACLViewer."""
+    # The blueprint ships its own static files, so the app needs none.
+    app = Flask(__name__, static_folder=None)
+    init_app(app, url_prefix='/')
+    return app

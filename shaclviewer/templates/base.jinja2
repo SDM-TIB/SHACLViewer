@@ -8,35 +8,35 @@
     <script type="importmap">
       {
         "imports": {
-          "three":          "{{ url_for('static', filename='js/libs/three.mjs') }}",
-          "CSS2DRenderer":  "{{ url_for('static', filename='js/libs/three-CSS2DRenderer.mjs') }}",
-          "SpriteText":     "{{ url_for('static', filename='js/libs/three-spritetext.mjs') }}",
-          "simple-treeview":"{{ url_for('static', filename='js/libs/simple-treeview.bootstrap.min.js') }}",
-          "graph_shared":   "{{ url_for('static', filename='js/graph_shared.js') }}"
+          "three":          "{{ url_for('shaclviewer.static', filename='js/libs/three.mjs') }}",
+          "CSS2DRenderer":  "{{ url_for('shaclviewer.static', filename='js/libs/three-CSS2DRenderer.mjs') }}",
+          "SpriteText":     "{{ url_for('shaclviewer.static', filename='js/libs/three-spritetext.mjs') }}",
+          "simple-treeview":"{{ url_for('shaclviewer.static', filename='js/libs/simple-treeview.bootstrap.min.js') }}",
+          "graph_shared":   "{{ url_for('shaclviewer.static', filename='js/graph_shared.js') }}"
         }
       }
     </script>
 
     <!-- JQuery -->
-    <script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
+    <script src="{{ url_for('shaclviewer.static', filename='js/libs/jquery.min.js') }}"></script>
 
     <!-- Font icons -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('shaclviewer.static', filename='css/fontawesome.all.min.css') }}">
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('shaclviewer.static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('shaclviewer.static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Base styles and utilities (flashMessage helper, dark-mode toggle) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <script defer src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('shaclviewer.static', filename='css/base.css') }}">
+    <script defer src="{{ url_for('shaclviewer.static', filename='js/base.js') }}"></script>
 
     {% block headbase %}{% endblock %}
     {% block title %}<title>SHACLViewer</title>{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="{{ url_for('home_page') }}">SHACL Viewer</a>
+    <a class="navbar-brand" href="{{ url_for('shaclviewer.home_page') }}">SHACL Viewer</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
     </button>

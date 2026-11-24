@@ -1,10 +1,10 @@
 {% include 'base.jinja2' %}
 {% block headbase %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_graph.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('shaclviewer.static', filename='css/base_graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('shaclviewer.static', filename='css/dataTables.min.css') }}">
 
-    <script src="{{ url_for('static', filename='js/libs/dataTables.min.js') }}"></script>
+    <script src="{{ url_for('shaclviewer.static', filename='js/libs/dataTables.min.js') }}"></script>
 
     {% block head %}{% endblock %}
 {% endblock %}

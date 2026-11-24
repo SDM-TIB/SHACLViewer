@@ -1,8 +1,8 @@
 {% extends 'base_graph.jinja2' %}
 
-{% block alt_view_url %}"{{ url_for('graph3d') }}"{% endblock %}
+{% block alt_view_url %}"{{ url_for('shaclviewer.graph3d') }}"{% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/libs/force-graph.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/graph_2d.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('shaclviewer.static', filename='js/libs/force-graph.min.js') }}"></script>
+    <script type="module" src="{{ url_for('shaclviewer.static', filename='js/graph_2d.js') }}"></script>
 {% endblock %}
