@@ -99,7 +99,7 @@ def graph3d():
     prettify_graph(graph)
 
     return render_template(
-        'graph_3d.jinja2',
+        'shaclviewer/graph_3d.jinja2',
         graph_json=_graph_to_json(graph),
     )
 
@@ -112,7 +112,7 @@ def graph2d():
     prettify_graph(graph)
 
     return render_template(
-        'graph_2d.jinja2',
+        'shaclviewer/graph_2d.jinja2',
         graph_json=_graph_to_json(graph),
     )
 
@@ -140,7 +140,7 @@ def home_page():
             "filecount": len(os.listdir(full_path + name))
         })
 
-    return render_template('home.jinja2', data=data)
+    return render_template('shaclviewer/home.jinja2', data=data)
 
 
 @bp.route('/validation', methods=['POST'])
