@@ -2,9 +2,9 @@ FROM python:3.12.16-slim-trixie
 
 WORKDIR /SHACLViewer
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt constraints.txt ./
 RUN python -m pip install --upgrade pip==26.3.* &&\
-    python -m pip install --no-cache-dir -r requirements.txt
+    python -m pip install --no-cache-dir -r requirements.txt -c constraints.txt
 
 COPY . .
 

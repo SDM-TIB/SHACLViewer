@@ -1,6 +1,8 @@
-Flask==3.1.3
-Werkzeug==3.1.9
-rdflib==7.6.0
-TravSHACL==1.10.0
-shaclapi==0.13.0
-requests==2.34.2
+# Direct dependencies of the SHACLViewer, with compatible ranges so that the
+# viewer can be installed next to other packages in a host application.
+# For reproducible builds (e.g., the Docker images) use constraints.txt:
+#   pip install -r requirements.txt -c constraints.txt
+Flask>=3.0,<4
+SPARQLWrapper>=2.0,<3
+TravSHACL>=1.10,<2
+shaclapi>=0.13,<1
