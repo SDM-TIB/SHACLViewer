@@ -3,6 +3,7 @@
 # For reproducible builds (e.g., the Docker images) use constraints.txt:
 #   pip install -r requirements.txt -c constraints.txt
 Flask>=3.0,<4
+rdflib>=7.0,<8
 SPARQLWrapper>=2.0,<3
 TravSHACL>=1.10,<2
 shaclapi>=0.13,<1

@@ -3,6 +3,7 @@ import tempfile
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from flask import Blueprint, Flask, abort, current_app, jsonify, render_template, request
+from rdflib.plugins.sparql.parser import parseQuery
 from shaclapi.api import validation_and_statistics, only_reduce_shape_schema
 
 from shaclviewer.shacl import prettify_graph
@@ -42,6 +43,22 @@ def _resolve_shapes_path(path):
     return candidate
 
 
+def _is_select_query(query):
+    """Return True only if `query` is a single, syntactically valid SPARQL
+    SELECT query.
+
+    SPARQLWrapper decides based on the query text whether to send a request
+    to the query or the update endpoint, so forwarding unchecked queries
+    would let a client modify the data of the endpoint (e.g., `DROP ALL`).
+    Parsing with the SPARQL grammar is exact: updates, other query forms, and
+    anything appended to a SELECT query (e.g., `; DROP ALL`) are rejected.
+    """
+    try:
+        return parseQuery(query)[1].name == 'SelectQuery'
+    except Exception:
+        return False
+
+
 def _shaclapi_params():
     """Build the parameters for the shaclAPI from the request.
 
@@ -54,6 +71,8 @@ def _shaclapi_params():
         abort(400)
     for key in _SERVER_CONTROLLED_PARAMS:
         params.pop(key, None)
+    if 'query' in params and not _is_select_query(params['query']):
+        abort(400)
     params['schemaDir'] = _resolve_shapes_path(path)
     params['outputDirectory'] = current_app.config['SHACLVIEWER_OUTPUT_DIR']
     return params
@@ -160,6 +179,8 @@ def get_data_node():
     endpoint = request.form.get('endpoint')
     if query is None or endpoint is None:
         return jsonify({})
+    if not _is_select_query(query):
+        abort(400)
     sparql = SPARQLWrapper(endpoint)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
