@@ -643,6 +643,8 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
         const ajaxError = (jqXHR, exception, targetNode) => {
             const errorMap = {
                 0:   ': Cannot connect to shaclAPI',
+                400: ': Invalid request [400].',
+                403: ': The endpoint is not allowed [403].',
                 404: ': Requested page not found. [404]',
                 500: ': Internal Server Error [500].'
             };
@@ -769,14 +771,14 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
     const suggBox       = searchWrapper.querySelector('#search-sugg');
 
     function renderSuggestions(targetBox, list, fallback) {
-        targetBox.innerHTML = list.length ? list.join('') : `<li>${fallback}</li>`;
+        targetBox.innerHTML = list.length ? list.join('') : `<li>${escapeHtml(fallback)}</li>`;
     }
 
     function suggest(e) {
         const userData  = e.target.value;
         const filtered  = suggestions
             .filter(d => userData ? d.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()) : true)
-            .map(d => `<li>${d}</li>`);
+            .map(d => `<li>${escapeHtml(d)}</li>`);
         searchWrapper.classList.add('active');
         renderSuggestions(suggBox, filtered.sort(), userData);
 
@@ -822,17 +824,19 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
     const endpointInputBox = endpointWrapper.querySelector('#endpointInputBox');
     const endpointSuggBox  = endpointWrapper.querySelector('#endpointSuggBox');
     const endpointIcon     = endpointWrapper.querySelector('#endpointIcon');
-    const defaultEndpoints = [
+    // If the server restricts the endpoints, only those are offered
+    const defaultEndpoints = config.endpoints || [
         'http://host.docker.internal:9000/sparql',
         'http://127.0.0.1:9000/sparql',
         'http://192.168.111.1:14000/sparql'
     ];
     saveToCacheDefaultValues(endpointInputBox.id, defaultEndpoints);
+    if (config.endpoints?.length === 1) endpointInputBox.value = config.endpoints[0];
 
     function endpointSuggest(userData) {
         const filtered = getFromCache(endpointInputBox.id)
             .filter(d => userData ? d.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()) : true)
-            .map(d => `<li>${d}</li>`);
+            .map(d => `<li>${escapeHtml(d)}</li>`);
         endpointWrapper.classList.add('active');
         renderSuggestions(endpointSuggBox, filtered.sort(), userData || '');
         endpointSuggBox.querySelectorAll('li').forEach(li => {

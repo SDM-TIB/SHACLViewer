@@ -1,5 +1,6 @@
 import os
 import tempfile
+from urllib.parse import urlsplit
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from flask import Blueprint, Flask, abort, current_app, jsonify, render_template, request
@@ -43,6 +44,48 @@ def _resolve_shapes_path(path):
     return candidate
 
 
+def _normalize_endpoint(url):
+    return url.strip().rstrip('/')
+
+
+def _allowed_endpoints():
+    """The endpoints the client may choose from as list, or None if the
+    configuration does not enumerate them (no restriction or a callable)."""
+    allowed = current_app.config['SHACLVIEWER_ALLOWED_ENDPOINTS']
+    if allowed is None or callable(allowed):
+        return None
+    return [allowed] if isinstance(allowed, str) else list(allowed)
+
+
+def _check_endpoint(url):
+    """Abort unless the server may query the SPARQL endpoint `url`.
+
+    The endpoint is chosen by the client, so the server would otherwise send
+    requests to any address it can reach, e.g., services in its internal
+    network. Only http(s) URLs are accepted and, if the application is
+    configured with `allowed_endpoints`, only those.
+    """
+    if any(ch.isspace() or ord(ch) < 32 for ch in url):
+        abort(400)
+    try:
+        parts = urlsplit(url)
+        parts.port  # raises ValueError for an invalid port
+    except ValueError:
+        abort(400)
+    if parts.scheme not in ('http', 'https') or not parts.hostname:
+        abort(400)
+
+    allowed = current_app.config['SHACLVIEWER_ALLOWED_ENDPOINTS']
+    if allowed is None:
+        return
+    if callable(allowed):
+        permitted = bool(allowed(url))
+    else:
+        permitted = _normalize_endpoint(url) in {_normalize_endpoint(a) for a in _allowed_endpoints()}
+    if not permitted:
+        abort(403)
+
+
 def _is_select_query(query):
     """Return True only if `query` is a single, syntactically valid SPARQL
     SELECT query.
@@ -73,6 +116,8 @@ def _shaclapi_params():
         params.pop(key, None)
     if 'query' in params and not _is_select_query(params['query']):
         abort(400)
+    if 'external_endpoint' in params:
+        _check_endpoint(params['external_endpoint'])
     params['schemaDir'] = _resolve_shapes_path(path)
     params['outputDirectory'] = current_app.config['SHACLVIEWER_OUTPUT_DIR']
     return params
@@ -120,6 +165,7 @@ def graph3d():
     return render_template(
         'shaclviewer/graph_3d.jinja2',
         graph_json=_graph_to_json(graph),
+        endpoints=_allowed_endpoints(),
     )
 
 
@@ -133,6 +179,7 @@ def graph2d():
     return render_template(
         'shaclviewer/graph_2d.jinja2',
         graph_json=_graph_to_json(graph),
+        endpoints=_allowed_endpoints(),
     )
 
 
@@ -179,6 +226,7 @@ def get_data_node():
     endpoint = request.form.get('endpoint')
     if query is None or endpoint is None:
         return jsonify({})
+    _check_endpoint(endpoint)
     if not _is_select_query(query):
         abort(400)
     sparql = SPARQLWrapper(endpoint)
@@ -188,7 +236,7 @@ def get_data_node():
     return jsonify(results)
 
 
-def init_app(app, url_prefix='/shaclviewer', shapes_dir=None, output_dir=None):
+def init_app(app, url_prefix='/shaclviewer', shapes_dir=None, output_dir=None, allowed_endpoints=None):
     """Mount the SHACLViewer into an existing Flask application.
 
     :param app: the Flask application to register the viewer with
@@ -201,6 +249,14 @@ def init_app(app, url_prefix='/shaclviewer', shapes_dir=None, output_dir=None):
                        defaults to the environment variable
                        SHACLVIEWER_OUTPUT_DIR or, if unset, a directory in
                        the system's temporary directory
+    :param allowed_endpoints: the SPARQL endpoints the viewer may query, as
+                       list of URLs (compared without trailing slash) or as
+                       function that takes a URL and returns whether it is
+                       allowed. If None, any http(s) endpoint is allowed,
+                       so the server can be made to send requests to any
+                       address it can reach. Defaults to the comma-separated
+                       URLs in the environment variable
+                       SHACLVIEWER_ALLOWED_ENDPOINTS, if set and not empty.
     """
     # explicit argument > value already in app.config > environment > default
     for key, value, env, default in (
@@ -211,13 +267,19 @@ def init_app(app, url_prefix='/shaclviewer', shapes_dir=None, output_dir=None):
             app.config[key] = value
         else:
             app.config.setdefault(key, os.environ.get(env, default))
+    if allowed_endpoints is not None:
+        app.config['SHACLVIEWER_ALLOWED_ENDPOINTS'] = allowed_endpoints
+    elif 'SHACLVIEWER_ALLOWED_ENDPOINTS' not in app.config:
+        from_env = os.environ.get('SHACLVIEWER_ALLOWED_ENDPOINTS', '')
+        app.config['SHACLVIEWER_ALLOWED_ENDPOINTS'] = [e.strip() for e in from_env.split(',') if e.strip()] or None
     app.register_blueprint(bp, url_prefix=url_prefix)
 
 
 def create_app(**config):
     """Create a standalone Flask application serving only the SHACLViewer.
 
-    Keyword arguments (`shapes_dir`, `output_dir`) are passed to `init_app`.
+    Keyword arguments (`shapes_dir`, `output_dir`, `allowed_endpoints`) are
+    passed to `init_app`.
     """
     # The blueprint ships its own static files, so the app needs none.
     app = Flask(__name__, static_folder=None)

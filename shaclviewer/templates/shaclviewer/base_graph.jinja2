@@ -19,6 +19,7 @@
         "graph":      {{ graph_json | tojson }},
         "path":       {{ request.args.get("path") | tojson }},
         "altViewUrl": {% block alt_view_url %}"#"{% endblock %},
+        "endpoints":  {{ endpoints | tojson }},
         "urls": {
             "validation": {{ url_for('shaclviewer.validation_shacl_api') | tojson }},
             "reduce":     {{ url_for('shaclviewer.reduce_shacl_api') | tojson }},
