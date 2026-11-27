@@ -635,9 +635,7 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
             external_endpoint: endpoint,
             query:             `PREFIX ub:<http://swat.cse.lehigh.edu/onto/univ-bench.owl#> PREFIX :<http://example.com/>${node.query}`,
             path:              config.path,
-            targetShape:       node.id.replace('&lt;', '<').replace('&gt;', '>'),
-            backend:           'travshacl',
-            output_format:     'test'
+            targetShape:       node.id.replace('&lt;', '<').replace('&gt;', '>')
         };
 
         const ajaxError = (jqXHR, exception, targetNode) => {

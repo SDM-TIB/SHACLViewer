@@ -20,14 +20,13 @@ bp = Blueprint(
 DEFAULT_SHAPES_DIR = '/shapes'
 DEFAULT_OUTPUT_DIR = os.path.join(tempfile.gettempdir(), 'shaclviewer-output')
 
-# Parameters of the shaclAPI that must never be taken from the client:
-# the schema location (and the config file, which can point anywhere on the
-# file system) as well as the output location are decided by the server.
-_SERVER_CONTROLLED_PARAMS = (
-    'config',
-    'schemaDir', 'schema_directory',
-    'outputDirectory', 'output_directory',
-)
+# The shaclAPI reads many more parameters than the viewer needs. They control,
+# e.g., the config file to load (any JSON file on the server), the memory
+# and parallelism of the validation, and what is written to disk. Only the
+# parameters in _CLIENT_PARAMS are taken from the client; the others are
+# set by the server. Everything else the client sends is dropped.
+_CLIENT_PARAMS = ('external_endpoint', 'query', 'targetShape')
+_SERVER_PARAMS = {'backend': 'travshacl', 'output_format': 'test'}
 
 
 def _shapes_dir():
@@ -112,19 +111,20 @@ def _is_select_query(query):
 def _shaclapi_params():
     """Build the parameters for the shaclAPI from the request.
 
-    The client only names the shape schema by its path relative to the shapes
-    directory (parameter `path`). The absolute locations are set here.
+    The client names the shape schema by its path relative to the shapes
+    directory (parameter `path`) and chooses the endpoint, the target query,
+    and the target shape. All other parameters, including the absolute
+    locations of the schema and the output, are set by the server.
     """
-    params = request.form.to_dict()
-    path = params.pop('path', None)
+    path = request.form.get('path')
     if path is None:
         abort(400)
-    for key in _SERVER_CONTROLLED_PARAMS:
-        params.pop(key, None)
+    params = {key: value for key, value in request.form.items() if key in _CLIENT_PARAMS}
     if 'query' in params and not _is_select_query(params['query']):
         abort(400)
     if 'external_endpoint' in params:
         _check_endpoint(params['external_endpoint'])
+    params.update(_SERVER_PARAMS)
     params['schemaDir'] = _resolve_shapes_path(path)
     params['outputDirectory'] = current_app.config['SHACLVIEWER_OUTPUT_DIR']
     return params
