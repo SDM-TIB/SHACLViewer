@@ -10,6 +10,7 @@
  */
 
 import { BootstrapTreeView } from 'simple-treeview';
+import { buildDataTableHtml, escapeHtml } from './html.js';
 
 const nodes        = [];
 const links        = [];
@@ -651,7 +652,7 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
                 abort:       ': Ajax request aborted.'
             };
             const msg = errorMap[jqXHR.status] || exceptionMap[exception] ||
-                        ': Uncaught Error.\n' + jqXHR.responseText;
+                        ': Uncaught Error.\n' + escapeHtml(jqXHR.responseText);
             $('#flash').append(window.flashMessage(targetNode.id + msg, 'danger'));
             delete requestMap[targetNode.id];
 
@@ -1073,17 +1074,8 @@ export function initAll(Graph, config, { updateNode3d, focusNode, updateLinkDist
 
     document.querySelector('#ViewDataBtn').onclick = () => {
         const dataIndex = selectedNode.columns.indexOf('Data');
-        let html = '<table id="myTable" class="display"><thead><tr>';
-        selectedNode.columns.forEach(col => { html += `<th>${col}</th>`; });
-        html += '<th>View Data</th></tr></thead><tbody>';
-        selectedNode.data.forEach(row => {
-            html += '<tr>';
-            row.forEach(cell => { html += `<td>${cell}</td>`; });
-            html += `<td><button query-data="${row[dataIndex]}" class="btn btn-primary view-data-graph btn-view-data">View</button></td>`;
-            html += '</tr>';
-        });
-        html += '</tbody></table>';
-        document.getElementById('data-table').innerHTML = html;
+        document.getElementById('data-table').innerHTML =
+            buildDataTableHtml(selectedNode.columns, selectedNode.data, dataIndex);
         $('#myTable').DataTable();
         $('#myTable').on('click', '.view-data-graph', function () {
             showDataGraph(selectedNode, $(this).attr('query-data'));
